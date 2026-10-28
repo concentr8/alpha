@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Concentr8: start the first task</title>
+<meta name="description" content="Concentr8 calls you at the time you pick, asks which task you will start and when, then keeps distractions away on your Mac. Made for Berkeley students with ADHD, by Berkeley students. Also on Windows and Linux (early versions).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22%3E%3Ccircle cx=%2264%22 cy=%2264%22 r=%2264%22 fill=%22%23CFE8C4%22/%3E%3Cg transform=%22translate%2818.1 20.3%29 scale%280.717%29%22%3E%3Cpath fill=%22%23855B52%22 d=%22M63.29,9.93c14.92,0.22,16.4,3.61,20.77,3.73c6.32,0.18,15.98-11.97,29.07-0.99 c12.9,10.82,2.39,27.8,2.39,27.8s7.18,12.72,8.02,32.1c0.61,14.03-4.79,31.49-29,41.39c-22.29,9.12-55.55,7.3-75.88-8.31 C2.9,93.56,4.01,75.92,4.44,69.91c1.13-15.77,8.02-28.44,8.02-28.44s-10.19-20.15,2.25-29.7c13.66-10.49,23.38,1.86,29,1.41 C47.8,12.84,49.14,9.72,63.29,9.93z%22/%3E%3Cpath fill=%22%23B99277%22 d=%22M35.98,20.77c-0.19-1.11-7.43-8.29-14.92-0.99c-5.77,5.63,0,15.42,0.99,14.64 c0.76-0.6,3.56-4.21,6.83-7.32C32.23,23.91,36.05,21.2,35.98,20.77z%22/%3E%3Cpath fill=%22%23B99277%22 d=%22M92.5,20.84c-0.05,0.62,3.81,2.95,7.32,6.26c3.55,3.35,6.75,7.67,7.32,7.6 c1.13-0.14,5.98-9.64-0.35-14.99S92.64,19.01,92.5,20.84z%22/%3E%3Cpath fill=%22%23F2A258%22 d=%22M64.51,60.38c14.64,0,23.42,16.52,22.9,26.84c-0.47,9.39-5.82,17.18-23.84,17.08 c-18.02-0.09-22.59-8.36-22.9-17.18C40.39,79.24,46.02,60.38,64.51,60.38z%22/%3E%3Cpath fill=%22%23171716%22 d=%22M92.92,59.7c0.33,4.16-1.9,7.95-6.17,7.63c-4.12-0.32-7.13-3.66-7.13-7.84s2.22-7.14,5.56-7.6 C89.26,51.32,92.45,53.79,92.92,59.7z%22/%3E%3Cpath fill=%22%232F3030%22 d=%22M74.55,76.99c-0.34,4.16-3.1,8.61-11.12,8.33c-6.73-0.24-9.9-4.72-10-8.89 c-0.14-5.89,3-8.06,10.61-8.17C72.72,68.15,75.02,71.27,74.55,76.99z%22/%3E%3Cpath fill=%22%23171716%22 d=%22M48.37,61.25c-0.43,4.15-4.33,7.06-7.98,6.17c-4.01-0.98-5.81-5.2-4.97-9.29 c0.75-3.66,3.96-6.51,7.6-6.1C46.82,52.45,48.91,56.02,48.37,61.25z%22/%3E%3Cpath fill=%22%232F3030%22 d=%22M63.99,95.04c5.49,0,8.49-3.03,9.34-3.87s1.99-2.28,3.75-0.84c1.5,1.22,0.02,3.12-0.66,3.85 c-1.22,1.31-4.9,5.31-12.93,4.95c-7.88-0.35-10.91-3.92-11.76-4.76c-0.84-0.84-2.25-3-0.66-4.22c1.91-1.46,2.53,0.19,4.5,1.78 S58.78,95.04,63.99,95.04z%22/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d2a26;
+  --mist:#eef3ef;
+  --paper:#f9fbf8;
+  --call:#1c7a52;
+  --call-deep:#14573a;
+  --sun:#ffd666;
+  --coral:#d9482b;
+  --mute:#52645f;
+  --line:#cfdcd5;
+  --display:'Bricolage Grotesque','Avenir Next',system-ui,sans-serif;
+  --text:'Atkinson Hyperlegible','Atkinson Hyperlegible Next',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#e9f1ec; --mist:#0b1f1c; --paper:#0f2723; --call:#4cc38a; --call-deep:#2f9c69;
+    --mute:#9bb2aa; --line:#254039; --coral:#ff7a5c;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--mist);color:var(--ink);font:19px/1.6 var(--text);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px;border-radius:4px}
+.wrap{max-width:68rem;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.08;margin:0;letter-spacing:-.02em}
+p{margin:0}
+
+/* top bar */
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+.brand{display:flex;align-items:center;gap:10px;font:700 1.25rem var(--display);letter-spacing:-.01em;text-decoration:none}
+.brand svg{width:34px;height:34px;display:block;flex:none}
+/* the logo: bear + name + who built it, always dark */
+.lockup{background:#0d2a26;color:#f1f6f2;border-radius:14px;padding:8px 18px 8px 8px;gap:12px}
+.lockup svg{width:38px;height:38px}
+.lockup .div{width:1.5px;height:30px;background:#2c4a43;flex:none}
+.lockup .by{font:700 .68rem/1.3 var(--text);letter-spacing:.07em;text-transform:uppercase;color:#9fd8b7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lockup{border:1px solid var(--line)}}
+@media (max-width:520px){header a.top,header a.cta{display:none}.lockup .by{white-space:nowrap}.lockup{gap:9px;padding:6px 12px 6px 6px}.lockup svg{width:30px;height:30px}.lockup .name{font-size:1.05rem}.lockup .by{font-size:.58rem}.lockup .div{height:24px}}
+header a.top{font-size:.95rem;color:var(--mute);text-decoration:none;border-bottom:1px solid var(--line)}
+.top-links{display:flex;gap:18px;align-items:center}
+header a.cta{font:700 .95rem var(--display);color:#fff;background:var(--call-deep);padding:9px 16px;border-radius:10px;text-decoration:none;border:0}
+header a.cta:hover{background:var(--call)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--sun);color:#0d2a26;padding:8px 14px;border-radius:8px;font-weight:700;z-index:9}
+.skip:focus{left:12px}
+.later{display:none;font-size:.9rem;color:var(--mute);margin-top:12px;max-width:30rem}
+[data-os="mac"] .note{display:none}
+[data-os="mac"] .later{display:block}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:48px 0 88px}
+.hero h1{font-size:clamp(2.5rem,6vw,4.4rem)}
+.hero .lede{font-size:1.2rem;color:var(--mute);max-width:30rem;margin:22px 0 30px}
+.btn{display:inline-block;background:var(--call-deep);color:#fff;text-decoration:none;font:700 1.1rem var(--display);padding:16px 26px;border-radius:12px;transition:transform .15s,background .15s}
+.btn:hover{background:var(--call);transform:translateY(-1px)}
+.others{margin-top:16px;font-size:.95rem;color:var(--mute);display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.others a{color:var(--mute)}
+.others a.soon{opacity:.55;pointer-events:none;text-decoration:none}
+.ver{font-size:.85rem;color:var(--mute);margin-top:10px;min-height:1.2em}
+.onphone{display:none;font-size:1rem;margin:0 0 18px;max-width:30rem;padding:14px 16px;border-radius:12px;background:var(--paper);border:1px solid var(--line)}
+.onphone button{margin-top:10px;font:700 .95rem var(--text);padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--mist);color:var(--ink);cursor:pointer}
+[data-os="phone"] .onphone{display:block}
+[data-os="win"] .note,[data-os="linux"] .note{font-size:1.02rem;border-left-width:6px}
+.small{font-size:.9rem;color:var(--mute);margin-top:16px;max-width:30rem}
+.note{font-size:.95rem;margin-top:18px;max-width:30rem;padding:12px 14px;border-left:4px solid var(--sun);background:rgba(255,214,102,.18);border-radius:0 10px 10px 0}
+
+/* setup */
+ol.setup{list-style:none;counter-reset:s;margin:44px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+ol.setup li{min-width:0;counter-increment:s;border-top:3px solid var(--call-deep);padding-top:18px}
+ol.setup li::before{content:counter(s);display:block;font:700 2.4rem/1 var(--display);color:var(--call-deep);margin-bottom:12px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) ol.setup li{border-color:var(--call)}:root:not([data-theme="light"]) ol.setup li::before{color:var(--call)}}
+ol.setup h3{font-size:1.3rem;margin-bottom:6px}
+ol.setup p{color:var(--mute)}
+ol.setup p+p{margin-top:10px}
+.cmd{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--paper);border:1px solid var(--line)}
+.cmd code{flex:1;min-width:0;font:.92rem ui-monospace,Menlo,monospace;overflow-wrap:anywhere}
+.cmd button{flex:none;font:700 .85rem var(--text);padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--mist);color:var(--ink);cursor:pointer}
+
+/* the call */
+.phone{background:var(--ink);color:#f1f6f2;border-radius:30px;padding:26px 22px 28px;max-width:25rem;margin-left:auto;box-shadow:0 30px 60px -28px rgba(13,42,38,.6)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .phone{background:#06150f;border:1px solid var(--line)}}
+/* dark mode: light green surfaces need dark text to stay readable (WCAG AA 4.5:1) */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn,:root:not([data-theme="light"]) header a.cta,:root:not([data-theme="light"]) .line.b{background:var(--call);color:#06231a}:root:not([data-theme="light"]) .btn:hover,:root:not([data-theme="light"]) header a.cta:hover{background:#6fd3a2}}
+.phone .who{display:flex;align-items:center;gap:12px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.14);margin-bottom:18px}
+.phone .dot{width:46px;height:46px;flex:none}
+.phone .dot svg{width:100%;height:100%;display:block}
+.phone .who b{display:block;font:700 1.05rem var(--display)}
+.phone .who span{font-size:.85rem;opacity:.7}
+.line{max-width:88%;padding:11px 15px;border-radius:18px;margin:10px 0;font-size:1rem;line-height:1.45;opacity:0;transform:translateY(6px);animation:in .5s forwards}
+.line.a{background:rgba(255,255,255,.12);border-bottom-left-radius:5px}
+.line.b{background:var(--call);color:#fff;margin-left:auto;border-bottom-right-radius:5px}
+.line:nth-of-type(1){animation-delay:.5s}
+.line:nth-of-type(2){animation-delay:2.1s}
+.line:nth-of-type(3){animation-delay:3.4s}
+.line:nth-of-type(4){animation-delay:4.7s}
+.line:nth-of-type(5){animation-delay:6s}
+@keyframes in{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.line{animation:none;opacity:1;transform:none}html{scroll-behavior:auto}.btn{transition:none}}
+
+/* sections */
+section{padding:84px 0;border-top:1px solid var(--line)}
+section h2{font-size:clamp(1.9rem,4vw,2.9rem);max-width:34rem}
+.intro{color:var(--mute);max-width:36rem;margin-top:16px}
+
+/* the day */
+.day{margin-top:48px;display:grid;gap:0;max-width:44rem}
+.day li{list-style:none;display:grid;grid-template-columns:6.2rem 1fr;gap:18px;padding:22px 0;border-bottom:1px solid var(--line)}
+.day time{font:700 1.5rem var(--display);color:var(--call-deep)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .day time{color:var(--call)}}
+.day li.warn time{color:var(--coral)}
+.day h3{font-size:1.3rem;margin-bottom:4px}
+.day p{color:var(--mute)}
+.day ul{padding:0;margin:0}
+
+/* features */
+.feat{margin-top:44px;display:grid;grid-template-columns:1fr 1fr;gap:44px 64px}
+.feat h3{font-size:1.35rem;margin-bottom:8px}
+.feat p{color:var(--mute)}
+
+/* research: always a dark panel, numbers in sun yellow */
+.lab{background:#0d2a26;color:#f1f6f2;border-radius:28px;padding:60px 44px 44px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lab{background:#06150f;border:1px solid var(--line)}}
+.lab h2{max-width:38rem}
+.lab h2 em{font-style:normal;color:var(--sun)}
+.lab .intro{color:#b7cbc3}
+ul.studies{list-style:none;margin:44px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+ul.studies li{display:flex;flex-direction:column;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:26px 22px 20px}
+.studies .big{display:block;white-space:nowrap;font:700 clamp(2.2rem,3.6vw,2.9rem)/1 var(--display);letter-spacing:-.03em;color:var(--sun)}
+.studies .find{margin-top:14px;font-size:1rem;line-height:1.5;color:#e6efe9}
+.studies .so{margin-top:12px;font:700 1.02rem/1.35 var(--display);color:#9fd8b7}
+.studies .so::before{content:"\2192\00a0";color:var(--sun)}
+.studies .src{margin-top:auto;padding-top:18px;font-size:.82rem;line-height:1.4;color:#9bb2aa;text-decoration:none}
+.studies .src:hover{color:#fff;text-decoration:underline}
+.lab .fine{margin-top:28px;font-size:.88rem;color:#9bb2aa;max-width:46rem}
+@media (max-width:980px){ul.studies{grid-template-columns:1fr 1fr}}
+@media (max-width:620px){ul.studies{grid-template-columns:1fr}.lab{padding:42px 20px 30px;border-radius:22px}}
+
+/* faq */
+details{border-bottom:1px solid var(--line);padding:18px 0;max-width:46rem}
+summary{cursor:pointer;font:700 1.2rem var(--display);list-style:none;display:flex;justify-content:space-between;gap:20px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.5rem;line-height:1;color:var(--call-deep)}
+details[open] summary::after{content:"\2013"}
+details p{margin-top:12px;color:var(--mute)}
+.faq{margin-top:36px}
+ol.steps{margin:12px 0 0;padding-left:1.3rem;color:var(--mute)}
+ol.steps li{margin:6px 0}
+
+/* closing */
+.last{background:var(--ink);color:#f1f6f2;border-radius:28px;padding:56px 36px;margin:20px 0 70px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .last{background:#06150f;border:1px solid var(--line)}}
+.last h2{max-width:26rem}
+.last .btn{background:var(--sun);color:#0d2a26;margin-top:26px}
+.last .btn:hover{background:#ffe08a}
+footer{padding:0 0 48px;color:var(--mute);font-size:.9rem}
+
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;gap:40px;padding-bottom:64px}
+  .phone{margin:0}
+  .feat{grid-template-columns:1fr;gap:34px}
+  ol.setup{grid-template-columns:1fr;gap:30px}
+  .day li{grid-template-columns:1fr;gap:4px}
+  section{padding:60px 0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#dl">Skip to the download</a>
+<div class="wrap">
+  <header>
+    <a class="brand lockup" href="#top" aria-label="Concentr8, by and for UC Berkeley students"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" aria-hidden="true" focusable="false"><circle cx="64" cy="64" r="64" fill="#CFE8C4"/><g transform="translate(18.1 20.3) scale(0.717)"><path fill="#855B52" d="M63.29,9.93c14.92,0.22,16.4,3.61,20.77,3.73c6.32,0.18,15.98-11.97,29.07-0.99 c12.9,10.82,2.39,27.8,2.39,27.8s7.18,12.72,8.02,32.1c0.61,14.03-4.79,31.49-29,41.39c-22.29,9.12-55.55,7.3-75.88-8.31 C2.9,93.56,4.01,75.92,4.44,69.91c1.13-15.77,8.02-28.44,8.02-28.44s-10.19-20.15,2.25-29.7c13.66-10.49,23.38,1.86,29,1.41 C47.8,12.84,49.14,9.72,63.29,9.93z"/><path fill="#B99277" d="M35.98,20.77c-0.19-1.11-7.43-8.29-14.92-0.99c-5.77,5.63,0,15.42,0.99,14.64 c0.76-0.6,3.56-4.21,6.83-7.32C32.23,23.91,36.05,21.2,35.98,20.77z"/><path fill="#B99277" d="M92.5,20.84c-0.05,0.62,3.81,2.95,7.32,6.26c3.55,3.35,6.75,7.67,7.32,7.6 c1.13-0.14,5.98-9.64-0.35-14.99S92.64,19.01,92.5,20.84z"/><path fill="#F2A258" d="M64.51,60.38c14.64,0,23.42,16.52,22.9,26.84c-0.47,9.39-5.82,17.18-23.84,17.08 c-18.02-0.09-22.59-8.36-22.9-17.18C40.39,79.24,46.02,60.38,64.51,60.38z"/><path fill="#171716" d="M92.92,59.7c0.33,4.16-1.9,7.95-6.17,7.63c-4.12-0.32-7.13-3.66-7.13-7.84s2.22-7.14,5.56-7.6 C89.26,51.32,92.45,53.79,92.92,59.7z"/><path fill="#2F3030" d="M74.55,76.99c-0.34,4.16-3.1,8.61-11.12,8.33c-6.73-0.24-9.9-4.72-10-8.89 c-0.14-5.89,3-8.06,10.61-8.17C72.72,68.15,75.02,71.27,74.55,76.99z"/><path fill="#171716" d="M48.37,61.25c-0.43,4.15-4.33,7.06-7.98,6.17c-4.01-0.98-5.81-5.2-4.97-9.29 c0.75-3.66,3.96-6.51,7.6-6.1C46.82,52.45,48.91,56.02,48.37,61.25z"/><path fill="#2F3030" d="M63.99,95.04c5.49,0,8.49-3.03,9.34-3.87s1.99-2.28,3.75-0.84c1.5,1.22,0.02,3.12-0.66,3.85 c-1.22,1.31-4.9,5.31-12.93,4.95c-7.88-0.35-10.91-3.92-11.76-4.76c-0.84-0.84-2.25-3-0.66-4.22c1.91-1.46,2.53,0.19,4.5,1.78 S58.78,95.04,63.99,95.04z"/></g></svg><span class="name">Concentr8</span><span class="div" aria-hidden="true"></span><span class="by" aria-hidden="true">By and for<br>UC Berkeley students</span></a>
+    <nav class="top-links"><a class="top" href="#day">How it works</a> <a class="top" href="#research">Research</a> <a class="top" href="#claude">Claude</a> <a class="top" href="#faq">Questions</a> <a class="cta" href="#dl">Download</a></nav>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <h1>The hard part is starting. We call you for that.</h1>
+        <p class="lede">A short call at the time you pick asks which task you will start and when. Then your Mac keeps distractions away. For Berkeley students with ADHD.</p>
+        <p class="onphone">Concentr8 runs on your laptop. Open this page there.<br><button type="button" id="copy">Copy the link</button> <a id="mail" href="mailto:?subject=Concentr8&amp;body=https%3A%2F%2Fconcentr8.github.io">Email it to me</a></p>
+        <a class="btn" id="dl" data-dl href="{{DOWNLOAD_BASE}}/Concentr8-arm64.dmg">Download for Mac</a>
+        <p class="ver" id="ver" aria-live="polite"></p>
+        <div class="others" aria-label="Other downloads">
+          <a data-file="Concentr8-arm64.dmg" href="{{DOWNLOAD_BASE}}/Concentr8-arm64.dmg">Mac (Apple Silicon)</a>
+          <a data-file="Concentr8-x64.dmg" href="{{DOWNLOAD_BASE}}/Concentr8-x64.dmg">Mac (Intel)</a>
+          <a data-file="Concentr8-x64.exe" href="{{DOWNLOAD_BASE}}/Concentr8-x64.exe">Windows</a>
+          <a data-file="Concentr8-x64.AppImage" href="{{DOWNLOAD_BASE}}/Concentr8-x64.AppImage">Linux</a>
+        </div>
+        <p class="note"><strong>Windows and Linux are early versions</strong> without distraction blocking. Full versions are coming.</p>
+        <p class="later">Windows and Linux: early versions, full versions coming.</p>
+        <p class="small">Not sure which Mac? Apple menu, About This Mac. US phone numbers only.</p>
+      </div>
+
+      <div class="phone" role="img" aria-label="Example of the planning call at 6 p.m. Concentr8 asks which task you will start. You answer: the CS 188 project, at nine thirty. Concentr8 confirms.">
+        <div class="who"><div class="dot"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" aria-hidden="true" focusable="false"><circle cx="64" cy="64" r="64" fill="#CFE8C4"/><g transform="translate(18.1 20.3) scale(0.717)"><path fill="#855B52" d="M63.29,9.93c14.92,0.22,16.4,3.61,20.77,3.73c6.32,0.18,15.98-11.97,29.07-0.99 c12.9,10.82,2.39,27.8,2.39,27.8s7.18,12.72,8.02,32.1c0.61,14.03-4.79,31.49-29,41.39c-22.29,9.12-55.55,7.3-75.88-8.31 C2.9,93.56,4.01,75.92,4.44,69.91c1.13-15.77,8.02-28.44,8.02-28.44s-10.19-20.15,2.25-29.7c13.66-10.49,23.38,1.86,29,1.41 C47.8,12.84,49.14,9.72,63.29,9.93z"/><path fill="#B99277" d="M35.98,20.77c-0.19-1.11-7.43-8.29-14.92-0.99c-5.77,5.63,0,15.42,0.99,14.64 c0.76-0.6,3.56-4.21,6.83-7.32C32.23,23.91,36.05,21.2,35.98,20.77z"/><path fill="#B99277" d="M92.5,20.84c-0.05,0.62,3.81,2.95,7.32,6.26c3.55,3.35,6.75,7.67,7.32,7.6 c1.13-0.14,5.98-9.64-0.35-14.99S92.64,19.01,92.5,20.84z"/><path fill="#F2A258" d="M64.51,60.38c14.64,0,23.42,16.52,22.9,26.84c-0.47,9.39-5.82,17.18-23.84,17.08 c-18.02-0.09-22.59-8.36-22.9-17.18C40.39,79.24,46.02,60.38,64.51,60.38z"/><path fill="#171716" d="M92.92,59.7c0.33,4.16-1.9,7.95-6.17,7.63c-4.12-0.32-7.13-3.66-7.13-7.84s2.22-7.14,5.56-7.6 C89.26,51.32,92.45,53.79,92.92,59.7z"/><path fill="#2F3030" d="M74.55,76.99c-0.34,4.16-3.1,8.61-11.12,8.33c-6.73-0.24-9.9-4.72-10-8.89 c-0.14-5.89,3-8.06,10.61-8.17C72.72,68.15,75.02,71.27,74.55,76.99z"/><path fill="#171716" d="M48.37,61.25c-0.43,4.15-4.33,7.06-7.98,6.17c-4.01-0.98-5.81-5.2-4.97-9.29 c0.75-3.66,3.96-6.51,7.6-6.1C46.82,52.45,48.91,56.02,48.37,61.25z"/><path fill="#2F3030" d="M63.99,95.04c5.49,0,8.49-3.03,9.34-3.87s1.99-2.28,3.75-0.84c1.5,1.22,0.02,3.12-0.66,3.85 c-1.22,1.31-4.9,5.31-12.93,4.95c-7.88-0.35-10.91-3.92-11.76-4.76c-0.84-0.84-2.25-3-0.66-4.22c1.91-1.46,2.53,0.19,4.5,1.78 S58.78,95.04,63.99,95.04z"/></g></svg></div><div><b>Concentr8</b><span>Example call, 6:00 p.m.</span></div></div>
+        <div class="line a">Good evening. Two things are due soon: Project 2 for CompSci 188, and the reading quiz. Which one will you start with?</div>
+        <div class="line b">The project.</div>
+        <div class="line a">When will you start?</div>
+        <div class="line b">Nine thirty.</div>
+        <div class="line a">Locked in: Project 2 at nine thirty. Good luck.</div>
+      </div>
+    </div>
+
+    <section id="setup">
+      <h2>Ready in three minutes.</h2>
+      <ol class="setup">
+        <li>
+          <h3>Install it</h3>
+          <p>Drag it into Applications. If macOS says it is damaged, run:</p>
+          <div class="cmd"><code>xattr -cr /Applications/Concentr8.app</code><button type="button" data-copy>Copy</button></div>
+        </li>
+        <li>
+          <h3>Add your courses</h3>
+          <p>Paste your bCourses token, or skip it and type any task.</p>
+        </li>
+        <li>
+          <h3>Turn on the call</h3>
+          <p>In Settings: your number and the time you want the call.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="day">
+      <h2>One call. Then your Mac helps you follow through.</h2>
+      <ul class="day" style="padding:0">
+        <li><time>6:00</time><div><h3>The call</h3><p>At the time you picked: which task, and when? One sentence.</p></div></li>
+        <li><time>9:30</time><div><h3>You start</h3><p>Your session begins at the time you said.</p></div></li>
+        <li class="warn"><time>9:41</time><div><h3>You drift</h3><p>A gentle warning, then back to your work.</p></div></li>
+        <li><time>10:15</time><div><h3>You are stuck</h3><p>One minute of breathing, then one tiny step.</p></div></li>
+        <li><time>11:00</time><div><h3>A break</h3><p>Take it on purpose. No nudges.</p></div></li>
+      </ul>
+    </section>
+
+    <section id="research">
+      <div class="lab">
+        <h2>Built on research, <em>not hunches.</em></h2>
+        <p class="intro">Every part of Concentr8 goes back to a study about getting started, several of them with people who have ADHD.</p>
+        <ul class="studies">
+          <li>
+            <span class="big">½ grade</span>
+            <p class="find">College students with ADHD earned about half a grade less in all four years, and fewer stayed enrolled.</p>
+            <p class="so">Why we built Concentr8.</p>
+            <a class="src" href="https://digitalcommons.uri.edu/psy_facpubs/900">DuPaul et al., 2021 · 406 college students</a>
+          </li>
+          <li>
+            <span class="big">Since 1997</span>
+            <p class="find">UC Berkeley researchers have followed girls with ADHD into adulthood. Trouble with school did not simply fade with age.</p>
+            <p class="so">Why it checks in every day, not once.</p>
+            <a class="src" href="https://news.berkeley.edu/2012/08/14/adhdyoungadults/">Hinshaw lab, UC Berkeley · 228 participants</a>
+          </li>
+          <li>
+            <span class="big">94 studies</span>
+            <p class="find">Deciding exactly when you will start, called an if-then plan, clearly helps people follow through.</p>
+            <p class="so">So the call asks: which task, and when?</p>
+            <a class="src" href="https://kops.uni-konstanz.de/entities/publication/2e749bfb-8533-437c-8203-7e788c910c5f">Gollwitzer &amp; Sheeran, 2006 · meta-analysis</a>
+          </li>
+          <li>
+            <span class="big">If → then</span>
+            <p class="find">If-then plans helped children with ADHD hold back unwanted responses, up to the level of children without ADHD.</p>
+            <p class="so">The same idea, tested with ADHD.</p>
+            <a class="src" href="https://www.socmot.uni-konstanz.de/publications/implementation-intentions-facilitate-response-inhibition-adhd-children">Gawrilow &amp; Gollwitzer, 2008</a>
+          </li>
+          <li>
+            <span class="big">2 in 3</span>
+            <p class="find">Adults with ADHD who learned skills like breaking big tasks into small steps: more than 2 in 3 saw symptoms drop by 30% or more, against about 1 in 3 with relaxation training.</p>
+            <p class="so">So when you are stuck, you get one tiny first step.</p>
+            <a class="src" href="https://sciencedaily.com/releases/2010/08/100824161434.htm">Safren et al., JAMA 2010 · randomized trial</a>
+          </li>
+          <li>
+            <span class="big">5 min</span>
+            <p class="find">Five minutes a day of structured breathing, box breathing among them, improved mood over four weeks.</p>
+            <p class="so">So I'm stuck starts with a minute of box breathing.</p>
+            <a class="src" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947">Balban et al., Stanford 2023 · 108 adults</a>
+          </li>
+        </ul>
+        <p class="fine">These studies are why we designed Concentr8 this way. Concentr8 itself has not been tested in a study, and it is not a medical product.</p>
+      </div>
+    </section>
+
+    <section id="claude">
+      <h2>Claude does the thinking.</h2>
+      <div class="feat">
+        <div><h3>Runs the call</h3><p>Cartesia gives it the phone line and the voice.</p></div>
+        <div><h3>Knows your deadlines</h3><p>The call opens with what is actually due.</p></div>
+        <div><h3>Finds a first step</h3><p>Small enough to start in five minutes.</p></div>
+        <div><h3>Checks unclear pages</h3><p>Only the title and address, during a session. Never your screen.</p></div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>Questions</h2>
+      <div class="faq">
+        <details>
+          <summary>macOS says the app is damaged.</summary>
+          <p>It is not, it is just not signed by Apple yet. Run this once in Terminal:</p>
+          <div class="cmd"><code>xattr -cr /Applications/Concentr8.app</code><button type="button" data-copy>Copy</button></div>
+        </details>
+        <details>
+          <summary>Windows says it protected my PC.</summary>
+          <p>Click More info, then Run anyway.</p>
+        </details>
+        <details>
+          <summary>How do I start the Linux version?</summary>
+          <p>Make it runnable, then double-click it. Newer Ubuntu may need libfuse2.</p>
+          <div class="cmd"><code>chmod +x Concentr8-x64.AppImage</code><button type="button" data-copy>Copy</button></div>
+        </details>
+        <details>
+          <summary>Do I get the newest version?</summary>
+          <p>Yes. The app tells you when a new one is out.</p>
+        </details>
+        <details>
+          <summary>What do you store?</summary>
+          <p>Your phone number, call time and assignment titles with due dates. Your bCourses token stays on your computer. Deleting your account removes everything.</p>
+        </details>
+        <details>
+          <summary>Why does it need permissions on the Mac?</summary>
+          <p>To see which app you are in and bring you back to your work. You can turn it off in System Settings.</p>
+        </details>
+        <details>
+          <summary>How do I stop the calls?</summary>
+          <p>Say "stop calling me", or turn the call off in the app.</p>
+        </details>
+      </div>
+    </section>
+
+    <div class="last">
+      <h2>Tomorrow at 8, answer one question.</h2>
+      <a class="btn" data-dl href="{{DOWNLOAD_BASE}}/Concentr8-arm64.dmg">Download for Mac</a>
+    </div>
+  </main>
+
+  <footer>Built by and for UC Berkeley students at Cal Hacks 13.0. Not affiliated with UC Berkeley. Not a medical product. Bear from <a href="https://github.com/googlefonts/noto-emoji">Noto Emoji</a> (Apache 2.0). <a id="all" href="{{DOWNLOAD_BASE}}/../..">All versions</a>.</footer>
+</div>
+<script>
+// Shapes the page for the visitor's computer: the big button downloads the right file, phones get a hint,
+// and the newest version (and which files it has) comes from GitHub. Without JavaScript the Mac button still works.
+(function () {
+  try {
+    var ua = navigator.userAgent || '';
+    var plat = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '') + ' ' + ua;
+    var os = /iPhone|iPad|iPod|Android/i.test(ua) ? 'phone'
+      : /Win/i.test(plat) ? 'win'
+      : /Mac/i.test(plat) ? (navigator.maxTouchPoints > 1 ? 'phone' : 'mac')
+      : /Linux|X11|CrOS/i.test(plat) ? 'linux' : 'other';
+    document.documentElement.setAttribute('data-os', os);
+    var dl = document.getElementById('dl');
+    var base = dl.href.replace(/\/[^\/]*$/, '');
+    var pick = { mac: ['Concentr8-arm64.dmg', 'Download for Mac'], win: ['Concentr8-x64.exe', 'Download for Windows'], linux: ['Concentr8-x64.AppImage', 'Download for Linux'] }[os];
+    var buttons = document.querySelectorAll('[data-dl]');
+    if (pick) for (var i = 0; i < buttons.length; i++) { buttons[i].href = base + '/' + pick[0]; buttons[i].textContent = pick[1]; buttons[i].setAttribute('data-file', pick[0]); }
+    else dl.setAttribute('data-file', 'Concentr8-arm64.dmg');
+
+    var m = base.match(/github\.com\/([^\/]+)\/([^\/]+)\/releases/);
+    if (m) {
+      document.getElementById('all').href = 'https://github.com/' + m[1] + '/' + m[2] + '/releases';
+      fetch('https://api.github.com/repos/' + m[1] + '/' + m[2] + '/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (rel) {
+        if (!rel || !rel.tag_name) return;
+        var names = (rel.assets || []).map(function (a) { return a.name; });
+        var when = rel.published_at ? new Date(rel.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+        document.getElementById('ver').textContent = 'Newest version ' + rel.tag_name.replace(/^v/, '') + (when ? ', released ' + when : '');
+        var links = document.querySelectorAll('[data-file]');
+        for (var j = 0; j < links.length; j++) {
+          var f = links[j].getAttribute('data-file');
+          if (names.length && names.indexOf(f) < 0) {
+            if (links[j].hasAttribute('data-dl')) { links[j].href = 'https://github.com/' + m[1] + '/' + m[2] + '/releases'; links[j].textContent = (os === 'win' ? 'Windows' : os === 'linux' ? 'Linux' : 'This') + ' version: coming with the next release'; }
+            else { links[j].classList.add('soon'); links[j].setAttribute('aria-disabled', 'true'); links[j].textContent += ' (with the next version)'; }
+          }
+        }
+      }).catch(function () {});
+    }
+    var cmds = document.querySelectorAll('[data-copy]');
+    for (var k = 0; k < cmds.length; k++) cmds[k].addEventListener('click', function (ev) {
+      var b = ev.currentTarget, text = b.previousElementSibling.textContent;
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 2000); });
+    });
+    var here = location.protocol.indexOf('http') === 0 ? location.href.split('#')[0] : 'https://concentr8.github.io';
+    document.getElementById('mail').href = 'mailto:?subject=' + encodeURIComponent('Concentr8 for my laptop') + '&body=' + encodeURIComponent(here);
+    var copy = document.getElementById('copy');
+    copy.addEventListener('click', function () {
+      var url = location.href.split('#')[0];
+      if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { copy.textContent = 'Copied. Paste it on your laptop.'; }, function () { copy.textContent = url; });
+      else copy.textContent = url;
+    });
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

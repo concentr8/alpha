@@ -1,0 +1,5 @@
+# Local data of the call server (see server/README.md)
+server/data.json
+server/data.json.tmp
+server/build.json
+.DS_Store
