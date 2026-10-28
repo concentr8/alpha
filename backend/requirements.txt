@@ -1,0 +1,9 @@
+# TODO: pin exact versions (fastapi==x.y.z) before the first deploy.
+fastapi
+uvicorn[standard]
+pydantic-settings
+apscheduler
+httpx
+anthropic
+dial-sdk
+pytest
