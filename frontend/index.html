@@ -666,6 +666,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 }
 </style>
   <button class="resume-focus" id="resume-focus" type="button" hidden aria-label="Return to active focus session"></button>
+  <script src="concentr8-server.js"></script>
   <script data-source="app-state.js">
 /* One local record shared by Home and the agent on every page. */
 (() => {
@@ -733,7 +734,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       if(current?.kind==='meditation'){session.phaseElapsedMs=0;session.phaseStartedAt=null;session.status='ready';}
     }
     if(value.canvas)clean.canvas={...clean.canvas,...value.canvas};
-    if (Array.isArray(value.messages)) clean.messages = value.messages.filter(m => m && typeof m.id === 'string' && typeof m.text === 'string').map(m => ({id:m.id, text:m.text.slice(0,2000), taskId:typeof m.taskId==='string'?m.taskId:null,eventId:typeof m.eventId==='string'?m.eventId:null,contextId:typeof m.contextId==='string'?m.contextId:null,proposal:validEvent(m.proposal)?cleanEvent(m.proposal):null}));
+    if (Array.isArray(value.messages)) clean.messages = value.messages.filter(m => m && typeof m.id === 'string' && typeof m.text === 'string').map(m => ({id:m.id, text:m.text.slice(0,2000), taskId:typeof m.taskId==='string'?m.taskId:null,eventId:typeof m.eventId==='string'?m.eventId:null,contextId:typeof m.contextId==='string'?m.contextId:null,proposal:validEvent(m.proposal)?cleanEvent(m.proposal):null,role:m.role==='assistant'?'assistant':'user'}));
     // Upgrade only unchanged sample titles; preserve personal edits and linked dates.
     const sampleTitles=[
       ['problem-set','Problem set','Computer Vision Assignment 1'],
@@ -849,7 +850,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   // Keep saved workflows readable without offering Study Rooms as a new tool.
   const tool=id=>tools.find(t=>t.id===id)||(id==='rooms'?{id:'rooms',name:'Study Rooms',icon:'room'}:undefined);
   const currentTask=()=>S.state.tasks.find(t=>t.id===S.state.activeTaskId);
-  const context=()=>currentTask()?.title||S.state.taskContext||S.state.messages.at(-1)?.text||'';
+  const context=()=>currentTask()?.title||S.state.taskContext||S.state.messages.filter(m=>m.role!=='assistant').at(-1)?.text||'';
   const go=(page,path='')=>window.dispatchEvent(new CustomEvent('articul8:go',{detail:{page,path}}));
   const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   const datePlus=n=>new Date(Date.parse(today()+'T12:00Z')+n*86400000).toISOString().slice(0,10);
@@ -1256,10 +1257,11 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   function profile(path) {
     if(path==='stats'||path==='data')return stats();
     if(path==='personal')return subheading('Personal information','Profile')+'<form class="product-form profile-form" id="profile-form"><label>Name<input name="name" aria-label="Name" maxlength="80" value="'+P.esc(S.state.profile.name)+'"></label><label>Email<input name="email" aria-label="Email" type="email" value="'+P.esc(S.state.profile.email)+'"></label><div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
+    if(path==='call')return window.Concentr8.callPage(subheading('Phone call','Profile'));
     if(path==='account')return subheading('Account & subscription','Profile')+'<div class="profile-detail"><h2>Local prototype</h2><p>Account and billing are not connected.</p></div>';
     if(path==='settings')return subheading('Settings','Profile')+'<form class="product-form profile-form" id="settings-form"><label>Default focus minutes<input name="minutes" aria-label="Default focus minutes" type="number" min="1" max="240" value="'+S.state.settings.focusMinutes+'"></label><label class="check-line"><input name="advance" type="checkbox" '+(S.state.settings.autoAdvance?'checked':'')+'>Advance workflow automatically</label><div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
-    if(path==='privacy')return subheading('Privacy policy','Profile')+'<div class="profile-detail"><h2>Prototype data</h2><p>Tasks, messages and focus history stay in this browser’s local storage.</p><p>Voice input uses your browser’s speech service and may send audio to its provider.</p><p>No Canvas or school account is connected. A production privacy policy is not yet available.</p><button class="wire-button" type="button" data-export-data>Export my data</button></div>';
-    return heading('Profile')+'<div class="profile-menu"><div class="profile-identity"><span class="avatar">'+P.esc((S.state.profile.name||'Y').slice(0,1).toUpperCase())+'</span><h2>'+P.esc(S.state.profile.name||'Your profile')+'</h2></div>'+[['personal','Personal information'],['account','Account & subscription'],['settings','Settings'],['privacy','Privacy policy'],['data','Data']].map(([path,label])=>'<button type="button" data-profile="'+path+'"><span>'+label+'</span>'+P.icon(P.paths.arrow,22)+'</button>').join('')+'</div>';
+    if(path==='privacy')return subheading('Privacy policy','Profile')+'<div class="profile-detail"><h2>Prototype data</h2><p>Tasks, messages and focus history stay in this browser’s local storage.</p><p>When you chat with the agent, your last messages and the titles of your open tasks are sent to the Concentr8 server and to Claude (Anthropic) to write an answer. The server keeps no chat history. If you set up the phone call, the server also stores your phone number, call time, time zone and open task titles until you delete your account.</p><p>Voice input uses your browser’s speech service and may send audio to its provider.</p><p>No Canvas or school account is connected. A production privacy policy is not yet available.</p><button class="wire-button" type="button" data-export-data>Export my data</button></div>';
+    return heading('Profile')+'<div class="profile-menu"><div class="profile-identity"><span class="avatar">'+P.esc((S.state.profile.name||'Y').slice(0,1).toUpperCase())+'</span><h2>'+P.esc(S.state.profile.name||'Your profile')+'</h2></div>'+[['personal','Personal information'],['account','Account & subscription'],['call','Phone call'],['settings','Settings'],['privacy','Privacy policy'],['data','Data']].map(([path,label])=>'<button type="button" data-profile="'+path+'"><span>'+label+'</span>'+P.icon(P.paths.arrow,22)+'</button>').join('')+'</div>';
   }
   document.addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b)return;
@@ -1836,7 +1838,7 @@ function setAgent(open, focusInput=true) {
     onState:renderVoice,
     onComplete:({text,base,submit,surface})=>{
       const message=[base,text].filter(Boolean).join(' ');
-      if(submit)store.send(message);else store.setDraft(message);
+      if(submit){store.send(message);window.Concentr8?.ask();}else store.setDraft(message);
       (surface==='agent'?agentForm:mainForm).querySelector('textarea').focus();
     },
     onError:(message,draft)=>{
@@ -1893,7 +1895,7 @@ function setAgent(open, focusInput=true) {
     inputs.forEach(sizeInput);
   }
   function renderMessages() {
-    const html=store.state.messages.map(message=>{const calendar=CalendarUI.messageMarkup(message);return `<article class="chat-message"><p>${escapeHtml(message.text)}</p><div class="message-actions"><button type="button" class="message-action" data-message-task="${escapeHtml(message.id)}" ${message.taskId?'disabled':''}>${message.taskId?'Added to to-do':'+ To-do'}</button>${message.proposal?'':calendar}<button type="button" class="message-action" data-message-tools="${escapeHtml(message.id)}">Tools</button></div>${message.proposal?calendar:''}</article>`;}).join('');
+    const html=store.state.messages.map(message=>{/* AI-GENERATED: answers of Concentr8 sit on the left, the student's own messages stay on the right. */if(message.role==='assistant')return `<article class="chat-message" style="align-items:flex-start" aria-label="Concentr8"><p>${escapeHtml(message.text)}</p></article>`;const calendar=CalendarUI.messageMarkup(message);return `<article class="chat-message"><p>${escapeHtml(message.text)}</p><div class="message-actions"><button type="button" class="message-action" data-message-task="${escapeHtml(message.id)}" ${message.taskId?'disabled':''}>${message.taskId?'Added to to-do':'+ To-do'}</button>${message.proposal?'':calendar}<button type="button" class="message-action" data-message-tools="${escapeHtml(message.id)}">Tools</button></div>${message.proposal?calendar:''}</article>`;}).join('');
     conversations.forEach(log=>{log.innerHTML=html;log.scrollTop=log.scrollHeight;});
     checkIn.classList.toggle('has-messages',store.state.messages.length>0);
   }
@@ -1941,6 +1943,7 @@ function setAgent(open, focusInput=true) {
       if(!text){input.focus();return;}
       voiceCapture.cancel();
       store.send(text);
+      window.Concentr8?.ask();
       input.focus();
     });
   });

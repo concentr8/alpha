@@ -1012,6 +1012,67 @@ function applySettings(u, body) {
   if (typeof body.paused === 'boolean') u.paused = body.paused;
 }
 
+// --- AI chat in the app (the agent panel in frontend/index.html) ---
+const CHAT_SYSTEM_PROMPT = [
+  'You are Concentr8, a calm study helper inside a focus app for students with ADHD.',
+  'Help them start, not plan forever: suggest one small first step they can begin in five minutes.',
+  'Keep replies to 1 to 3 short sentences, plain words, no lists, no headings, no emoji.',
+  'Ask at most one question at the end. Answer in the language the student writes in.',
+  'You can only talk. You cannot see their screen, open apps, call them or change anything in the app, so never say that you did.',
+  'The student may list their open tasks. Use them only when they help; never invent tasks or deadlines.',
+].join(' ');
+
+const CHAT_PER_DAY = Number(env.CHAT_PER_DAY || 100);
+
+// Why: the app sends the last messages itself (the server keeps no chat history, so nothing private is stored here).
+// We only accept plain role and text, cut them short, and make sure the list starts with the student and alternates.
+function cleanChatMessages(list) {
+  if (!Array.isArray(list)) throw httpError(400, 'Expected { messages: [...] }');
+  const cleaned = [];
+  for (const m of list.slice(-12)) {
+    const role = m && m.role === 'assistant' ? 'assistant' : 'user';
+    const text = String((m && m.text) || '').trim().slice(0, 2000);
+    if (!text) continue;
+    if (cleaned.length && cleaned[cleaned.length - 1].role === role) cleaned[cleaned.length - 1].content += `\n${text}`;
+    else cleaned.push({ role, content: text });
+  }
+  while (cleaned.length && cleaned[0].role !== 'user') cleaned.shift();
+  if (!cleaned.length || cleaned[cleaned.length - 1].role !== 'user') throw httpError(400, 'The last message must be from the student.');
+  return cleaned;
+}
+
+async function claudeChat(body) {
+  const messages = cleanChatMessages(body.messages);
+  const tasks = (Array.isArray(body.tasks) ? body.tasks : []).slice(0, 10).map((t) => oneLine(t, 120)).filter(Boolean);
+  const system = tasks.length ? `${CHAT_SYSTEM_PROMPT}\nOpen tasks of the student: ${tasks.join('; ')}` : CHAT_SYSTEM_PROMPT;
+  let res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: claudeModel(), thinking: noThinking(), max_tokens: 300, system, messages }),
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch (err) {
+    noteClaude('chat', false, err.name);
+    throw httpError(502, `Claude did not answer (${err.name})`);
+  }
+  if (!res.ok) {
+    const why = await claudeError(res);
+    console.error(`[chat] ${why}`);
+    noteClaude('chat', false, why);
+    throw httpError(502, why);
+  }
+  const answer = await res.json();
+  const reply = String((answer.content || []).find((c) => c.type === 'text')?.text || '').trim().slice(0, 1500);
+  if (!reply) {
+    noteClaude('chat', false, 'empty answer');
+    throw httpError(502, 'Claude sent an empty answer');
+  }
+  noteClaude('chat', true);
+  return { reply };
+}
+
 async function route(req, res) {
   const url = new URL(req.url, 'http://localhost');
   const p = url.pathname.replace(/\/+$/, '') || '/';
@@ -1053,7 +1114,7 @@ async function route(req, res) {
       cartesiaNumber: !!env.CARTESIA_PHONE_NUMBER_ID,
       cartesiaToolSecret: !!env.CARTESIA_WEBHOOK_SECRET,
       cartesiaStuckAgent: !!env.CARTESIA_STUCK_AGENT_ID,
-      features: [...(stuckCallReady() ? ['stuck-call'] : []), ...(env.ANTHROPIC_API_KEY ? ['first-step', 'relevance'] : [])],
+      features: [...(stuckCallReady() ? ['stuck-call'] : []), ...(env.ANTHROPIC_API_KEY ? ['first-step', 'relevance', 'chat'] : [])],
       build: BUILD,
       claude: { key: !!env.ANTHROPIC_API_KEY, model: claudeModel(), ...claudeStatus },
       users: Object.keys(data.users).length,
@@ -1127,6 +1188,18 @@ async function route(req, res) {
       const result = await claudeFirstStep(body);
       u.steps.count += 1;
       g.steps = (g.steps || 0) + 1;
+      save();
+      return send(res, 200, result);
+    }
+    if (p === '/api/chat' && m === 'POST') {
+      if (!env.ANTHROPIC_API_KEY) throw httpError(503, 'This server has no Claude key.');
+      let body;
+      try { body = JSON.parse((await readBody(req)) || '{}'); } catch { throw httpError(400, 'The request body is not valid JSON.'); }
+      const date = localDate(u);
+      if (!u.chat || u.chat.date !== date) u.chat = { date, count: 0 };
+      if (u.chat.count >= CHAT_PER_DAY) throw httpError(429, 'That is enough chatting for today. Try again tomorrow.');
+      const result = await claudeChat(body);
+      u.chat.count += 1;
       save();
       return send(res, 200, result);
     }

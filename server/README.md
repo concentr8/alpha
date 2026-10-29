@@ -73,6 +73,7 @@ The server finds its own public address on Replit. Elsewhere, set `PUBLIC_URL`.
 | `TWILIO_VOICE` | | old name of `CALL_VOICE` |
 | `VALIDATE_TWILIO_SIGNATURE` | off | set `true` to reject webhooks not signed by Twilio |
 | `ANTHROPIC_MODEL` | `claude-haiku-5-5` | model for first steps and the optional natural replies |
+| `CHAT_PER_DAY` | `100` | AI chat answers per student per day (`POST /api/chat`) |
 
 ## Many students
 
