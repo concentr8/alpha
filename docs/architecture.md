@@ -45,6 +45,15 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | docs/plans/download-site.md | Plan: download site, app builds, stable releases | New |
 | docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
 | app/main.js | Desktop app: opens `frontend/index.html` in a window | New |
+| app/preload.js | The one door from the page to the desktop part: `window.concentr8Desktop` (ADR 0024) | New |
+| app/desktop/rules.js | Decides work, neutral or distraction for the program or page on screen | New (ported from the Cal Hacks app) |
+| app/desktop/apps.js | Turns names in the block list ("YouTube") into app and website rules | New |
+| app/desktop/platform.js | Reads the front program and browser tab, closes tabs, hides apps (AppleScript, Mac only) | New (ported) |
+| app/desktop/relevance.js | Plain rules first, then the AI check through the server (`/api/relevance`) | New (ported) |
+| app/desktop/blocker.js | The focus loop: warn, wait 15 seconds, close, go back to the last work page | New (ported) |
+| app/desktop/bridge.js | Electron side of the door: starts and stops the blocker, shows notifications | New |
+| app/test/desktop.test.js | Tests for the blocker with a fake screen and clock (`npm test` in app/) | New |
+| frontend/concentr8-blocker.js | Hints and AI switch on the Block App page; starts the blocker during a session (AI generated) | New |
 | app/package.json | App name, version, build settings (electron-builder) | New |
 | app/build/icon.png | App icon | New (from the Cal Hacks app) |
 | .github/workflows/app-beta.yml | Builds Mac, Windows, Linux apps on every merge and publishes a beta (Pre-release) | New |
