@@ -28,6 +28,9 @@ backend that will call users at the times they chose (voice call feature).
 - Think first: any new feature gets a plan in docs/plans/<name>.md and a
   human "go" before code is written.
 - Never create new buttons, colors or layouts: reuse docs/design.md.
+- A Concentr8 function without a wireframe from Jack is built from existing
+  classes and marked "AI generated" (`.preview-note` plus an `AI-GENERATED:`
+  comment), so Jack can redraw it.
 - Do not edit frontend/index.html unless the plan says so and a human agrees.
 - Secrets (API keys, tokens) live only in backend/.env. Never in the frontend,
   never in git, never in logs. Add new names to .env.example.
