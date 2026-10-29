@@ -11,7 +11,7 @@ the task. It worked. Jack's app has a Block App page that only keeps a list. A w
 ## Decision
 - The blocker is ported to plain JavaScript in `app/desktop/` (no TypeScript toolchain, no new dependency).
 - The page talks to it through one small preload door, `window.concentr8Desktop`.
-- Blocking runs only in focus phases of sessions that include the Block App tool.
+- Blocking runs in every focus phase (not on breaks or when paused) as soon as the block list has an entry. The AI check on its own (empty list) needs the Block App tool in the session. (First version required the tool; a plain "Start focus" then blocked nothing, so it was changed.)
 - The AI check uses the server route `/api/relevance`; the app holds no API key.
 - The panel on the Block App page is marked "AI generated" so Jack can redraw it.
 

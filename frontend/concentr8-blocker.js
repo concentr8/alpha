@@ -23,14 +23,15 @@
 
   const connection = () => (window.Concentr8 && window.Concentr8.connection ? window.Concentr8.connection() : null);
 
-  // Blocking runs only in a focus phase of a session that has the Block App tool, and not on breaks or when paused.
+  // Why: a student who put apps on the list expects blocking in every focus session, also without ticking the Block App
+  // tool. The tool only matters for the AI check on its own (empty list). Breaks and paused sessions are never blocked.
   function wanted() {
     const app = window.Articul8;
     const a = app && app.state.activeSession;
     if (!a || a.status === 'review' || a.timerOnly) return null;
     const phase = a.phases && a.phases[a.index];
-    if (!phase || !phase.tools || !phase.tools.includes('block')) return { task: a.taskTitle, active: false };
-    return { task: a.taskTitle, active: a.status === 'running' && phase.kind === 'focus' };
+    if (!phase) return null;
+    return { task: a.taskTitle, hasTool: !!(phase.tools && phase.tools.includes('block')), active: a.status === 'running' && phase.kind === 'focus' };
   }
 
   async function sync() {
@@ -40,7 +41,7 @@
     const names = app ? app.state.tools.blockedApps : [];
     const server = connection();
     const useAi = aiCheck && !!server;
-    if (!w || (!names.length && !useAi)) {
+    if (!w || (!names.length && !(useAi && w.hasTool))) {
       if (running) { running = false; lastKey = ''; await desktop.stop(); }
       return;
     }
@@ -62,7 +63,7 @@
   }
 
   function liveText() {
-    if (!live || !live.running) return 'Not running right now. It starts with a focus session that includes Block App.';
+    if (!live || !live.running) return 'Not running right now. It starts with your next focus session.';
     if (live.paused) return 'Paused (break).';
     return `Running. Warnings: ${live.nudges}, closed: ${live.blocks}.`;
   }
@@ -82,7 +83,7 @@
       return '<div class="preview-note">AI generated · Blocking is not available on this system. Your list is saved.</div>';
     }
     const signedIn = !!connection();
-    return `<div class="preview-note">AI generated · Blocking is on during focus sessions with the Block App tool. <span data-block-live>${esc(liveText())}</span>
+    return `<div class="preview-note">AI generated · Blocking is on in every focus session as soon as your list has an app. <span data-block-live>${esc(liveText())}</span>
       <details><summary>How it works</summary>
       ${OS_HINT[desktop.platform] || ''}Concentr8 looks at your screen every few seconds. If you open something on your list, you get a notification and 15 seconds to switch back. After that the tab is closed (your browser goes back to your last work page) or the app is hidden. Breaks are never blocked.<br>
       ${desktop.platform === 'darwin' ? 'The first time, macOS asks if Concentr8 may control your browser and System Events. Click Allow. Firefox also needs Accessibility (System Settings, Privacy &amp; Security).' : ''}</details>
