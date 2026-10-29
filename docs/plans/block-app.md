@@ -8,15 +8,14 @@ that what is on the screen fits the task. This is the part of the old weekend ap
 
 ## What the student sees
 1. Block App page (Jack's page, unchanged): the block list and presets.
-2. New on that page (AI generated, `.preview-note`): one line on when blocking runs, "How it works", a switch "Let AI
+2. New on that page (AI generated, `.preview-note`): one line saying that blocking runs in every focus session with a non-empty list, "How it works", a switch "Let AI
    check that my screen fits my task", a button "Test notification and permissions".
 3. In the web version the same place says: blocking works only in the Mac app.
 4. During a session: notification "Back to: <task>", 15 seconds, then the tab is closed (browser goes back to the last
    work page) or the program is hidden. Breaks and paused sessions are never blocked.
 
 ## Why this structure (not the weekend structure)
-- The old app had its own blocker window and settings. Now the list lives on Jack's Block App page and blocking is part of
-  the Block App tool of a session. One place, no second screen.
+- The old app had its own blocker window and settings. Now the list lives on Jack's Block App page and blocking runs in every focus session once the list has an app. One place, no second screen.
 - No separate "permissions" page: the test button shows a notification and triggers the macOS permission question
   at a moment the student chose.
 
