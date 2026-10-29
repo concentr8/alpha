@@ -42,6 +42,8 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | .github/workflows/pages.yml | Publishes frontend/ as a website (GitHub Pages) | New |
 | server/ | Concentr8 call server (Node, no dependencies), imported unchanged from intentguard-v2 | New, tests run in CI |
 | .github/workflows/deploy-server.yml | Tests server/, deploys it to the Azure web app `concentr8-api`, then checks `/api/health` | New |
+| docs/plans/download-site.md | Plan: download site, app builds, stable releases | New |
+| docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
 | .env.example | Names of required secrets | Works |
 
 ## How a call happens (target flow)
