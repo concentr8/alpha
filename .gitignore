@@ -21,3 +21,7 @@ __pycache__/
 # Saved spoken audio (see backend/src/voice/service.py)
 backend/.cache/
 .cache/
+
+# Desktop app build output and packages
+app/release/
+app/node_modules/

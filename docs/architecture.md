@@ -44,6 +44,11 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | .github/workflows/deploy-server.yml | Tests server/, deploys it to the Azure web app `concentr8-api`, then checks `/api/health` | New |
 | docs/plans/download-site.md | Plan: download site, app builds, stable releases | New |
 | docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
+| app/main.js | Desktop app: opens `frontend/index.html` in a window | New |
+| app/package.json | App name, version, build settings (electron-builder) | New |
+| app/build/icon.png | App icon | New (from the Cal Hacks app) |
+| .github/workflows/app-beta.yml | Builds Mac, Windows, Linux apps on every merge and publishes a beta (Pre-release) | New |
+| .github/workflows/promote-stable.yml | Copies a tested beta into a stable release on the website repo | New |
 | .env.example | Names of required secrets | Works |
 
 ## How a call happens (target flow)

@@ -1,0 +1,44 @@
+# Purpose: turns a tested beta into a stable download. It copies the exact files of the beta release
+# (build once, promote) into a new release of the website repo concentr8/concentr8.github.io.
+# Runs on: "Run workflow" under Actions, with the beta tag, for example v1.1.0-beta.4. Result: release v1.1.0.
+# Needs the secret RELEASE_TOKEN (fine-grained token, Contents: read and write on the website repo only).
+name: Promote to stable
+on:
+  workflow_dispatch:
+    inputs:
+      beta:
+        description: 'Beta tag to promote, for example v1.1.0-beta.4'
+        required: true
+permissions:
+  contents: read
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    env:
+      SITE_REPO: concentr8/concentr8.github.io
+    steps:
+      - name: Work out the stable version
+        id: v
+        env:
+          BETA: ${{ inputs.beta }}
+        run: |
+          if [[ ! "$BETA" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+$ ]]; then
+            echo "::error::'$BETA' is not a beta tag like v1.1.0-beta.4"; exit 1
+          fi
+          echo "stable=${BETA%-beta.*}" >> "$GITHUB_OUTPUT"
+      - name: Download the beta files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BETA: ${{ inputs.beta }}
+        run: gh release download "$BETA" --repo "${{ github.repository }}" --dir release
+      - name: Publish the stable release on the website repo
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          BETA: ${{ inputs.beta }}
+          STABLE: ${{ steps.v.outputs.stable }}
+        run: |
+          if [[ -z "$GH_TOKEN" ]]; then echo "::error::Secret RELEASE_TOKEN is missing (see the header of this file)"; exit 1; fi
+          ls -l release
+          gh release create "$STABLE" release/* --repo "$SITE_REPO" --latest \
+            --title "Concentr8 ${STABLE#v}" \
+            --notes "Promoted from the tested beta $BETA in concentr8/alpha."
