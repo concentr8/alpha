@@ -32,11 +32,14 @@ that what is on the screen fits the task. This is the part of the old weekend ap
 - AppleScript text is escaped; page titles can not run code.
 - No API key in the app. Only app name, page title, host/path/search query go to the server, only for pages the list cannot judge.
 
+## Windows and Linux
+Blocking works there too, with less: only program name and window title (no web address), a tab is closed with Ctrl+W
+(no "back to the last work page"), a program is minimized. Linux needs `xdotool` and X11. Not tried on a real computer yet.
+
 ## Not in this change
-- Windows and Linux blocking (a null platform sees and blocks nothing; the page says so).
 - Canvas task links ("open the assignment") and the "I'm stuck" calm screen from the old app.
 - Real Mac test: needs a Mac; macOS permissions cannot be tried in CI.
 
 ## Check
-- `npm test` in `app/` (14 tests: rules, AppleScript text, AI check, loop with fake screen and clock).
+- `npm test` in `app/` (18 tests: rules, AppleScript text, AI check, loop with fake screen and clock).
 - Browser test of the page with a mocked desktop door (web, Mac, Windows/Linux note).

@@ -17,5 +17,5 @@ the task. It worked. Jack's app has a Block App page that only keeps a list. A w
 
 ## Consequences
 - Good: the working logic is kept, tests are kept, Jack's page and focus code stay as they are.
-- Harder: only macOS can see and block; Windows and Linux show a hint. Real behaviour needs a Mac to try.
+- Harder: Windows and Linux see only program and window title (no web address); Linux needs xdotool and X11. Real behaviour needs a Mac, a Windows and a Linux computer to try.
 - The app is unsigned, so macOS asks again for Automation after every update until signing exists.
