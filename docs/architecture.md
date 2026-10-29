@@ -49,6 +49,7 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | app/desktop/rules.js | Decides work, neutral or distraction for the program or page on screen | New (ported from the Cal Hacks app) |
 | app/desktop/apps.js | Turns names in the block list ("YouTube") into app and website rules | New |
 | app/desktop/platform.js | Reads the front program and browser tab, closes tabs, hides apps (AppleScript, Mac only) | New (ported) |
+| app/desktop/platform-other.js | Same as platform.js for Windows (PowerShell) and Linux (xdotool, X11): program and window title, Ctrl+W, minimize | New |
 | app/desktop/relevance.js | Plain rules first, then the AI check through the server (`/api/relevance`) | New (ported) |
 | app/desktop/blocker.js | The focus loop: warn, wait 15 seconds, close, go back to the last work page | New (ported) |
 | app/desktop/bridge.js | Electron side of the door: starts and stops the blocker, shows notifications | New |
