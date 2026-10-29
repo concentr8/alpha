@@ -147,3 +147,49 @@ test('going back in time stops the warning', async (t) => {
   await blocker.tick();
   assert.deepEqual(log.hidden, []);
 });
+
+const { createWindowsPlatform, createLinuxPlatform, friendly } = require('../desktop/platform-other');
+
+test('program names get the names used in the block list', () => {
+  assert.equal(friendly('chrome.exe'), 'Google Chrome');
+  assert.equal(friendly('msedge'), 'Microsoft Edge');
+  assert.equal(friendly('Discord.exe'), 'Discord');
+});
+
+test('Windows: reads program and title, closes a tab with Ctrl+W only while the browser is in front', async () => {
+  const scripts = [];
+  const answers = ['chrome\tFunny cats - YouTube - Google Chrome', 'ok', 'no', 'ok'];
+  const platform = createWindowsPlatform(async (file, args) => { scripts.push(args.at(-1)); return answers.shift(); });
+  const seen = await platform.activity();
+  assert.deepEqual({ app: seen.app, url: seen.url, title: seen.title }, { app: 'Google Chrome', url: null, title: 'Funny cats - YouTube - Google Chrome' });
+  assert.equal(await platform.closeTab('Google Chrome'), true);
+  assert.match(scripts[1], /if \(\$n -ne 'chrome'\)/);
+  assert.match(scripts[1], /SendKeys\('\^w'\)/);
+  assert.equal(await platform.hideApp('Discord'), false, 'another program is in front: nothing is touched');
+  assert.equal(await platform.hideApp('Chrome'), true);
+  assert.match(scripts[3], /ShowWindow\(\$h, 6\)/);
+  assert.equal(await platform.closeTab('Discord'), false, 'only browsers get Ctrl+W');
+  assert.equal(await platform.redirect('Google Chrome', 'https://example.com'), false);
+});
+
+test('a YouTube title in Chrome on Windows is a distraction by title', () => {
+  const verdict = classify(ctx({ app: 'Google Chrome', title: 'Funny cats - YouTube - Google Chrome' }), rules);
+  assert.equal(verdict.kind, 'distraction');
+});
+
+test('Linux: reads program and title through xdotool, and gives up quietly without it', async () => {
+  const calls = [];
+  const platform = createLinuxPlatform(async (file, args) => {
+    calls.push(args.join(' '));
+    if (args.includes('getwindowname')) return 'Steam';
+    if (args.includes('getwindowpid')) return '4242';
+    return '';
+  }, (pid) => (pid === '4242' ? 'steam' : 'x'));
+  assert.equal((await platform.activity()).app, 'steam');
+  assert.equal(await platform.hideApp('Steam'), true, 'names are compared without caring for capitals');
+  assert.ok(calls.includes('getactivewindow windowminimize'));
+  assert.equal(await platform.hideApp('Discord'), false);
+  const missing = createLinuxPlatform(async () => { throw new Error('xdotool: not found'); });
+  assert.equal(await missing.activity(), null);
+  assert.equal(await missing.closeTab('Firefox'), false);
+});

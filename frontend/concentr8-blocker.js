@@ -67,19 +67,25 @@
     return `Running. Warnings: ${live.nudges}, closed: ${live.blocks}.`;
   }
 
+  // Why: only the Mac can read the web address; Windows and Linux see the program and the window title.
+  const OS_HINT = {
+    win32: 'On Windows, websites are found by the words in the tab title, and a tab is closed with Ctrl+W. This is new and not tested on many computers yet.<br>',
+    linux: 'On Linux this needs the tool xdotool (install it with your package manager) and an X11 session, not Wayland. Websites are found by the tab title. This is new and not tested on many computers yet.<br>',
+  };
+
   // The hints at the top of the Block App page.
   function panel() {
     if (!desktop) {
       return '<div class="preview-note">AI generated · Blocking works only in the Concentr8 app for Mac. In the browser your list is saved, but nothing is closed. Download the app on concentr8.github.io.</div>';
     }
-    if (desktop.platform !== 'darwin') {
-      return '<div class="preview-note">AI generated · Blocking works only on Mac so far. Your list is saved and will work here as soon as Windows and Linux are supported.</div>';
+    if (!['darwin', 'win32', 'linux'].includes(desktop.platform)) {
+      return '<div class="preview-note">AI generated · Blocking is not available on this system. Your list is saved.</div>';
     }
     const signedIn = !!connection();
     return `<div class="preview-note">AI generated · Blocking is on during focus sessions with the Block App tool. <span data-block-live>${esc(liveText())}</span>
       <details><summary>How it works</summary>
-      Concentr8 looks at your screen every few seconds. If you open something on your list, you get a notification and 15 seconds to switch back. After that the tab is closed (your browser goes back to your last work page) or the app is hidden. Breaks are never blocked.<br>
-      The first time, macOS asks if Concentr8 may control your browser and System Events. Click Allow. Firefox also needs Accessibility (System Settings, Privacy &amp; Security).</details>
+      ${OS_HINT[desktop.platform] || ''}Concentr8 looks at your screen every few seconds. If you open something on your list, you get a notification and 15 seconds to switch back. After that the tab is closed (your browser goes back to your last work page) or the app is hidden. Breaks are never blocked.<br>
+      ${desktop.platform === 'darwin' ? 'The first time, macOS asks if Concentr8 may control your browser and System Events. Click Allow. Firefox also needs Accessibility (System Settings, Privacy &amp; Security).' : ''}</details>
       <label><input type="checkbox" data-ai-check ${aiCheck && signedIn ? 'checked' : ''} ${signedIn ? '' : 'disabled'}> Let AI check that my screen fits my task ${signedIn ? '' : '(first set up Profile, Phone call)'}</label>
       <details><summary>What the AI check sends</summary>The app name, page title and web address of pages that your list does not cover go to the Concentr8 server and are judged by Claude. Nothing is stored.</details>
       <button class="wire-button" type="button" data-block-test>Test notification and permissions</button> <span data-block-test-result>${esc(testMessage)}</span></div>`;
@@ -98,7 +104,7 @@
     const result = await desktop.test();
     testMessage = result.activity
       ? `Works. Right now Concentr8 sees: ${result.activity}.`
-      : 'Notification sent. macOS cannot be read yet: allow Concentr8 under System Settings, Privacy & Security, Automation.';
+      : 'Notification sent, but the screen cannot be read yet. On Mac: allow Concentr8 under System Settings, Privacy & Security, Automation. On Linux: install xdotool.';
     const el = document.querySelector('[data-block-test-result]');
     if (el) el.textContent = testMessage; else repaint();
   });

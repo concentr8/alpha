@@ -1,6 +1,6 @@
 // Purpose: asks macOS what is in front (program, browser address, window title) and pushes distractions away.
 // Called by: app/desktop/blocker.js.
-// Calls: osascript (AppleScript), only on macOS. On Windows and Linux a "null" platform is used that sees and blocks nothing.
+// Calls: osascript (AppleScript), only on macOS. Windows and Linux are in platform-other.js; any other system uses a "null" platform that blocks nothing.
 // Origin: ported from the old Mac app (intentguard-v2/src/services/platform.ts).
 // Permissions on the first run, macOS asks:
 //   - "Concentr8 wants to control Google Chrome / Safari / System Events" (Automation) -> Allow
@@ -8,6 +8,7 @@
 //     System Settings -> Privacy & Security -> Accessibility -> enable Concentr8.
 const { execFile } = require('node:child_process');
 const { SCRIPTABLE_BROWSERS, TITLE_ONLY_BROWSERS } = require('./rules');
+const { createWindowsPlatform, createLinuxPlatform } = require('./platform-other');
 
 const SEPARATOR = '\x1e'; // splits address and title in one AppleScript answer
 
@@ -112,11 +113,16 @@ function createMacPlatform(runScript = osascript) {
   };
 }
 
-// Windows and Linux: nothing can be seen or blocked there yet.
+// Other systems: nothing can be seen or blocked.
 function createNullPlatform() {
   return { supported: false, activity: async () => null, redirect: async () => false, closeTab: async () => false, hideApp: async () => false };
 }
 
-const createPlatform = () => (process.platform === 'darwin' ? createMacPlatform() : createNullPlatform());
+function createPlatform(os = process.platform) {
+  if (os === 'darwin') return createMacPlatform();
+  if (os === 'win32') return createWindowsPlatform();
+  if (os === 'linux') return createLinuxPlatform();
+  return createNullPlatform();
+}
 
 module.exports = { createPlatform, createMacPlatform, createNullPlatform, asString, canonicalApp };
