@@ -23,7 +23,9 @@ Goal: a stable version where the student can set up the daily phone call and cha
 ## Not in this step
 - Voice answers in the chat (text only), Canvas/bCourses, Google Calendar, blocking, "I'm stuck".
 - Tasks with due dates: the app's tasks have no due date field, so calls list titles only. TODO.
-- Closing the server to strangers: sign-ups are open (OPEN_SIGNUPS) until the stable version is tested.
+- Closing the server to strangers is done with the existing server settings, no code: `OPEN_SIGNUPS=false` and a
+  `REGISTER_CODE` (Jonas's choice, 2026-10-28). The Phone call page then shows the field "Invite or recovery code"
+  (it asks the server's `/api/health`), and the call and chat work as soon as a valid code was entered once.
 
 ## Risks
 - Each chat costs Claude money (small with Haiku, about 20x more with Sonnet; docs/plans/ai-assistant.md has numbers).

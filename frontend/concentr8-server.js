@@ -73,13 +73,21 @@
       + `<label>Time of the call<input name="time" type="time" value="${esc(settings.callTime || '18:00')}"></label>`
       + `<p class="detail-note">Your time zone: ${esc(timezone())}. We call you once a day at this time and ask which task you will start and when.</p>`
       + '<label class="check-line"><input name="consent" type="checkbox"' + (settings.consent ? ' checked' : '') + '>I agree that Concentr8 calls this number at this time.</label>'
-      + '<label data-recovery hidden>Recovery code<input name="recovery" type="password" autocomplete="off"></label>'
+      + '<label data-recovery hidden>Invite or recovery code<input name="recovery" type="password" autocomplete="off"></label>'
       + '<div class="dialog-actions">'
       + (saved ? '<button class="wire-button" type="button" data-call-delete>Delete my account</button>' : '')
       + '<button class="wire-button" type="button" data-call-now' + (saved ? '' : ' disabled') + '>Call me now</button>'
       + '<button class="wire-button solid" type="submit">Save</button></div>'
       + `<p class="detail-note" id="call-status" role="status" aria-live="polite">${saved ? 'Your call is set up.' : 'Save first, then you can test the call.'}</p>`
       + '</form>';
+  }
+
+  // Why: when the server is closed to strangers (OPEN_SIGNUPS=false), the code field must be there from the start.
+  async function showCodeFieldIfNeeded() {
+    if (settings.token) return;
+    const r = await request('/api/health', 'GET');
+    const field = document.querySelector('#call-form [data-recovery]');
+    if (r.ok && r.data.inviteRequired && field) field.hidden = false;
   }
 
   const status = (text) => { const el = document.getElementById('call-status'); if (el) el.textContent = text; };
@@ -104,7 +112,7 @@
       const recovery = form.elements.recovery.value.trim();
       r = await request('/api/register', 'POST', { phoneNumber: phone, consent: true, callTime, timezone: timezone(), ...(recovery ? { inviteCode: recovery } : {}) });
       if (r.ok) settings.token = r.data.token;
-      else if (r.status === 409) form.querySelector('[data-recovery]').hidden = false;
+      else if (r.status === 403 || r.status === 409) form.querySelector('[data-recovery]').hidden = false;
     }
     if (!r.ok) { status(r.error); return; }
     settings = { ...settings, callTime, consent: true, ...(phone ? { phoneEnd: phone.replace(/\D/g, '').slice(-4) } : {}) };
@@ -140,5 +148,6 @@
     if (e.target.closest('[data-call-delete]')) deleteAccount();
   });
 
-  window.Concentr8 = { ask, callPage };
+  // The page is drawn by index.html after callPage() returns, so the check runs right after it.
+  window.Concentr8 = { api: API, ask, callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
 })();

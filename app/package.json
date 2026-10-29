@@ -27,6 +27,10 @@
       "category": "public.app-category.productivity",
       "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
       "identity": null,
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Concentr8 uses the microphone for voice input in the chat and the body-double room.",
+        "NSCameraUsageDescription": "Concentr8 uses the camera in the body-double room."
+      },
       "icon": "build/icon.png"
     },
     "win": { "target": [{ "target": "nsis", "arch": ["x64"] }], "icon": "build/icon.png" },

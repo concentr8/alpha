@@ -1592,11 +1592,13 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 
 </script>
   <script data-source="elevenlabs.js">
-/* Optional ElevenLabs voice through our backend. ON by default (our online backend).
+/* Optional ElevenLabs voice through the Concentr8 server. ON by default.
    ?api=http://localhost:8000 uses another address (remembered), ?api=off turns it
    off (remembered). The browser never holds a key. */
 (() => {
-  const DEFAULT_API='https://articul8-api-84d5a6ebccf8.herokuapp.com';
+  const DEFAULT_API=window.Concentr8.api; /* the Concentr8 server on Azure, one address for everything (concentr8-server.js) */
+  /* Voice needs a signed-in student: the token comes from Profile > Phone call. */
+  const auth=()=>{try{const t=JSON.parse(localStorage.getItem('concentr8-server-v1')).token;return t?{Authorization:'Bearer '+t}:{};}catch(_){return {};}};
   let base=DEFAULT_API;
   try {
     const asked=new URLSearchParams(location.search).get('api');
@@ -1633,7 +1635,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
         this.release();
         if(this.aborted)return;
         const type=this.recorder.mimeType||'audio/webm';
-        fetch(base+'/voice/transcribe',{method:'POST',headers:{'Content-Type':type},body:new Blob(this.chunks,{type})})
+        fetch(base+'/api/voice/transcribe',{method:'POST',headers:{'Content-Type':type,...auth()},body:new Blob(this.chunks,{type})})
           .then(r=>r.ok?r.json():Promise.reject(new Error('status '+r.status)))
           .then(data=>{
             const text=(data.text||'').trim();
@@ -1653,7 +1655,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 
   function clip(text) {
     if(!clips.has(text)) {
-      clips.set(text,fetch(base+'/voice/speak',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})})
+      clips.set(text,fetch(base+'/api/voice/speak',{method:'POST',headers:{'Content-Type':'application/json',...auth()},body:JSON.stringify({text})})
         .then(r=>r.ok?r.blob():Promise.reject(new Error('status '+r.status)))
         .then(blob=>URL.createObjectURL(blob))
         .catch(error=>{clips.delete(text);throw error;}));
