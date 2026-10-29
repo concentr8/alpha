@@ -1,0 +1,77 @@
+# Purpose: builds the Concentr8 app for Mac (.dmg), Windows (.exe) and Linux (.AppImage) and publishes it
+# as a beta (GitHub "Pre-release") in this repo, for example v1.1.0-beta.4.
+# Runs on: every merge to main that changes app/ or frontend/. "Run workflow" under Actions builds only (no publish).
+# Next step by hand: test the beta, then run "Promote to stable" (promote-stable.yml).
+# The base version (1.1.0) is "version" in app/package.json; the beta number counts up by itself.
+name: App beta
+on:
+  push:
+    branches: [main]
+    paths: ['app/**', 'frontend/**', '.github/workflows/app-beta.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+# One release at a time, so two quick merges get two different beta numbers.
+concurrency:
+  group: app-beta
+  cancel-in-progress: false
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        run: |
+          BASE="$(node -p "require('./app/package.json').version")"
+          LAST="$(git ls-remote --tags origin "refs/tags/v${BASE}-beta.*" | sed -n 's#.*-beta\.\([0-9]*\)$#\1#p' | sort -n | tail -1)"
+          VERSION="${BASE}-beta.$(( ${LAST:-0} + 1 ))"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "### Building $VERSION" >> "$GITHUB_STEP_SUMMARY"
+  build:
+    needs: plan
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { name: mac,   os: macos-latest,   script: dist,         files: 'app/release/*.dmg' }
+          - { name: win,   os: windows-latest, script: 'dist:win',   files: 'app/release/*.exe' }
+          - { name: linux, os: ubuntu-latest,  script: 'dist:linux', files: 'app/release/*.AppImage' }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build app
+        shell: bash
+        working-directory: app
+        run: |
+          npm install
+          npm run "${{ matrix.script }}" -- --config.extraMetadata.version="${{ needs.plan.outputs.version }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Concentr8-${{ matrix.name }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+  publish:
+    needs: [plan, build]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+      - name: Publish beta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -l release
+          gh release create "v${{ needs.plan.outputs.version }}" release/* \
+            --repo "${{ github.repository }}" --target "${{ github.sha }}" \
+            --prerelease --title "Beta ${{ needs.plan.outputs.version }}" \
+            --notes "Early build for testing. Things may break. Stable versions are on https://concentr8.github.io"
