@@ -149,5 +149,5 @@
   });
 
   // The page is drawn by index.html after callPage() returns, so the check runs right after it.
-  window.Concentr8 = { ask, callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
+  window.Concentr8 = { api: API, ask, callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
 })();

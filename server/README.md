@@ -74,6 +74,11 @@ The server finds its own public address on Replit. Elsewhere, set `PUBLIC_URL`.
 | `VALIDATE_TWILIO_SIGNATURE` | off | set `true` to reject webhooks not signed by Twilio |
 | `ANTHROPIC_MODEL` | `claude-haiku-5-5` | model for first steps and the optional natural replies |
 | `CHAT_PER_DAY` | `100` | AI chat answers per student per day (`POST /api/chat`) |
+| `ELEVENLABS_API_KEY` | none | ElevenLabs key for spoken cues and voice input (`/api/voice/*`); without it voice is off |
+| `ELEVENLABS_VOICE_ID` | none | the voice that reads aloud |
+| `ELEVENLABS_TTS_MODEL` / `ELEVENLABS_STT_MODEL` | `eleven_multilingual_v2` / `scribe_v2` | models for speaking and listening |
+| `VOICE_REQUESTS_PER_USER_PER_HOUR` | `60` | voice requests per student per hour |
+| `VOICE_DAILY_SPEECH_CHARACTERS` / `VOICE_DAILY_TRANSCRIPTIONS` | `20000` / `200` | daily budget for the whole app |
 
 ## Many students
 

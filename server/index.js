@@ -11,6 +11,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const voice = require('./voice');
 
 const env = process.env;
 const PORT = Number(env.PORT || 3000);
@@ -1114,7 +1115,7 @@ async function route(req, res) {
       cartesiaNumber: !!env.CARTESIA_PHONE_NUMBER_ID,
       cartesiaToolSecret: !!env.CARTESIA_WEBHOOK_SECRET,
       cartesiaStuckAgent: !!env.CARTESIA_STUCK_AGENT_ID,
-      features: [...(stuckCallReady() ? ['stuck-call'] : []), ...(env.ANTHROPIC_API_KEY ? ['first-step', 'relevance', 'chat'] : [])],
+      features: [...(stuckCallReady() ? ['stuck-call'] : []), ...(env.ANTHROPIC_API_KEY ? ['first-step', 'relevance', 'chat'] : []), ...(env.ELEVENLABS_API_KEY ? ['voice'] : [])],
       build: BUILD,
       claude: { key: !!env.ANTHROPIC_API_KEY, model: claudeModel(), ...claudeStatus },
       users: Object.keys(data.users).length,
@@ -1202,6 +1203,15 @@ async function route(req, res) {
       u.chat.count += 1;
       save();
       return send(res, 200, result);
+    }
+    if (p === '/api/voice/speak' && m === 'POST') {
+      let body;
+      try { body = JSON.parse((await readBody(req)) || '{}'); } catch { throw httpError(400, 'The request body is not valid JSON.'); }
+      return send(res, 200, await voice.speak(env, u.id, body.text), 'audio/mpeg');
+    }
+    if (p === '/api/voice/transcribe' && m === 'POST') {
+      const audio = await voice.readAudio(req);
+      return send(res, 200, { text: await voice.transcribe(env, u.id, audio, req.headers['content-type']) });
     }
     if (p === '/api/relevance' && m === 'POST') {
       if (!env.ANTHROPIC_API_KEY) throw httpError(503, 'This call server has no Claude key.');

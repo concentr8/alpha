@@ -1,5 +1,7 @@
 # Deploy the backend on Heroku
 
+> Replaced on 2026-10-28: voice now runs on the Azure server (ADR 0023, docs/plans/voice-on-azure.md). Kept for history.
+
 Status: Route A worked on 2026-10-23 (app `articul8-api`, /health showed
 {"status":"ok"}). The first build failed with "APP_BASE was not set": the
 config var `APP_BASE=backend` is required, the buildpacks alone are not enough.
