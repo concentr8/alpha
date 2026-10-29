@@ -413,3 +413,34 @@ test('/api/relevance passes on the reason when Claude refuses (e.g. no credits)'
     if (saved === undefined) delete process.env.ANTHROPIC_API_KEY; else process.env.ANTHROPIC_API_KEY = saved;
   }
 });
+
+test('/api/chat: Claude answers a signed-in student with their last messages and open tasks', async () => {
+  const s = await signup('+15555550141');
+  process.env.ANTHROPIC_API_KEY = 'sk-ant-test';
+  claudeAnswer = () => ({ status: 200, json: { stop_reason: 'end_turn', content: [{ type: 'text', text: 'Open the spec and read only the first paragraph. Which one is it?' }] } });
+  try {
+    assert.equal((await post('/api/chat', { messages: [{ role: 'user', text: 'hi' }] })).status, 401, 'needs a student token');
+
+    claudeCalls.length = 0;
+    const r = await post('/api/chat', {
+      messages: [{ role: 'assistant', text: 'old answer' }, { role: 'user', text: 'I cannot start' }, { role: 'user', text: 'my project' }],
+      tasks: ['Project 2', ''],
+    }, s.token);
+    assert.equal(r.status, 200);
+    assert.deepEqual(await r.json(), { reply: 'Open the spec and read only the first paragraph. Which one is it?' });
+    const sent = claudeCalls[0].body;
+    assert.deepEqual(sent.messages, [{ role: 'user', content: 'I cannot start\nmy project' }], 'starts with the student, same speaker merged');
+    assert.match(sent.system, /Open tasks of the student: Project 2$/);
+    assert.deepEqual(sent.thinking, { type: 'disabled' });
+
+    assert.equal((await post('/api/chat', { messages: [{ role: 'assistant', text: 'hello' }] }, s.token)).status, 400, 'the last message must be the student');
+    assert.equal((await post('/api/chat', {}, s.token)).status, 400);
+
+    claudeAnswer = () => ({ status: 529, json: {} });
+    assert.equal((await post('/api/chat', { messages: [{ role: 'user', text: 'hi' }] }, s.token)).status, 502, 'the app shows a friendly error');
+
+    claudeAnswer = () => ({ status: 200, json: { stop_reason: 'end_turn', content: [{ type: 'text', text: 'ok' }] } });
+    data.users[s.userId].chat = { date: data.users[s.userId].chat.date, count: 100 };
+    assert.equal((await post('/api/chat', { messages: [{ role: 'user', text: 'hi' }] }, s.token)).status, 429, 'daily cap');
+  } finally { delete process.env.ANTHROPIC_API_KEY; }
+});

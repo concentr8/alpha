@@ -13,7 +13,7 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 ## File map
 | File | Purpose | Status |
 |---|---|---|
-| frontend/index.html | Whole UI in one file. Stores data in the browser (localStorage). | Frozen. Jack's 2026-10-21 version plus the ElevenLabs block (ADR 0010, 0013) and a phone layout block (ADR 0014) |
+| frontend/index.html | Whole UI in one file. Stores data in the browser (localStorage). | Small edits only (ADR 0022). Jack's 2026-10-21 version plus the ElevenLabs block (ADR 0010, 0013) and a phone layout block (ADR 0014) |
 | docs/evidence/mobile-layout/ | Before/after screenshots at phone width (proof for ADR 0014) | New |
 | frontend/music/ | Four music loops for the Music page (ADR 0015) | New |
 | docs/music-credits.md | Source and terms of every audio file | New |
@@ -49,6 +49,9 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | app/build/icon.png | App icon | New (from the Cal Hacks app) |
 | .github/workflows/app-beta.yml | Builds Mac, Windows, Linux apps on every merge and publishes a beta (Pre-release) | New |
 | .github/workflows/promote-stable.yml | Copies a tested beta into a stable release on the website repo | New |
+| frontend/concentr8-server.js | Connects the web app to the server: AI chat and phone call setup (ADR 0022) | New |
+| docs/plans/call-and-chat.md | Plan: phone call setup and AI chat in the app | New |
+| docs/decisions/0022-frontend-talks-to-the-concentr8-server.md | ADR: what changed in the frozen frontend and why | New |
 | .env.example | Names of required secrets | Works |
 
 ## How a call happens (target flow)
