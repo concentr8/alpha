@@ -146,6 +146,67 @@ test('the scheduler calls each student at their own local time, once a day, neve
   assert.equal((await api('/api/call-now', { method: 'POST', key: e.token, body: {} })).status, 200, 'no daily limit on calls');
 });
 
+test('every student has morning, midday and night slots; old records keep their call time as the morning call', async () => {
+  const a = await signup('4155557001', { callTime: '07:45' });
+  const me = await (await api('/api/me', { key: a.token })).json();
+  assert.deepEqual(me.callSlots, {
+    morning: { time: '07:45', enabled: true },
+    midday: { time: '12:30', enabled: false },
+    night: { time: '21:30', enabled: false },
+  });
+
+  // An old record on disk has no callSlots at all.
+  delete data.users[a.userId].callSlots;
+  data.users[a.userId].callTime = '09:10';
+  const old = await (await api('/api/me', { key: a.token })).json();
+  assert.deepEqual(old.callSlots.morning, { time: '09:10', enabled: true });
+  assert.equal(old.callSlots.midday.enabled, false);
+
+  // Older app versions still send callTime: that is the morning time.
+  await api('/api/settings', { method: 'POST', key: a.token, body: { callTime: '06:30' } });
+  assert.equal((await (await api('/api/me', { key: a.token })).json()).callSlots.morning.time, '06:30');
+});
+
+test('slot settings are checked before anything is changed', async () => {
+  const a = await signup('4155557002');
+  const set = (callSlots) => api('/api/settings', { method: 'POST', key: a.token, body: { callSlots } });
+  const bad = [{ evening: { time: '19:00' } }, { midday: { time: '25:00' } }, { night: { enabled: 'yes' } }, { midday: 'now' }, []];
+  for (const body of bad) assert.equal((await set(body)).status, 400, JSON.stringify(body));
+  // One wrong entry must not apply the right one next to it.
+  assert.equal((await set({ midday: { time: '13:00', enabled: true }, night: { time: 'late' } })).status, 400);
+  assert.deepEqual((await (await api('/api/me', { key: a.token })).json()).callSlots.midday, { time: '12:30', enabled: false });
+
+  assert.equal((await set({ midday: { time: '13:00', enabled: true }, night: { time: '23:15', enabled: true } })).status, 200);
+  const slots = (await (await api('/api/me', { key: a.token })).json()).callSlots;
+  assert.deepEqual(slots.midday, { time: '13:00', enabled: true });
+  assert.deepEqual(slots.night, { time: '23:15', enabled: true }, 'the night call may be after 21:00');
+});
+
+test('midday and night calls fire at their own local time, once a day each', async () => {
+  const g = await signup('4155557003', { timezone: 'Europe/Berlin' });
+  await api('/api/settings', {
+    method: 'POST',
+    key: g.token,
+    body: { callSlots: { morning: { enabled: false }, midday: { time: '12:30', enabled: true }, night: { time: '22:00', enabled: true } } },
+  });
+  for (const u of Object.values(data.users)) if (u.id !== g.userId) u.paused = true;
+  data.users[g.userId].calls = { date: null, count: 0 };
+  calls.length = 0;
+
+  const midday = new Date('2026-11-02T11:30:00Z'); // 12:30 in Berlin (CET)
+  const night = new Date('2026-11-02T21:00:00Z'); // 22:00 in Berlin
+  assert.equal(schedulerTick(new Date('2026-11-02T08:00:00Z')), 0, 'nothing is due at 09:00');
+  assert.equal(schedulerTick(midday), 1);
+  assert.equal(schedulerTick(midday), 0, 'midday only once a day');
+  assert.equal(schedulerTick(night), 1);
+  assert.equal(schedulerTick(night), 0, 'night only once a day');
+  assert.equal(schedulerTick(new Date('2026-11-03T11:30:00Z')), 1, 'the next day the midday call is due again');
+  await new Promise((r) => setTimeout(r, 50));
+  assert.equal(calls.length, 3);
+  const kinds = data.users[g.userId].callLog.map((e) => e.kind);
+  assert.deepEqual(kinds, ['midday', 'night', 'midday']);
+});
+
 test('a stranger who phones our number is told to sign up', async () => {
   const r = await (await form('/twilio/voice', { Direction: 'inbound', From: '+14150000000' })).text();
   assert.match(r, /sign up in the Concentr8 app/);
