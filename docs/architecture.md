@@ -8,16 +8,18 @@ adds, moves or removes a file.
                                               |                          Claude API (writes the call script)
                                               +-> Scheduler (runs jobs at each user's local time)
 
-The frontend is frozen (ADR 0001). Only the backend changes for now.
+The frontend is mostly frozen (ADR 0001); approved page-specific changes are
+listed in their plan and decision record. Calendar redesign is scoped to its
+existing inline blocks plus the pure helper documented in ADR 0028.
 
 ## File map
 | File | Purpose | Status |
 |---|---|---|
-| frontend/index.html | Whole UI in one file. Stores data in the browser (localStorage). | Small edits only (ADR 0022). Jack's 2026-10-21 version plus the ElevenLabs block (ADR 0010, 0013) and a phone layout block (ADR 0014) |
+| frontend/index.html | Whole UI in one file. Stores local data in the browser (localStorage); Calendar exposes a separate in-memory read-only extension point. | Small approved page edits (ADR 0022, 0028). Includes Jack's 2026-10-21 version, ElevenLabs (ADR 0010, 0013), phone layout (ADR 0014), calendar redesign (ADR 0028) |
 | docs/evidence/mobile-layout/ | Before/after screenshots at phone width (proof for ADR 0014) | New |
 | frontend/music/ | Four music loops for the Music page (ADR 0015) | New |
 | docs/music-credits.md | Source and terms of every audio file | New |
-| docs/design.md | Look of the frontend: tokens and components to reuse | Updated for the 2026-10-21 version |
+| docs/design.md | Look of the frontend: tokens and components to reuse | Updated for 2026-10-31 Calendar redesign (ADR 0028) |
 | backend/src/main.py | Creates the app, CORS, plugs in routers, /health | Works |
 | backend/src/config.py | Reads all settings and secrets from the environment | Works |
 | backend/src/calls/schemas.py | Data shapes: schedule input, stored schedule, call log entry | Works |
@@ -74,6 +76,9 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | .env.example | Names of required secrets | Works |
 | docs/plans/calendar-redesign.md | Approved calendar-only redesign plan | New |
 | docs/plans/calendar-wireframes.md | Text wireframes for Jack before implementation | New |
+| frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
+| server/test/calendar-tools.test.js | Node built-in tests for calendar date boundaries and quick-add valid, invalid and ambiguous input | New |
+| docs/decisions/0028-calendar-redesign.md | Calendar-only design, parsing, timezone and read-only external-event boundaries | New |
 
 ## How a call happens (target flow)
 1. User agrees to calls and picks days and a time. The API stores the schedule
