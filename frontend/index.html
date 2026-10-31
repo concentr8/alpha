@@ -1299,6 +1299,11 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(b.hasAttribute('data-course-focus'))FocusUI.setup({taskId:b.dataset.courseFocus,origin:'Courses'});
     if(b.hasAttribute('data-canvas-connect'))P.canvasConnect();
     if(b.hasAttribute('data-profile'))P.go('Profile',b.dataset.profile);
+    if(b.hasAttribute('data-reset-cancel')){resetAsked=false;window.dispatchEvent(new CustomEvent('articul8:rerender'));}
+    if(b.hasAttribute('data-reset-data')){
+      if(!resetAsked){resetAsked=true;window.dispatchEvent(new CustomEvent('articul8:rerender'));}
+      else{S.reset();try{localStorage.removeItem('concentr8-blocker-v1');}catch(_){}location.reload();}
+    }
     if(b.hasAttribute('data-export-data')){const url=URL.createObjectURL(new Blob([JSON.stringify(S.state,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='concentr8-data-'+P.today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
     if(b.hasAttribute('data-practice-start')){if(!practice)practice={kind:b.dataset.practiceStart,elapsed:0,running:false,started:0};if(practice.running){practice.elapsed+=Date.now()-practice.started;practice.running=false;}else{if(practice.elapsed>=60000)practice.elapsed=0;practice.started=Date.now();practice.running=true;}b.textContent=practice.running?'Pause':'Resume';}
     if(b.hasAttribute('data-practice-reset')){practice=null;window.dispatchEvent(new CustomEvent('articul8:rerender'));}
