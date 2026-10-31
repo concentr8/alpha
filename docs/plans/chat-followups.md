@@ -29,8 +29,7 @@ Goal: the suggestion gets better the longer a student uses the app. Proposal, ke
 - The student can see and clear the habits under Profile, Settings (AI generated, built from existing classes).
 - Tests: the habit calculation (pure function, fixed history in, fixed lines out); a browser check that a changed date
   shows up in the next request.
-**Open question for Jonas:** is "learn" meant like this (habits from accepted and changed due dates)? Or also what the
-student likes to do at which time of day? Recommended: due dates only first, the rest later.
+**Scope:** due dates only for now. Time-of-day habits come later. TODO: Jonas has not answered this directly; confirm.
 
 ## 2. "Back" on tool pages opened from the chat
 **Today:** the tool card opens `#toolbox/<tool>`, and "Back" goes to the Toolbox page, which is no longer in the
@@ -41,10 +40,22 @@ stays in the code, only without a way in from the sidebar.
 **Decision (Jonas, 2026-10-30):** a reloaded chat may be empty only for students WITHOUT an account. For students with
 an account the conversation is kept and restored. This changes ADR 0027 ("no stored chat"): a new ADR supersedes it
 for signed-in students (AGENTS.md: no silent reversal).
-**Plan for the stored chat:** signed in (token present) the last 50 messages are saved with the other task data in the
-browser and restored on start; guests stay clean. The "Reset all data" button also deletes it. TODO: decide with Jonas
-whether the chat should also follow the student to another device (then it lives on the server and the privacy text must
-say so); the first version stays in the browser.
+**Plan for the stored chat (Jonas, 2026-10-31):** with an account the conversation follows the student to every device,
+so it lives on the server (per student, last 50 messages, in the data file next to tasks). Without an account nothing
+is stored and a reload starts clean. "Reset all data" and account deletion remove the stored chat. The privacy text
+must say that the chat is stored on the server for signed-in students. TODO: server routes to load and save the chat
+(`GET/PUT /api/chat/history`, own plan step) and a new ADR that supersedes the "no stored chat" part of ADR 0027.
+
+## 2b. Two levels of students (Jonas, 2026-10-31)
+1. **Raw**: no account. The whole app works in the browser, the AI chat has the free daily limit (12), nothing is stored
+   on the server, no calls, no phone number. Learned due-date habits stay in the browser.
+2. **With calling feature and phone number**: the student has an account (phone number, consent). Calls (slots, task
+   start, inbound), chat stored on the server and available on every device, the normal chat limit, voice. Learned
+   habits are saved with the account so they follow the student too.
+Why it matters: every feature in this plan and in `docs/plans/calling-feature.md` belongs to exactly one level, so the
+app can show "Sign in with your phone number to get this" in one place and the privacy text stays short.
+TODO (needs Jonas): is voice input part of level 2 only (today it needs the account), and does level 2 keep the
+Profile > Phone call page as the way in? Assumed: yes to both.
 
 ## 3. French "tu"
 **Confirmed by Jonas, 2026-10-30:** French uses "tu". Done in `docs/plans/languages.md` decision 1.
