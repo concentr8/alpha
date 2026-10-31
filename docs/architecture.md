@@ -72,6 +72,8 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | docs/plans/chat-followups.md | Plan: follow-ups of the chat actions (due date, Back from chat cards, French "tu", translations) | New, waiting for a human go |
 | docs/decisions/0023-voice-on-the-node-server.md | ADR: voice moves from Heroku to the Node server | New |
 | .env.example | Names of required secrets | Works |
+| docs/plans/calendar-redesign.md | Approved calendar-only redesign plan | New |
+| docs/plans/calendar-wireframes.md | Text wireframes for Jack before implementation | New |
 
 ## How a call happens (target flow)
 1. User agrees to calls and picks days and a time. The API stores the schedule
