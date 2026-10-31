@@ -1,6 +1,6 @@
 # Plan: app in German, French and Spanish
 
-Status: PROPOSED. Written 2026-10-30, waiting for Jonas's "go" and the decisions below.
+Status: ACCEPTED. Jonas answered the decisions on 2026-10-30 (below). Built step by step, after the guest chat.
 
 ## Goal
 The whole app can be used in English (today), German, French and Spanish: every page, button, message, the
@@ -38,15 +38,16 @@ B. **Translation layer** (recommended): the English text in the HTML stays the s
 - The meditation cues are translated as well; ElevenLabs text to speech uses a multilingual model today
   (`eleven_multilingual_v2`), cues are saved per text, so each language is paid once.
 
-## Decisions needed from Jonas
-1. German "du" or "Sie"? French "tu" or "vous"? (Study apps often use "du", to be confirmed.)
-2. Which Spanish: neutral Latin American / US Spanish (users are in the USA) or Spain?
-3. Should phone calls speak the chosen language from the start, or is the first version UI and chat only?
-4. Who checks the translations? I write them; a native reader for each language should read them before real users.
-5. Keep Berkeley time as the fixed time zone for now (users are in the USA, ADR 0008 / call-feature.md)?
+## Decisions (Jonas, 2026-10-30)
+1. German with "du". French: Jonas answered "du" for both, so French uses "tu" (TODO: confirm with Jonas).
+2. Spanish from Spain (`es-ES`).
+3. Phone calls speak the chosen language too. The default is English; the student can change it in the settings.
+4. Jonas reads all four languages and checks the translations himself.
+5. The time zone is no longer fixed: the student can set it in the settings (today the app uses Berkeley time in
+   several places and the server stores a time zone per student). Default: the browser's time zone.
 
 ## Risks
-- Machine-style translation misses tone and ADHD-friendly wording: native review (decision 4).
+- Machine-style translation misses tone and ADHD-friendly wording: Jonas's review (decision 4).
 - The privacy text is translated but is not legal advice.
 - A long string in German or French can break a layout (buttons, sidebar). Check each page on desktop and phone width.
 
@@ -54,7 +55,8 @@ B. **Translation layer** (recommended): the English text in the HTML stays the s
 0. Script that counts and lists all strings (gives the real size of the work).
 1. ADR, `i18n.js`, language switch, string check; English only, behaviour unchanged.
 2. German. 3. French. 4. Spanish. (One pull request each, screenshots of every page.)
-5. Server texts, chat and call openings per language; Cartesia agent per language.
+5. Time zone setting in the app (replaces the fixed Berkeley time).
+6. Server texts, chat and call openings per language; Cartesia agent per language (default English, set in the settings).
 
 ## Done when
 Every page and message appears in the chosen language, no user text is touched, the string check passes for all
