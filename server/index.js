@@ -53,7 +53,7 @@ function newUser(id, fields = {}) {
 }
 
 function migrate(raw) {
-  const out = { users: raw.users || {}, publicBase: raw.publicBase || null, global: raw.global || { date: null, calls: 0, signups: 0 } };
+  const out = { users: raw.users || {}, guests: raw.guests || {}, publicBase: raw.publicBase || null, global: raw.global || { date: null, calls: 0, signups: 0 } };
   if (!raw.users && (raw.settings || raw.tasks)) {
     // The single-student format of the first version becomes the owner.
     out.users.owner = newUser('owner', {
@@ -1069,6 +1069,66 @@ function applySettings(u, body) {
   if (typeof body.paused === 'boolean') u.paused = body.paused;
 }
 
+// --- AI chat without login (docs/plans/guest-chat.md) ---
+// Anyone may try the chat for a few messages a day. Three limits, all on the server, because a counter in the browser
+// could be skipped by anyone: per guest, per IP address, and for all guests together (the brake for the Claude bill).
+const GUEST_CHAT_PER_DAY = Number(env.GUEST_CHAT_PER_DAY || 12);
+const GUEST_CHAT_PER_IP_PER_DAY = Number(env.GUEST_CHAT_PER_IP_PER_DAY || 30);
+const GUEST_CHAT_GLOBAL_PER_DAY = Number(env.GUEST_CHAT_GLOBAL_PER_DAY || 200);
+const GUEST_ID = /^[a-f0-9]{32,64}$/; // random, made once by the browser; no phone number, no account
+const guestIpCounts = new Map(); // address -> { date, count }. Memory only: the address is never written to disk.
+let guestGlobal = { date: null, count: 0 };
+const SIGN_IN_HINT = 'Sign in under Profile, Phone call to keep chatting.';
+
+/**
+ * The caller's address. A guest can send any X-Forwarded-For text, but every proxy adds the address it saw at the END,
+ * so the last entry is the one we can trust. Azure writes it as "1.2.3.4:5678", the port is cut off.
+ * TODO: check on the live server that this is the visitor's address and not an Azure address.
+ */
+function clientIp(req) {
+  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',').map((part) => part.trim()).filter(Boolean);
+  const last = forwarded[forwarded.length - 1] || (req.socket && req.socket.remoteAddress) || 'unknown';
+  return last.replace(/^(\d+\.\d+\.\d+\.\d+):\d+$/, '$1');
+}
+
+/** Counts of yesterday are of no use: they are dropped once, when the first guest of a new day arrives. */
+function startNewGuestDay(day) {
+  guestGlobal = { date: day, count: 0 };
+  guestIpCounts.clear();
+  for (const [key, entry] of Object.entries(data.guests)) if (entry.date !== day) delete data.guests[key];
+}
+
+async function guestChat(req, body) {
+  if (!env.ANTHROPIC_API_KEY) throw httpError(503, 'This server has no Claude key.');
+  const guestId = String(body.guestId || '');
+  if (!GUEST_ID.test(guestId)) throw httpError(400, 'Missing or wrong guestId.');
+  const day = new Date().toISOString().slice(0, 10); // a guest has no time zone: the UTC day counts
+  if (guestGlobal.date !== day) startNewGuestDay(day);
+
+  const ip = clientIp(req);
+  const ipEntry = guestIpCounts.get(ip) || { date: day, count: 0 };
+  const key = sha256(guestId);
+  const guest = data.guests[key] || (data.guests[key] = { date: day, count: 0 });
+
+  // Checked before Claude is asked, so a refused message costs nothing.
+  if (guest.count >= GUEST_CHAT_PER_DAY) throw httpError(429, `You used your ${GUEST_CHAT_PER_DAY} free messages for today. ${SIGN_IN_HINT}`);
+  if (ipEntry.count >= GUEST_CHAT_PER_IP_PER_DAY || guestGlobal.count >= GUEST_CHAT_GLOBAL_PER_DAY) {
+    throw httpError(429, `The free chat is busy right now. ${SIGN_IN_HINT}`);
+  }
+
+  // Counted first, so ten messages sent at the same moment cannot all pass; given back if Claude fails.
+  guest.count += 1; ipEntry.count += 1; guestGlobal.count += 1;
+  guestIpCounts.set(ip, ipEntry);
+  try {
+    const result = await claudeChat(body);
+    save();
+    return { ...result, remaining: Math.max(0, GUEST_CHAT_PER_DAY - guest.count) };
+  } catch (err) {
+    guest.count -= 1; ipEntry.count -= 1; guestGlobal.count -= 1;
+    throw err;
+  }
+}
+
 // --- AI chat in the app (the agent panel in frontend/index.html) ---
 const CHAT_SYSTEM_PROMPT = [
   'You are Concentr8, a calm study helper inside a focus app for students with ADHD.',
@@ -1182,6 +1242,11 @@ async function route(req, res) {
   }
 
   // --- sign-up (no login yet; closed, invite code, or open to everyone with OPEN_SIGNUPS=true) ---
+  if (p === '/api/chat/guest' && m === 'POST') {
+    let body;
+    try { body = JSON.parse((await readBody(req)) || '{}'); } catch { throw httpError(400, 'The request body is not valid JSON.'); }
+    return send(res, 200, await guestChat(req, body));
+  }
   if (p === '/api/register' && m === 'POST') {
     const body = JSON.parse((await readBody(req)) || '{}');
     if (!signupsOpen()) throw httpError(403, 'Sign-ups are closed on this server.');
