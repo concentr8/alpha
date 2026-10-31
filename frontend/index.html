@@ -99,13 +99,6 @@
     .workspace { position:relative; min-width:0; }
     .check-in { position:absolute; bottom:21.5%; left:50%; transform:translateX(-50%); width:calc(100% - 96px); max-width:688px; }
     h1 { font-size:28px; font-weight:400; line-height:1.3; margin-bottom:24px; letter-spacing:-.4px; }
-    .moods { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:0 0 27px; padding:0; border:0; }
-    .mood { position:relative; cursor:pointer; min-width:0; }
-    .mood input { position:absolute; opacity:0; width:1px; height:1px; }
-    .mood-word { display:grid; place-items:center; height:46px; padding:0 10px; border:1.5px solid #bdbdbd; border-radius:8px; background:#fff; font-size:18px; line-height:1.2; white-space:nowrap; }
-    .mood:hover .mood-word { background:#f7f7f7; }
-    .mood input:checked + .mood-word { background:#eaeaea; border-color:#333; }
-    .mood input:focus-visible + .mood-word { outline:2px solid var(--ink); outline-offset:4px; }
     .composer { display:flex; gap:8px; align-items:center; width:100%; height:64px; border:1.5px solid #bdbdbd; border-radius:8px; padding:8px 10px 8px 20px; background:#fff; }
     .composer:focus-within { border-color:#333; }
     .composer input { min-width:0; flex:1; border:0; outline:none; background:transparent; font-size:19px; }
@@ -134,7 +127,6 @@
       .sidebar { padding-left:16px;padding-right:16px; }
       .nav button,.profile { font-size:18px;padding-left:16px; }
       .check-in { width:calc(100% - 64px); }
-      .moods { gap:16px; }
       .todo { padding-left:24px;padding-right:20px; }
     }
     @media (max-width:960px) {
@@ -144,8 +136,6 @@
       .nav button,.profile { padding-left:12px; }
       .check-in { width:calc(100% - 48px); }
       h1 { font-size:25px; }
-      .moods { gap:10px; }
-      .mood-word { border-radius:12px; }
       .todo { padding-left:20px;padding-right:16px; }
       .todo h2 { font-size:24px; }
       .task { font-size:17px;gap:12px; }
@@ -170,8 +160,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .workspace { overflow:auto; }
 .check-in { position:relative; top:clamp(170px,29vh,280px); bottom:auto; left:auto; transform:none; width:calc(100% - 96px); max-width:688px; margin:0 auto 80px; }
 .check-in h1 { font-size:30px; margin-bottom:26px; }
-.moods { gap:10px; margin-bottom:28px; }
-.mood-word { height:46px; border-radius:8px; }
 .chat-composer { flex-wrap:wrap; align-items:flex-end; justify-content:space-between; height:auto; min-height:136px; padding:18px 16px 12px; gap:10px; }
 .chat-composer textarea { width:100%; min-width:0; resize:none; border:0; outline:none; box-shadow:none; background:transparent; font-size:20px; line-height:1.45; height:32px; max-height:116px; padding:0 4px; color:var(--ink); }
 .chat-composer textarea::placeholder { color:#777; opacity:1; }
@@ -200,7 +188,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .check-in.has-messages { top:86px; height:calc(100dvh - 150px); min-height:430px; display:flex; flex-direction:column; margin-bottom:64px; }
 .has-messages .conversation { flex:1; margin-bottom:18px; }
 .has-messages h1 { font-size:26px; margin-bottom:20px; }
-.has-messages .moods { flex-shrink:0; margin-bottom:24px; }
 .has-messages .chat-composer { flex-shrink:0; }
 .chat-message { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
 .chat-message p { max-width:92%; background:#f2f2f2; padding:14px 18px; border-radius:8px; font-size:19px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
@@ -230,7 +217,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   .sidebar-toggle { width:32px; }
   .nav .nav-child { padding-left:36px; }
   .check-in { width:calc(100% - 64px); }
-  .moods { gap:12px; }
   .todo { padding-left:24px; padding-right:20px; }
 }
 @media(max-width:960px) {
@@ -241,8 +227,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   .nav .nav-child { padding-left:30px; }
   .check-in { width:calc(100% - 48px); }
   .check-in h1 { font-size:26px; }
-  .moods { gap:8px; }
-  .mood-word { height:44px; }
   .chat-composer textarea { font-size:18px; }
   .todo { padding-left:20px; padding-right:16px; }
   .task-title { font-size:17px; }
@@ -465,42 +449,12 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 
     <main class="workspace" aria-label="Home">
       <section class="check-in" aria-labelledby="check-in-title">
-        <h1 id="check-in-title">How are you feeling?</h1>
-        <fieldset class="moods">
-          <legend class="sr-only">Choose how you feel</legend>
-          <label class="mood">
-            <input type="checkbox" name="mood" value="calm" aria-label="Calm">
-            <span class="mood-word">Calm</span>
-          </label>
-          <label class="mood">
-            <input type="checkbox" name="mood" value="energized" aria-label="Energized">
-            <span class="mood-word">Energized</span>
-          </label>
-          <label class="mood">
-            <input type="checkbox" name="mood" value="motivated" aria-label="Motivated">
-            <span class="mood-word">Motivated</span>
-          </label>
-          <label class="mood">
-            <input type="checkbox" name="mood" value="content" aria-label="Content">
-            <span class="mood-word">Content</span>
-          </label>
-          <label class="mood">
-            <input type="checkbox" name="mood" value="tired" aria-label="Tired">
-            <span class="mood-word">Tired</span>
-          </label>
-          <label class="mood">
-            <input type="checkbox" name="mood" value="anxious" aria-label="Anxious">
-            <span class="mood-word">Anxious</span>
-          </label>
-          <label class="mood">
-            <input type="checkbox" name="mood" value="overwhelmed" aria-label="Overwhelmed">
-            <span class="mood-word">Overwhelmed</span>
-          </label>
-          <label class="mood">
-            <input type="checkbox" name="mood" value="distracted" aria-label="Distracted">
-            <span class="mood-word">Distracted</span>
-          </label>
-        </fieldset>
+        <h1 id="check-in-title">Hello</h1>
+        <!-- AI-GENERATED: no wireframe from Jack for the clean start screen; built from existing tokens (docs/plans/home-chat-tools.md). -->
+        <section class="up-next" aria-labelledby="up-next-title">
+          <h2 id="up-next-title">Up next</h2>
+          <ul class="up-next-row" id="up-next-list"></ul>
+        </section>
         <div class="conversation" id="home-conversation" role="log" aria-label="Conversation" aria-live="polite"></div>
         <form class="composer chat-composer" id="main-composer">
           <textarea rows="1" aria-label="What's on your mind?" placeholder="What’s on your mind?" autocomplete="off" maxlength="2000"></textarea>
@@ -512,8 +466,8 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       </section>
     </main>
 
-    <aside class="todo" aria-labelledby="todo-title">
-      <div class="todo-header"><h2 id="todo-title">To-do</h2><button class="icon-button" id="add-task-toggle" type="button" aria-label="Add a to-do" aria-controls="add-task-form" aria-expanded="false" title="Add a to-do"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+    <aside class="todo" id="all-todos" aria-labelledby="todo-title" hidden>
+      <div class="todo-header"><h2 id="todo-title">To-do</h2><div class="todo-header-actions"><button class="icon-button" id="add-task-toggle" type="button" aria-label="Add a to-do" aria-controls="add-task-form" aria-expanded="false" title="Add a to-do"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button class="icon-button" type="button" data-close-todos aria-label="Close to-do list" title="Close">×</button></div></div>
       <ul class="tasks" id="home-tasks"></ul>
       <form id="add-task-form" class="add-task-form" hidden><input aria-label="New to-do" placeholder="Add a to-do" maxlength="2000" autocomplete="off"><button class="icon-button" type="submit" aria-label="Save to-do"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></button></form>
     </aside>
@@ -643,6 +597,24 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .page-content[aria-label="Toolbox"]>:is(.product-heading,.detail-heading)>.text-back{min-height:48px}
 .page-content[aria-label="Toolbox"]>.detail-heading .detail-actions .wire-button{height:48px;padding-block:10px}
 @media(max-width:960px){.page-content[aria-label="Toolbox"]>:is(.product-heading,.detail-heading)>h1{font-size:26px}}
+/* AI-GENERATED: clean start screen (docs/plans/home-chat-tools.md). Home has two columns; the full to-do list opens on demand. */
+.up-next { margin-bottom:22px; }
+.up-next h2 { font-size:17px; font-weight:400; color:#666; margin:0 0 10px; }
+.up-next-row { display:flex; gap:10px; margin:0; padding:0 0 4px; list-style:none; overflow-x:auto; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; }
+.up-next-row > li { flex:0 0 230px; min-width:0; scroll-snap-align:start; }
+.up-next-card { display:flex; flex-direction:column; gap:2px; width:100%; padding:12px 14px; border:1px solid #eaeaea; border-radius:8px; background:#fff; text-align:left; font:inherit; color:inherit; cursor:pointer; }
+.up-next-card:hover { background:#f7f7f5; }
+.up-next-card strong { font-weight:500; font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.up-next-card span { font-size:15px; color:#666; }
+.has-messages .up-next { display:none; }
+.todo-header-actions { display:flex; align-items:center; gap:4px; }
+@media(min-width:761px){
+.app:not(.inner-page) { grid-template-columns:224px minmax(360px,1fr); }
+.app:not(.inner-page).sidebar-collapsed { grid-template-columns:52px minmax(360px,1fr); }
+.app.todo-open .todo { position:fixed; top:0; right:0; bottom:0; width:336px; z-index:20; background:#fff; }
+}
+@media(min-width:761px) and (max-width:1250px){ .app:not(.inner-page) { grid-template-columns:188px minmax(360px,1fr); } }
+@media(min-width:761px) and (max-width:960px){ .app:not(.inner-page) { grid-template-columns:160px minmax(360px,1fr); } }
 </style>
 <style data-source="mobile.css">
 /* Phones: one column, the menu slides over the page. Desktop is unchanged (ADR 0014). */
@@ -653,8 +625,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .workspace,.todo{overflow:visible}
 .check-in,.check-in.has-messages{top:0;width:calc(100% - 32px);margin:72px auto 32px}
 .check-in.has-messages{height:calc(100dvh - 104px);min-height:380px}
-.moods{grid-template-columns:repeat(2,minmax(0,1fr))}
-.mood-word{white-space:normal;height:auto;min-height:44px;padding:6px 8px}
 .todo{border-left:0;border-top:1px solid var(--line);padding:24px 16px 120px}
 .page-content,.page-content.calendar-page{padding:72px 16px 96px}
 .page-heading{flex-wrap:wrap}
@@ -672,9 +642,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 /* One local record shared by Home and the agent on every page. */
 (() => {
   const key = 'articul8-wireframe-v2';
-  const moods = ['calm', 'energized', 'motivated', 'content', 'tired', 'anxious', 'overwhelmed', 'distracted'];
-  const legacyMoods = {low:'tired',okay:'calm',good:'content',ready:'motivated'};
-  const cleanMoods = values => [...new Set(values.map(value=>legacyMoods[value]||value).filter(value=>moods.includes(value)))];
   const today = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   const monday = new Date(today+'T12:00:00Z');
   monday.setUTCDate(monday.getUTCDate()-(monday.getUTCDay()+6)%7);
@@ -683,7 +650,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   const validEvent = event => event && typeof event.title==='string' && event.title.trim() && validTime(event.start) && validTime(event.end) && (event.kind==='deadline' || event.end>event.start);
   const cleanEvent = event => ({id:event.id,title:event.title.trim().slice(0,200),kind:event.kind==='deadline'?'deadline':'plan',start:event.start,end:event.kind==='deadline'?event.start:event.end,allDay:event.kind==='deadline'&&event.allDay===true,taskId:typeof event.taskId==='string'?event.taskId:null,notes:typeof event.notes==='string'?event.notes.slice(0,2000):''});
   const initial = () => ({
-    version: 2, mood: '', moods: [], draft: '', collapsed: matchMedia('(max-width:760px)').matches, messages: [], agentEventId:null,
+    version: 2, draft: '', collapsed: matchMedia('(max-width:760px)').matches, messages: [], agentEventId:null,
     activeTaskId:null, taskContext:'', courses:[{id:'cs188',name:'COMPSCI 188',why:''},{id:'econ1',name:'ECON 1',why:''},{id:'rhetor10',name:'RHETOR 10',why:''}],
     workflows:[], sessions:[], activeSession:null,
     tools:{favorites:[],selected:[],customSelection:false,blockedApps:[],sound:'brown'},
@@ -704,8 +671,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   function read(value) {
     const clean = initial();
     if (!value || value.version !== 2) return clean;
-    clean.moods = cleanMoods(Array.isArray(value.moods)?value.moods:Array.isArray(value.mood)?value.mood:[value.mood]);
-    clean.mood = clean.moods[0] || '';
     clean.draft = typeof value.draft === 'string' ? value.draft.slice(0, 2000) : '';
     clean.collapsed = value.collapsed === true;
     if(Array.isArray(value.calendarEvents))clean.calendarEvents=value.calendarEvents.filter(e=>validEvent(e)&&typeof e.id==='string').map(cleanEvent);
@@ -774,11 +739,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     },
     uid:id,
     setDraft(text) { update(s => {s.draft=text.slice(0,2000);}, 'draft'); },
-    setMood(mood, checked) { if (moods.includes(mood)) update(s => {
-      const enabled = typeof checked==='boolean'?checked:!s.moods.includes(mood);
-      s.moods = enabled ? cleanMoods([...s.moods,mood]) : s.moods.filter(value=>value!==mood);
-      s.mood = s.moods[0] || '';
-    }, 'mood'); },
     setCollapsed(value) { update(s => {s.collapsed=Boolean(value);}, 'sidebar'); },
     setAgentEvent(eventId) { update(s=>{const event=s.calendarEvents.find(e=>e.id===eventId);s.agentEventId=event?.id||null;if(event?.taskId)s.activeTaskId=event.taskId;},'calendar-context'); },
     send(text) {
@@ -866,10 +826,10 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   const dateLabel=value=>new Date(value+'Z').toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'UTC'});
   function recommend(text=context()) {
     const selected=['timer','checklist'];
-    if(S.state.moods.some(mood=>mood==='overwhelmed'||mood==='anxious')||/stress|overwhelm|焦虑|累|紧张/i.test(text))selected.unshift('breathing');
+    if(/stress|overwhelm|焦虑|累|紧张/i.test(text))selected.unshift('breathing');
     if(/read|essay|write|报告|论文|阅读/i.test(text))selected.push('music');
     if(/together|group|同学|一起|小组/i.test(text))selected.push('body');
-    if(S.state.moods.includes('distracted')||/distract|phone|手机|分心/i.test(text))selected.push('block');
+    if(/distract|phone|手机|分心/i.test(text))selected.push('block');
     return selected;
   }
   function chosen(){return S.state.tools.customSelection?S.state.tools.selected.filter(id=>tools.some(t=>t.id===id)):[];}
@@ -1905,9 +1865,6 @@ function setAgent(open, focusInput=true) {
       input.form.querySelector('[type="submit"]').disabled=voiceCapture.active||!input.value.trim();
     });
   }
-  function renderMood() {
-    document.querySelectorAll('.moods input').forEach(input=>{input.checked=store.state.moods.includes(input.value);});
-  }
   function renderSidebar() {
     const collapsed=store.state.collapsed;
     app.classList.toggle('sidebar-collapsed',collapsed);
@@ -1926,25 +1883,68 @@ function setAgent(open, focusInput=true) {
     taskList.innerHTML=store.state.tasks.map(task=>`<li class="task"><input type="checkbox" data-task-check="${escapeHtml(task.id)}" aria-label="Complete ${escapeHtml(task.title)}" ${task.done?'checked':''}><button class="task-title" type="button" data-discuss-task="${escapeHtml(task.id)}" aria-label="Discuss ${escapeHtml(task.title)}">${escapeHtml(task.title)}</button></li>`).join('');
     if(focusedId)Array.from(taskList.querySelectorAll('input')).find(input=>input.dataset.taskCheck===focusedId)?.focus();
   }
+  /* AI-GENERATED: greeting, "Up next" and the on-demand to-do list of the clean start screen (docs/plans/home-chat-tools.md). */
+  const greetingTitle=document.getElementById('check-in-title');
+  const upNextList=document.getElementById('up-next-list');
+  const allTodos=document.getElementById('all-todos');
+  function renderGreeting() {
+    const hour=new Date().getHours();
+    const word=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+    const name=store.state.profile.name.trim();
+    greetingTitle.textContent=name?word+', '+name:word;
+  }
+  // A task is due at its earliest "deadline" calendar event, the same rule the Toolbox pages use.
+  function deadlineOf(task) {
+    return store.state.calendarEvents.filter(e=>e.taskId===task.id&&e.kind==='deadline').map(e=>e.start).sort()[0]||'';
+  }
+  function dueLabel(start) {
+    if(!start)return 'No due date';
+    const todayLA=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    const days=Math.round((Date.parse(start.slice(0,10)+'T12:00Z')-Date.parse(todayLA+'T12:00Z'))/86400000);
+    if(days<0)return 'Overdue';
+    if(days===0)return 'Due today';
+    if(days===1)return 'Due tomorrow';
+    const date=new Date(start.slice(0,10)+'T12:00Z');
+    return 'Due '+(days<=6?date.toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'}):date.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'}));
+  }
+  function renderUpNext() {
+    const open=store.state.tasks.filter(task=>!task.done);
+    // Tasks without a due date go last: '9' sorts after any date string.
+    const top=open.map(task=>({task,due:deadlineOf(task)})).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9')).slice(0,3);
+    upNextList.innerHTML=top.map(({task,due})=>`<li><button class="up-next-card" type="button" data-discuss-task="${escapeHtml(task.id)}"><strong>${escapeHtml(task.title)}</strong><span>${dueLabel(due)}</span></button></li>`).join('')
+      +`<li><button class="up-next-card" type="button" data-open-todos><strong>All to-dos</strong><span>${open.length} open</span></button></li>`;
+  }
+  upNextList.addEventListener('click',event=>{
+    if(event.target.closest('[data-open-todos]')){setAllTodos(true);return;}
+    const button=event.target.closest('[data-discuss-task]');
+    if(!button)return;
+    store.selectTask(button.dataset.discussTask);
+    store.setAgentEvent(null);
+    inputs[0].focus();
+  });
+  function setAllTodos(open) {
+    allTodos.hidden=!open;
+    app.classList.toggle('todo-open',open);
+    if(open)allTodos.querySelector('[data-close-todos]').focus();
+    else upNextList.querySelector('[data-open-todos]')?.focus();
+  }
+  allTodos.querySelector('[data-close-todos]').addEventListener('click',()=>setAllTodos(false));
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!allTodos.hidden)setAllTodos(false);});
   function renderContext() {
     const event=store.state.calendarEvents.find(e=>e.id===store.state.agentEventId);
     contexts.forEach(context=>{context.hidden=!event;context.innerHTML=event?`<button type="button" data-open-context><span>${escapeHtml(event.title)}</span><span>${escapeHtml(CalendarUI.timeLabel(event))}</span></button><button class="icon-button" type="button" data-clear-context aria-label="Clear selected event">×</button>`:'';});
   }
   contexts.forEach(context=>context.addEventListener('click',event=>{if(event.target.closest('[data-clear-context]'))store.setAgentEvent(null);else if(event.target.closest('[data-open-context]'))CalendarUI.details(store.state.agentEventId);}));
-  function renderAll() { renderDraft();renderMood();renderSidebar();renderMessages();renderTasks();renderContext(); }
+  function renderAll() { renderDraft();renderGreeting();renderUpNext();renderSidebar();renderMessages();renderTasks();renderContext(); }
   window.addEventListener('articul8:change',event=>{
     const {reason,persisted}=event.detail;
     if(!persisted&&!storageNoticeShown){announce('Changes are saved for this session only.');storageNoticeShown=true;}
     if(reason==='draft')renderDraft();
-    else if(reason==='mood')renderMood();
     else if(reason==='sidebar')renderSidebar();
-    else if(reason==='tasks'){renderTasks();renderMessages();}
+    else if(reason==='tasks'){renderTasks();renderUpNext();renderMessages();}
     else renderAll();
   });
   window.addEventListener('articul8:agent-open',()=>{renderDraft();const log=conversations[1];log.scrollTop=log.scrollHeight;});
-  document.querySelectorAll('.moods input').forEach(input=>input.addEventListener('change',()=>{
-    store.setMood(input.value,input.checked);
-  }));
   document.getElementById('collapse-sidebar').addEventListener('click',()=>{store.setCollapsed(true);document.getElementById('open-sidebar').focus();});
   document.getElementById('open-sidebar').addEventListener('click',()=>{store.setCollapsed(false);document.getElementById('collapse-sidebar').focus();});
   toggle.addEventListener('click',()=>{setAgent(agent.hidden);renderDraft();});
@@ -2251,7 +2251,7 @@ function setAgent(open, focusInput=true) {
     CalendarUI.unmount();ProductPages.unmount();Product.closeModal();
     currentPage=name;path=nextPath;
     if(updateHash)history.pushState(null,'','#'+name.toLowerCase()+(path?'/'+encodeURIComponent(path):''));
-    const isHome=name==='Home';app.classList.toggle('inner-page',!isHome);home.hidden=!isHome;todo.hidden=!isHome;content.hidden=isHome;content.setAttribute('aria-label',name);
+    const isHome=name==='Home';app.classList.toggle('inner-page',!isHome);home.hidden=!isHome;todo.hidden=true;app.classList.remove('todo-open');content.hidden=isHome;content.setAttribute('aria-label',name);
     document.querySelectorAll('[data-page]').forEach(b=>{if(b.dataset.page===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     if(!isHome){content.innerHTML=renders[name]();if(name==='Calendar')CalendarUI.mount(content);ToolPages.mountWheels();BodyRooms.mount();}
     if(matchMedia('(max-width:760px)').matches)Articul8.change(s=>{s.collapsed=true;},'sidebar');
@@ -2266,7 +2266,7 @@ function setAgent(open, focusInput=true) {
   window.addEventListener('articul8:change',e=>{
     const reason=e.detail.reason;
     if(['draft','sidebar','calendar-context','sound','workflow-name'].includes(reason))return;
-    if(currentPage==='Toolbox'&&['tasks','message','task-context','context','tools','restore','mood','calendar','wellness'].includes(reason))render();
+    if(currentPage==='Toolbox'&&['tasks','message','task-context','context','tools','restore','calendar','wellness'].includes(reason))render();
     if(currentPage==='Workflow'&&['workflow','restore'].includes(reason))render();
     if(currentPage==='Courses'&&['tasks','courses','calendar','restore'].includes(reason))render();
     if(currentPage==='Focus'&&['tasks','focus','calendar','restore'].includes(reason))render();

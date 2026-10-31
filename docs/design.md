@@ -66,7 +66,7 @@ directly. Do not add new greys or new accent colors.
 | `.stat-row` | Three numbers in a row | big 38px numbers |
 | `.template-grid` | Cards in 3 columns (2 when narrow) | gap 22px |
 | `.avatar` | Round initials | 40px, `#eee` |
-| `.mood` / `.mood-word` | Check-in words on Home | 8 words, wrap to 2 rows, selected = `#f4f4f2` + dark border |
+| `.up-next-row` / `.up-next-card` | "Up next" row on Home (AI generated, ADR 0026) | cards 230px wide, 1px `#eaeaea`, radius 8px, hover `#f7f7f5`, swipeable (scroll snap) |
 | `.detail-heading` | Header of a tool page: `.text-back`, `h1`, `.detail-actions` on the right | 28px title, actions push right |
 | `.detail-section`, `.detail-note`, `.detail-empty` | Block with 21px/500 title, grey note, empty text | notes `#737373`, 16px |
 | `.detail-search` | Search field with icon and button | 1px `#ccc`, radius 6px |
