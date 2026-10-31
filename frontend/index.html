@@ -765,6 +765,13 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   window.Articul8 = {
     get state() { return state; },
     change:update,
+    /* Back to a fresh start. The in-memory state is replaced too: other code saves it again when the page is left, which would bring the old data back. */
+    reset() {
+      state = initial();
+      state.draft='';state.tools.selected=[];state.tools.customSelection=false;
+      try { localStorage.removeItem(key); } catch (_) { /* Nothing stored, nothing to delete. */ }
+      window.dispatchEvent(new CustomEvent('articul8:change', {detail:{reason:'restore', persisted:true}}));
+    },
     uid:id,
     setDraft(text) { update(s => {s.draft=text.slice(0,2000);}, 'draft'); },
     setMood(mood, checked) { if (moods.includes(mood)) update(s => {
@@ -1254,7 +1261,14 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     d.querySelector('form').onsubmit=e=>{e.preventDefault();const f=e.currentTarget.elements,name=f.name.value.trim().replace(/\s+/g,' ');if(!name)return;const duplicate=S.state.courses.find(c=>c.id!==existing?.id&&c.name.trim().replace(/\s+/g,' ').toLowerCase()===name.toLowerCase());if(duplicate){f.name.setCustomValidity('This course already exists.');f.name.reportValidity();f.name.oninput=()=>f.name.setCustomValidity('');return;}const id=existing?.id||S.uid();selectedCourse=id;S.change(s=>{if(existing){const c=s.courses.find(c=>c.id===id);s.tasks.filter(t=>t.course===c.name).forEach(t=>t.course=name);c.name=name;c.why=f.why.value.trim();}else s.courses.push({id,name,why:f.why.value.trim()});},'courses');d.close();};
   }
   const dayOf=timestamp=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(timestamp));
-  function stats(){return Insights.profile();}
+  /* AI-GENERATED: no wireframe from Jack for "Reset all data"; built from .profile-detail, .preview-note and .wire-button. The first click only asks, the second click deletes. */
+  let resetAsked=false;
+  function resetDataSection(){
+    const buttons=resetAsked?'<p>Really delete everything?</p><button class="wire-button" type="button" data-reset-data>Yes, delete all data</button> <button class="wire-button" type="button" data-reset-cancel>Cancel</button>':'<button class="wire-button" type="button" data-reset-data>Reset all data</button>';
+    return '<div class="profile-detail"><h2>Reset all data</h2><p class="preview-note">AI generated: Jack has not drawn this yet. It will be redrawn.</p><p>Deletes your tasks, courses, calendar, messages, focus history and block list from this browser. Your phone call account stays; delete it under Profile, Phone call. Export your data first if you want a copy.</p>'+buttons+'</div>';
+  }
+  window.addEventListener('articul8:navigate',()=>{resetAsked=false;}); /* leaving the page cancels a pending question */
+  function stats(){return Insights.profile()+resetDataSection();}
   function profile(path) {
     if(path==='stats'||path==='data')return stats();
     if(path==='personal')return subheading('Personal information','Profile')+'<form class="product-form profile-form" id="profile-form"><label>Name<input name="name" aria-label="Name" maxlength="80" value="'+P.esc(S.state.profile.name)+'"></label><label>Email<input name="email" aria-label="Email" type="email" value="'+P.esc(S.state.profile.email)+'"></label><div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
