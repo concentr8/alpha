@@ -17,6 +17,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 |---|---|---|
 | frontend/index.html | Whole UI in one file. Stores local data in the browser (localStorage); Calendar exposes a separate in-memory read-only extension point. | Small approved page edits (ADR 0022, 0028). Includes Jack's 2026-10-21 version, ElevenLabs (ADR 0010, 0013), phone layout (ADR 0014), calendar redesign (ADR 0028) |
 | docs/evidence/mobile-layout/ | Before/after screenshots at phone width (proof for ADR 0014) | New |
+| docs/evidence/calendar/ | 1440/390 before/after screenshots; README explains synthetic fixtures, per-PR images and browser checks | New |
 | frontend/music/ | Four music loops for the Music page (ADR 0015) | New |
 | docs/music-credits.md | Source and terms of every audio file | New |
 | docs/design.md | Look of the frontend: tokens and components to reuse | Updated for 2026-10-31 Calendar redesign (ADR 0028) |
@@ -78,6 +79,10 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/calendar-wireframes.md | Text wireframes for Jack before implementation | New |
 | docs/plans/calendar-find-time.md | Approved calendar-only availability plan | New |
 | docs/plans/google-calendar.md | Approved read-only OAuth, frontend contract and future ICS fallback | New |
+| server/google-calendar.js | Per-student read-only OAuth, encrypted refresh credentials, calendar selection and event pagination | New |
+| server/test/google-calendar.test.js | Mocked OAuth, cookie/state/PKCE, isolation, selection, range, timezone and disconnect tests | New |
+| frontend/concentr8-google-calendar.js | Runtime Settings dialog and in-memory read-only calendar adapter; calls the same Concentr8 server | New |
+| docs/decisions/0030-google-calendar-readonly.md | OAuth identity, credential storage and read-only data boundaries | New |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
@@ -92,6 +97,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
    provider to place the call, stores only the status.
 
 ## Where to read next
+- Calendar changes and setup: docs/plans/google-calendar.md and server/README.md.
 - Why things are built this way: docs/decisions/
 - The backend on one page: docs/backend-overview.md
 - What we are building now: docs/plans/call-feature.md

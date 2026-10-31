@@ -327,6 +327,16 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .cal-view-switch{display:flex;gap:4px}
 .cal-view-switch button{font:inherit;font-size:16px;padding:9px 12px;background:white;border:1px solid transparent;border-radius:6px;cursor:pointer}
 .cal-view-switch button[aria-pressed=true]{background:#f4f4f2;border-color:#ccc}
+.cal-filter-chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.cal-filter-chip[aria-pressed=true]{background:#f4f4f2;border-color:#566b60}
+.cal-filter-chip.google{border-style:dashed}
+.google-calendar-option{display:flex;align-items:center;gap:12px;padding:12px 10px;border-bottom:1px solid #eaeaea;font-size:16px}
+.google-calendar-option input{width:20px;height:20px;accent-color:#566b60;flex:0 0 20px}
+.google-calendar-option input:disabled{opacity:.55}
+.google-calendar-dialog h3{font-size:20px;font-weight:400;margin:20px 0 8px}
+.google-calendar-status{color:#555;margin:0 0 16px}
+.google-calendar-dialog .detail-note{font-size:14px;color:#666}
+.google-calendar-dialog .dialog-actions{flex-wrap:wrap}
 .cal-workspace{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:0;flex:1;gap:16px}
 .cal-rail{min-width:0;border:1px solid #eaeaea;border-radius:8px;padding:12px;overflow:auto}
 .cal-rail[hidden]{display:none}
@@ -1475,7 +1485,9 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     return `<section aria-label="Find time for a task"><h2>Find study time</h2><form class="cal-find-time" data-cal-find-time><label>Task<select name="task" required><option value="">Choose a task</option>${tasks.map(task=>`<option value="${esc(task.id)}">${esc(task.title)}</option>`).join('')}</select></label><label>Estimated minutes<input name="duration" type="number" min="1" max="780" required placeholder="e.g. 45"></label><button class="wire-button" type="submit">Find time</button><p data-cal-time-result role="status" aria-live="polite"></p><button class="wire-button" type="button" data-cal-use-time hidden>Add to calendar</button></form></section>`;
   }
   function availability(duration) {
-    if(external.calendars.length&&external.status!=='ready')throw new Error('Refresh Google Calendar before finding a free slot.');
+    if ((external.calendars.length && external.status !== 'ready') || ['loading', 'error', 'stale'].includes(external.status)) {
+      throw new Error('Refresh Google Calendar before finding a free slot.');
+    }
     const now=new Date(),rounded=now.getSeconds()?new Date(now.getTime()+60000):now;
     const wallNow=tools.localDate(rounded)+'T'+String(rounded.getHours()).padStart(2,'0')+':'+String(rounded.getMinutes()).padStart(2,'0');
     return tools.findFreeSlot([...store.state.calendarEvents,...external.events],duration,wallNow);
@@ -1492,10 +1504,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   const emitRange=()=>window.dispatchEvent(new CustomEvent('concentr8:calendar-range',{detail:getRange()}));
   function getRange() {
     const days=dates();
-    if(view==='month'){
-      const from=anchor.slice(0,7)+'-01';
-      return {from,to:tools.localDate(new Date(Number(anchor.slice(0,4)),Number(anchor.slice(5,7)),1))};
-    }
     return {from:days[0],to:dayAdd(days[days.length-1],1)};
   }
   const getEvent=id=>store.state.calendarEvents.find(e=>e.id===id);
@@ -1553,8 +1561,10 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     const monthCells=monthDates(miniMonth),miniHead=fmt(miniMonth,{month:'long',year:'numeric'});
     const stateText=external.status==='loading'?'Google calendars are updating. Your tasks remain available.':
       external.status==='error'?(external.message||'Google calendars could not be loaded.'):
-      external.status==='stale'?`Showing saved Google events${external.updatedAt?' · last updated '+external.updatedAt:''}.`:
+      external.status==='stale'?`Google Calendar could not refresh. Showing stale events${external.updatedAt?' · last updated '+external.updatedAt:''}.`:
       external.status==='unconfigured'?'Google Calendar is not set up yet. Local tasks remain available.':
+      external.status==='disconnected'?'Connect Google Calendar in Profile Settings to show external events.':
+      external.status==='signin'?'Sign in to Concentr8 to view your Google calendars.':
       external.status==='ready'?'Google Calendar events are read only.':'';
     const stateMarkup=stateText?`${esc(stateText)}${external.status==='error'?' <button type="button" data-cal-retry>Retry</button>':''}`:'';
     const rangeMarkup=`<span class="cal-range">${esc(range)}</span><label class="sr-only" for="cal-go-date">Go to date</label><input id="cal-go-date" type="date" value="${esc(anchor)}" aria-label="Go to date"><span class="cal-nav-shortcut">G</span>`;
@@ -1562,7 +1572,8 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     const quick=`<form class="cal-quick-add" data-cal-quick><label class="sr-only" for="cal-quick-input">Quick add a study plan</label><input id="cal-quick-input" name="quick" autocomplete="off" placeholder="Quick add: study Tuesday 3pm 2h"><button class="wire-button solid" type="submit">Add</button></form>`;
     const body=view==='month'?`<div class="cal-month-view">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-month-weekday">${d}</div>`).join('')}${days.map(date=>`<section class="cal-month-cell ${date.slice(0,7)!==anchor.slice(0,7)?'is-outside':''}" data-cal-month-day="${date}"><button type="button" data-cal-date-jump="${date}" aria-label="Go to ${fmt(date,{month:'long',day:'numeric'})}">${Number(date.slice(8))}</button><div data-cal-month-events="${date}"></div></section>`).join('')}</div><p class="cal-month-empty cal-grid-message" role="status" aria-live="polite" hidden></p>`:
       `<div class="cal-scroll" tabindex="0" aria-label="${view==='day'?'Daily':'Weekly'} calendar"><div class="cal-table" style="--cal-days:${days.length}"><div class="cal-head"><div></div>${days.map(date=>`<div class="cal-date ${date===today()?'is-today':''}"><span>${fmt(date,{weekday:'short'})}</span><strong>${Number(date.slice(8))}</strong></div>`).join('')}</div><div class="cal-allday"><div>Due</div>${days.map(date=>`<div data-all-day="${date}"></div>`).join('')}</div><div class="cal-body"><div class="cal-hours">${Array.from({length:24},(_,h)=>`<span style="top:${h*HOUR}px">${String(h).padStart(2,'0')}:00</span>`).join('')}</div>${days.map(date=>`<div class="cal-day-body" data-cal-date="${date}" aria-label="${fmt(date,{weekday:'long',month:'long',day:'numeric'})}"></div>`).join('')}</div><div class="cal-grid-message" role="status" aria-live="polite" hidden></div></div></div>`;
-    return `<div class="page-heading"><h1>Calendar</h1><span class="preview-note quiet calendar-ai-note">AI generated</span><div class="cal-heading-actions"><button class="wire-button" type="button" data-cal-new>+ New <span class="cal-shortcut">N</span></button></div></div><div class="cal-navigation"><button class="wire-button" type="button" data-cal-today>Today <span class="cal-shortcut">T</span></button><button class="icon-button" type="button" data-cal-step="-1" aria-label="Previous ${view==='day'?'day':'range'} (left arrow)" title="Left arrow">${icon('m14 6-6 6 6 6')}</button><button class="icon-button" type="button" data-cal-step="1" aria-label="Next ${view==='day'?'day':'range'} (right arrow)" title="Right arrow">${icon('m10 6 6 6-6 6')}</button>${rangeMarkup}<button class="wire-button cal-calendar-toggle" type="button" data-cal-toggle>Calendars</button></div><div class="cal-toolbar">${quick}<div class="cal-view-switch" role="group" aria-label="Calendar view">${['day','week','month'].map(v=>`<button type="button" data-cal-view="${v}" aria-pressed="${view===v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div></div><div class="cal-workspace">${rail}<main class="cal-main">${body}</main></div>`;
+    const chips=`<div class="cal-filter-chips" role="group" aria-label="Calendar filters"><button type="button" class="wire-button cal-filter-chip" data-cal-chip="tasks" aria-pressed="${showTasks}">Tasks</button>${external.calendars.map(cal=>`<button type="button" class="wire-button cal-filter-chip google" data-cal-chip="google" data-calendar-id="${esc(cal.id)}" aria-pressed="${visibleExternal.has(cal.id)}">${esc(cal.name)}</button>`).join('')}</div>`;
+     return `<div class="page-heading"><h1>Calendar</h1><span class="preview-note quiet calendar-ai-note">AI generated</span><div class="cal-heading-actions"><button class="wire-button" type="button" data-cal-new>+ New <span class="cal-shortcut">N</span></button></div></div><div class="cal-navigation"><button class="wire-button" type="button" data-cal-today>Today <span class="cal-shortcut">T</span></button><button class="icon-button" type="button" data-cal-step="-1" aria-label="Previous ${view==='day'?'day':'range'} (left arrow)" title="Left arrow">${icon('m14 6-6 6 6 6')}</button><button class="icon-button" type="button" data-cal-step="1" aria-label="Next ${view==='day'?'day':'range'} (right arrow)" title="Right arrow">${icon('m10 6 6 6-6 6')}</button>${rangeMarkup}<button class="wire-button cal-calendar-toggle" type="button" data-cal-toggle>Calendars</button></div><div class="cal-toolbar">${quick}<div class="cal-view-switch" role="group" aria-label="Calendar view">${['day','week','month'].map(v=>`<button type="button" data-cal-view="${v}" aria-pressed="${view===v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div></div>${chips}<div class="cal-workspace">${rail}<main class="cal-main">${body}</main></div>`;
   }
   function drawEvents() {
     if(!root)return;
@@ -1739,6 +1750,12 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   document.addEventListener('click',event=>{
     if(!root||(!root.contains(event.target)&&!dialog.contains(event.target)))return;
     const button=event.target.closest('button');if(!button)return;
+    if(button.dataset.calChip==='tasks'){showTasks=!showTasks;syncFilterChips();drawEvents();drawMessages();return;}
+    if(button.dataset.calChip==='google'){
+      const id=button.dataset.calendarId;
+      if(visibleExternal.has(id))visibleExternal.delete(id);else visibleExternal.add(id);
+      syncFilterChips();drawEvents();drawMessages();return;
+    }
     if(button.hasAttribute('data-cal-use-time')&&suggestedSlot){
       const form=button.closest('form'),task=store.state.tasks.find(task=>task.id===form.elements.task.value);
       try{
@@ -1769,13 +1786,13 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   document.addEventListener('keydown',event=>{
     if(!root||event.defaultPrevented||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey||dialog.open)return;
     const target=event.target;
-    if(target?.isContentEditable||target?.closest('input,textarea,select,[contenteditable="true"],form'))return;
+    if(target?.isContentEditable||target?.closest?.('input,textarea,select,[contenteditable="true"],form'))return;
     const key=event.key.toLowerCase();
     if(key==='n'){event.preventDefault();const start=`${anchor}T${anchor===today()?localClock():'09:00'}`;editor({start,end:iso(stamp(start)+3600000)});}
     else if(key==='t'){event.preventDefault();anchor=today();miniMonth=anchor;scrollTop=Math.max(0,new Date().getHours()*HOUR-48);redraw();emitRange();}
     else if(key==='g'){event.preventDefault();root.querySelector('#cal-go-date')?.focus();}
     else if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
-      event.preventDefault();const direction=event.key==='ArrowLeft'?-1:1;if(view==='month')anchor=tools.localDate(new Date(Number(anchor.slice(0,4)),Number(anchor.slice(5,7))-1+direction,1));else anchor=dayAdd(anchor,direction*(view==='day'?1:7));miniMonth=anchor;redraw();emitRange();
+      event.preventDefault();anchor=dayAdd(anchor,event.key==='ArrowLeft'?-1:1);miniMonth=anchor;redraw();emitRange();
     }
   });
   function rootlessEvents() {
@@ -1794,7 +1811,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       else if(input.matches('[data-cal-filter="deadlines"]'))showDeadlines=input.checked;
       else if(input.matches('[data-cal-external]')){input.checked?visibleExternal.add(input.dataset.calExternal):visibleExternal.delete(input.dataset.calExternal);}
       else if(input.matches('#cal-go-date')&&tools.validDate(input.value)){anchor=input.value;miniMonth=anchor;redraw();emitRange();return;}
-      if(input.matches('[data-cal-filter],[data-cal-external]')){drawEvents();drawMessages();}
+      if(input.matches('[data-cal-filter],[data-cal-external]')){syncFilterChips();drawEvents();drawMessages();}
     });
     document.addEventListener('submit',event=>{
       if(event.target.matches('[data-cal-find-time]')){
@@ -1822,6 +1839,13 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
         editor({title:text,start,end:iso(stamp(start)+3600000)});
       }
     });
+  }
+  function syncFilterChips() {
+    if(!root)return;
+    root.querySelectorAll('[data-cal-filter="tasks"]').forEach(input=>{input.checked=showTasks;});
+    root.querySelectorAll('[data-cal-external]').forEach(input=>{input.checked=visibleExternal.has(input.dataset.calExternal);});
+    root.querySelectorAll('[data-cal-chip="tasks"]').forEach(button=>button.setAttribute('aria-pressed',String(showTasks)));
+    root.querySelectorAll('[data-cal-chip="google"]').forEach(button=>button.setAttribute('aria-pressed',String(visibleExternal.has(button.dataset.calendarId))));
   }
   window.addEventListener('articul8:change',event=>{if(['calendar','restore','tasks','courses'].includes(event.detail.reason)){if(drag)cancelDrag();redraw();}});
 
@@ -1886,12 +1910,16 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     const value=message.proposal||context||{title:message.text.slice(0,200),taskId:message.taskId};
     if(button.dataset.calAction==='save')store.saveEvent(value,message.id);else editor(value,message.id);
   }
-  window.CalendarUI={render,mount,unmount,editor,details,interpret,messageMarkup,messageAction,timeLabel,getRange,setExternal(value={}) {
+  window.CalendarUI={render,mount,unmount,editor,details,interpret,messageMarkup,messageAction,timeLabel,getRange,setFilter(kind,id,visible) {
+    if(kind==='tasks')showTasks=!!visible;
+    else if(kind==='google'){if(visible)visibleExternal.add(String(id));else visibleExternal.delete(String(id));}
+    syncFilterChips();drawEvents();drawMessages();
+  },setExternal(value={}) {
     const priorCalendars=new Set(external.calendars.map(calendar=>calendar.id));
     const calendars=Array.isArray(value.calendars)?value.calendars.map(calendar=>({id:String(calendar.id),name:String(calendar.name||'Google calendar')})):[];
     const calendarIds=new Set(calendars.map(calendar=>calendar.id));
     const events=Array.isArray(value.events)?value.events.filter(event=>event&&event.kind==='google'&&event.readOnly===true&&event.id!=null&&event.calendarId!=null&&tools.validDate(String(event.start||'').slice(0,10))&&tools.validDate(String(event.end||'').slice(0,10))).map(event=>({...event,id:String(event.id),calendarId:String(event.calendarId),title:String(event.title||'Untitled event'),start:String(event.start),end:String(event.end),notes:String(event.notes||''),allDay:!!event.allDay})).filter(event=>calendarIds.has(event.calendarId)):[];
-    external={events,calendars,status:['idle','loading','error','stale','ready','unconfigured'].includes(value.status)?value.status:'idle',updatedAt:value.updatedAt||null,message:value.message||''};
+    external={events,calendars,status:['idle','loading','error','stale','ready','unconfigured','disconnected','signin'].includes(value.status)?value.status:'idle',updatedAt:value.updatedAt||null,message:value.message||''};
     const nextIds=new Set(external.calendars.map(calendar=>calendar.id));
     external.calendars.forEach(calendar=>{if(!priorCalendars.has(calendar.id))visibleExternal.add(calendar.id);});
     for(const id of visibleExternal)if(!nextIds.has(id))visibleExternal.delete(id);
@@ -1900,6 +1928,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 })();
 
 </script>
+  <script src="concentr8-google-calendar.js"></script>
   <script data-source="elevenlabs.js">
 /* Optional ElevenLabs voice through the Concentr8 server. ON by default.
    ?api=http://localhost:8000 uses another address (remembered), ?api=off turns it
