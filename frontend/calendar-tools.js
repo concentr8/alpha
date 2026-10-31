@@ -146,5 +146,35 @@
     };
   }
 
-  return { localDate, validDate, addDays, weekday, weekStart, wallTime, parseQuickAdd, DAY_MS };
+  // Wall-clock arithmetic intentionally ignores UTC offsets: events and working
+  // hours have already been expressed in the same student's local calendar.
+  function findFreeSlot(events, duration, now) {
+    if (!Number.isInteger(duration) || duration < 1 || duration > 780) return null;
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now || '') || !validDate(now.slice(0, 10))) return null;
+    const stamp = value => Date.parse(value.length === 10 ? value + 'T00:00Z' : value + 'Z');
+    const current = stamp(now);
+    if (!Number.isFinite(current)) return null;
+    const busy = events.map(event => {
+      const start = stamp(event.start);
+      const end = event.kind === 'deadline'
+        ? start + (event.allDay ? DAY_MS : 30 * 60000)
+        : stamp(event.end);
+      if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) throw new Error('Invalid event interval');
+      return { start, end };
+    });
+    for (let day = 0; day < 7; day += 1) {
+      const date = addDays(now.slice(0, 10), day);
+      const midnight = stamp(date);
+      const first = Math.max(480, day === 0 ? Math.ceil((current - midnight) / 900000) * 15 : 480);
+      for (let minute = first; minute + duration <= 1260; minute += 15) {
+        const start = midnight + minute * 60000, end = start + duration * 60000;
+        if (busy.every(event => end <= event.start || start >= event.end)) {
+          return { start: wallTime(date, minute), end: wallTime(date, minute + duration) };
+        }
+      }
+    }
+    return null;
+  }
+
+  return { localDate, validDate, addDays, weekday, weekStart, wallTime, parseQuickAdd, findFreeSlot, DAY_MS };
 });
