@@ -59,6 +59,7 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | app/build/icon.png | App icon | New (from the Cal Hacks app) |
 | .github/workflows/app-beta.yml | Builds Mac, Windows, Linux apps on every merge and publishes a beta (Pre-release) | New |
 | .github/workflows/promote-stable.yml | Copies a tested beta into a stable release on the website repo | New |
+| scripts/count-strings.js | Counts the English texts in the app (step 0 of docs/plans/languages.md); reads only, changes nothing | New |
 | frontend/concentr8-server.js | Connects the web app to the server: AI chat and phone call setup (ADR 0022) | New |
 | docs/plans/call-and-chat.md | Plan: phone call setup and AI chat in the app | New |
 | docs/decisions/0022-frontend-talks-to-the-concentr8-server.md | ADR: what changed in the frozen frontend and why | New |
