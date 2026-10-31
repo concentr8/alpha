@@ -25,6 +25,8 @@ backend that will call users at the times they chose (voice call feature).
 - Team workflow: never work on `main`. Use a short-lived branch
   (feat/, fix/, docs/), open a pull request, let the teammate review it, no
   force-push. Do not rewrite shared history.
+- Pull request titles say what changes for the student, in plain words ("Reset all data now works", not "Docs/home chat").
+  The beta release notes are built from these titles.
 - Think first: any new feature gets a plan in docs/plans/<name>.md and a
   human "go" before code is written.
 - Never create new buttons, colors or layouts: reuse docs/design.md.

@@ -1,6 +1,7 @@
 # Purpose: builds the Concentr8 app for Mac (.dmg), Windows (.exe) and Linux (.AppImage) and publishes it
 # as a beta (GitHub "Pre-release") in this repo, for example v1.1.0-beta.4.
 # Runs on: every merge to main that changes app/ or frontend/. "Run workflow" under Actions builds only (no publish).
+# Every beta lists what changed since the previous beta (the merged pull requests), so testers know what to try.
 # Next step by hand: test the beta, then run "Promote to stable" (promote-stable.yml).
 # The base version (1.1.0) is "version" in app/package.json; the beta number counts up by itself.
 name: App beta
@@ -20,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.v.outputs.version }}
+      previous: ${{ steps.v.outputs.previous }}
     steps:
       - uses: actions/checkout@v4
       - id: v
@@ -28,6 +30,8 @@ jobs:
           LAST="$(git ls-remote --tags origin "refs/tags/v${BASE}-beta.*" | sed -n 's#.*-beta\.\([0-9]*\)$#\1#p' | sort -n | tail -1)"
           VERSION="${BASE}-beta.$(( ${LAST:-0} + 1 ))"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          # Empty for the very first beta: then the notes simply have no "what changed" list.
+          echo "previous=${LAST:+v${BASE}-beta.${LAST}}" >> "$GITHUB_OUTPUT"
           echo "### Building $VERSION" >> "$GITHUB_STEP_SUMMARY"
   build:
     needs: plan
@@ -69,9 +73,27 @@ jobs:
       - name: Publish beta
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.plan.outputs.version }}
+          PREVIOUS: ${{ needs.plan.outputs.previous }}
         run: |
           ls -l release
-          gh release create "v${{ needs.plan.outputs.version }}" release/* \
+          # What changed: GitHub lists the pull requests merged since the previous beta. If that lookup fails,
+          # the beta is still published, only without the list (a release must not depend on a nice-to-have).
+          CHANGES=""
+          if [[ -n "$PREVIOUS" ]]; then
+            CHANGES="$(gh api "repos/${{ github.repository }}/releases/generate-notes" \
+              -f tag_name="v$VERSION" -f target_commitish="${{ github.sha }}" -f previous_tag_name="$PREVIOUS" \
+              --jq .body || true)"
+          fi
+          {
+            echo "Early build for testing. Things may break."
+            echo
+            echo "**Which file?** Mac with Apple chip (M1 or newer): \`Concentr8-arm64.dmg\`. Mac with Intel chip: \`Concentr8-x64.dmg\`. Windows: \`Concentr8-x64.exe\`. Linux: \`Concentr8-x86_64.AppImage\`."
+            echo
+            if [[ -n "$CHANGES" ]]; then echo "$CHANGES"; else echo "No list of changes for this beta."; fi
+            echo
+            echo "Stable versions: https://concentr8.github.io"
+          } > notes.md
+          gh release create "v$VERSION" release/* \
             --repo "${{ github.repository }}" --target "${{ github.sha }}" \
-            --prerelease --title "Beta ${{ needs.plan.outputs.version }}" \
-            --notes "Early build for testing. Things may break. Stable versions are on https://concentr8.github.io"
+            --prerelease --title "Concentr8 $VERSION" --notes-file notes.md
