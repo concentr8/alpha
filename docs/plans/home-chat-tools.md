@@ -1,6 +1,6 @@
 # Plan: Clean Home start screen and tools inside the chat
 
-Status: DRAFT, waiting for a human "go" (AGENTS.md). No code yet.
+Status: ACCEPTED. Jonas answered the decisions on 2026-10-30 (below). Built step by step.
 Source: Jonas, 2026-10-30, with a mockup of two screens (clean start, chat with tools).
 UNVERIFIED means not checked yet.
 
@@ -59,11 +59,13 @@ UNVERIFIED means not checked yet.
   and added to `docs/design.md`. Jonas wants smaller buttons in the chat.
 - Changing `frontend/index.html` (ADR 0001, 0007). A new ADR supersedes 0001 for the Home page only.
 
-## Decisions for Jonas
-1. Remove the mood row completely, or move it elsewhere? TODO: check what uses `mood` today (tool recommendations).
-2. Remove the right to-do column on Home? Then where does the full list live? Proposal: last card in "Up next" is "All to-dos".
-3. Which tools may appear as chat cards? Proposal: all seven, the model chooses.
-4. `add_todo` without asking: yes when sure (as you said). Proposal: never for vague messages, always with Undo.
+## Decisions (Jonas, 2026-10-30)
+1. The mood row is removed completely (not moved). TODO: check what uses `mood` today (tool recommendations) and remove that too.
+2. The right to-do column leaves Home. The last "Up next" card is "All to-dos".
+3. All seven tools may appear as chat cards. The model chooses.
+4. Concentr8 adds a task by itself only when the student clearly states one, always with "Undo". An offered action
+   ("+ To-do: <title>") is confirmed with one click or with Enter: the newest offer is focused, Enter confirms it,
+   typing a new message dismisses it.
 
 ## Risks
 - The model adds wrong tasks: Undo on every automatic add, strict rule in the system prompt (only explicit tasks).
