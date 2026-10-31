@@ -12,6 +12,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const voice = require('./voice');
+const { createGoogleCalendar } = require('./google-calendar');
 
 const env = process.env;
 const PORT = Number(env.PORT || 3000);
@@ -1240,6 +1241,10 @@ async function claudeChat(body) {
   return { reply, actions };
 }
 
+const googleCalendar = createGoogleCalendar({
+  env, users: data.users, save, authenticate: userFromRequest, send,
+});
+
 async function route(req, res) {
   const url = new URL(req.url, 'http://localhost');
   const p = url.pathname.replace(/\/+$/, '') || '/';
@@ -1255,6 +1260,7 @@ async function route(req, res) {
   }
 
   if (m === 'OPTIONS') return send(res, 204, '', 'text/plain');
+  if (await googleCalendar.handle(req, res, url)) return;
   if (p === '/' && m === 'GET') {
     const page = require('path').join(__dirname, 'public', 'index.html');
     let html;
