@@ -1,4 +1,4 @@
-# Plan: AI chat without login (at least 10 messages)
+# Plan: AI chat without login (12 messages per day)
 
 Status: ACCEPTED. Jonas answered the decisions on 2026-10-30 (below). Built step by step.
 
