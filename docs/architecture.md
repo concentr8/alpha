@@ -77,6 +77,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/calendar-redesign.md | Approved calendar-only redesign plan | New |
 | docs/plans/calendar-wireframes.md | Text wireframes for Jack before implementation | New |
 | docs/plans/calendar-find-time.md | Approved calendar-only availability plan | New |
+| docs/plans/google-calendar.md | Approved read-only OAuth, frontend contract and future ICS fallback | New |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
