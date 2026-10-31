@@ -84,6 +84,7 @@ directly. Do not add new greys or new accent colors.
 | `.data-chart`, `.activity-bar` | Insights bar chart | bars `#a6b5af` |
 | `.room-grid`, `.camera-frame`, `.room-toolbar` | Body Double room | 3x2 grid, toolbar with 5 buttons |
 | `.composer` | Text input with send button | 64px high, radius 8px |
+| Calendar mini month, visibility rail, quick add, view switch | Calendar-only extension built from `.wire-button`, `.icon-button`, `.cal-field`, `.preview-note.quiet` | Day / Week / Month; task blocks use existing light greys, deadlines use `--ink`, read-only Google blocks use existing sage/grey with dashed borders |
 Dialogs, calendar details and the agent panel are built in the scripts and
 reuse the same classes.
 
@@ -104,6 +105,24 @@ reuse the same classes.
   `aria-current="page"` on the active sidebar button.
 - `prefers-reduced-motion` is respected.
 
+## Calendar redesign (AI generated for review)
+- Calendar remains inside `frontend/index.html`; `frontend/calendar-tools.js`
+  contains dependency-free local date arithmetic and quick-add parsing.
+- The calendar uses a left mini month and visibility rail, a quick-add field,
+  Day / Week / Month controls, a tabular time gutter, thin grey grid lines, and
+  the existing Arial and grey/white/sage tokens. At 800px the rail is hidden
+  before the seven-column week becomes cramped; below 700px the initial view is
+  one day.
+- Tasks retain a light-grey block, deadlines are dark with white text, and
+  Google events are visibly read-only and dashed. External events remain in
+  CalendarUI memory and are never passed to Articul8 storage.
+- The current-time marker follows the browser's local timezone. The quick-add
+  parser accepts explicit dates, today/tomorrow, weekdays, a time, and duration;
+  invalid or ambiguous text opens the existing event editor without saving.
+- New calendar surfaces carry a quiet “AI generated” marker for review. This
+  is a calendar-only exception approved in the calendar redesign plan and ADR
+  0028; no other page is restyled.
+
 ## How to check a change did not alter the look
 Render the same screens before and after and compare them pixel by pixel
 (Home, Calendar, Toolbox, Courses, Workflow, Profile, the tool pages, Focus,
@@ -116,7 +135,7 @@ verified.
   stays as it is until the team decides to unify it.
 - On the Music page the frame of the selected card covers only the picture
   and name, not the bottom row.
-- At 800 px wide the calendar shows only about 5.5 of 7 days (it scrolls
-  sideways) and long event titles break inside a word.
+- Calendar layout and word-boundary wrapping are addressed in the calendar
+  redesign; other pages and the order of existing style blocks remain unchanged.
 - The style blocks override each other (10 blocks). Merging them is a
   separate cleanup PR.

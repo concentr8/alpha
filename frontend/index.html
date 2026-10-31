@@ -245,7 +245,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 
 </style>
   <style data-source="calendar.css">
-.page-content.calendar-page{padding:32px 32px 96px;display:flex;flex-direction:column;overflow:hidden;height:100%;}
+.page-content.calendar-page{padding:32px 32px 96px;display:flex;flex-direction:column;overflow:hidden;height:100dvh;}
 .calendar-page .page-heading{margin-bottom:22px;flex-shrink:0;}
 .cal-heading-actions,.cal-navigation,.cal-actions{display:flex;align-items:center;gap:12px;}
 .cal-navigation{margin-bottom:22px;flex-shrink:0;gap:10px;}
@@ -315,6 +315,111 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .calendar-proposal .wire-button{min-height:40px;font-size:17px;padding:6px 14px;}
 @media(max-width:1100px){.page-content.calendar-page{padding:32px 24px 96px;}.cal-range{font-size:20px}.cal-heading-actions{gap:8px}.cal-event{padding:6px;font-size:16px}.cal-event-time{font-size:16px}}
 @media(max-width:850px){.page-content.calendar-page{padding-left:20px;padding-right:20px}.cal-heading-actions .wire-button{padding:10px 12px}.cal-navigation{gap:4px}.cal-range{font-size:19px;margin-left:6px}.cal-dialog{width:500px}}
+/* AI-GENERATED: Calendar redesign surfaces for review; uses only existing design tokens. */
+.calendar-page{min-width:0}
+.calendar-page .page-heading{align-items:center}
+.calendar-page .page-heading h1{margin:0}
+.calendar-ai-note{font-size:11px;color:#9a9a9a;margin-left:8px}
+.cal-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;flex-shrink:0}
+.cal-quick-add{display:flex;align-items:center;gap:8px;flex:1 1 300px;min-width:180px}
+.cal-quick-add input{font:inherit;font-size:16px;min-width:0;flex:1;height:48px;padding:8px 12px;border:1px solid #bbb;border-radius:6px}
+.cal-shortcut{font-size:12px;color:#666;margin-left:4px}
+.cal-view-switch{display:flex;gap:4px}
+.cal-view-switch button{font:inherit;font-size:16px;padding:9px 12px;background:white;border:1px solid transparent;border-radius:6px;cursor:pointer}
+.cal-view-switch button[aria-pressed=true]{background:#f4f4f2;border-color:#ccc}
+.cal-workspace{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:0;flex:1;gap:16px}
+.cal-rail{min-width:0;border:1px solid #eaeaea;border-radius:8px;padding:12px;overflow:auto}
+.cal-rail[hidden]{display:none}
+.cal-month-head{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:8px}
+.cal-month-head strong{font-size:17px;font-weight:400}
+.cal-month-head button{width:32px;height:32px}
+.cal-month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center}
+.cal-month-grid span{font-size:12px;color:#666;padding:4px 0}
+.cal-month-grid button{height:30px;border:0;background:transparent;border-radius:5px;font:inherit;font-size:13px;cursor:pointer}
+.cal-month-grid button[aria-current=date],.cal-month-grid button[aria-pressed=true],.cal-month-grid button.is-in-range{background:#f4f4f2}
+.cal-month-grid button.is-outside{color:#999}
+.cal-rail h2{font-size:17px;font-weight:400;margin:18px 0 9px}
+.cal-visibility{display:grid;gap:8px}
+.cal-visibility label{display:flex;align-items:center;gap:9px;font-size:15px}
+.cal-visibility input{width:17px;height:17px;accent-color:#555}
+.cal-external-state{font-size:13px;line-height:1.45;color:#666;margin:12px 0 0}
+.cal-external-state button{font:inherit;color:inherit;background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.cal-external-state[hidden]{display:none}
+.cal-external-state.is-error{border-left:2px solid #555;padding-left:8px}
+.cal-main{min-width:0;min-height:0;display:flex;flex-direction:column}
+.cal-scroll{border-color:#dedede;border-radius:6px}
+.cal-table{min-width:0;width:100%}
+.cal-head,.cal-allday,.cal-body{grid-template-columns:54px repeat(var(--cal-days,7),minmax(0,1fr))}
+.cal-head{background:#fff;border-color:#dedede}
+.cal-date{border-color:#eaeaea}
+.cal-date.is-today{background:#f4f4f2}
+.cal-hours span{font-variant-numeric:tabular-nums;font-size:13px;color:#666}
+.cal-day-body{border-color:#eaeaea;background:repeating-linear-gradient(to bottom,transparent 0,transparent 35px,#f4f4f2 35px,#f4f4f2 36px,transparent 36px,transparent 71px,#dedede 71px,#dedede 72px)}
+.cal-event{border-radius:5px;background:#f0f0f0;border:1px solid #dedede;border-left:1px solid #bdbdbd;padding:6px;font-size:14px;line-height:1.3;cursor:grab}
+.cal-event:hover{background:#eaeaea;border-color:#bdbdbd}
+.cal-event-title{overflow-wrap:normal;word-break:normal;hyphens:none}
+.cal-event.deadline{background:#292929;color:white;border:1px solid #292929;border-radius:5px;padding:5px}
+.cal-event.deadline:hover{background:#292929;border-color:#292929}
+.cal-event.external{background:#f4f4f2;border:1px dashed #a6b5af;color:#292929;cursor:pointer}
+.cal-event.external:hover{background:#f4f4f2}
+.cal-event.external .cal-resize{display:none}
+.cal-event.compact{padding:0 4px}
+.cal-deadline-day{background:#292929;color:#fff;border-left:3px solid #292929;border-radius:4px}
+.cal-deadline-day.external{background:#f4f4f2;color:#292929;border:1px dashed #a6b5af}
+.cal-now-line{position:absolute;left:0;right:0;height:1px;background:#292929;z-index:3;pointer-events:none}
+.cal-now-line:before{content:'';position:absolute;left:-4px;top:-3px;width:7px;height:7px;background:#292929;border-radius:50%}
+.cal-grid-message{position:sticky;left:8px;z-index:4;width:max-content;max-width:90%;padding:7px 10px;margin:8px;background:#f4f4f2;border:1px solid #eaeaea;border-radius:5px;font-size:14px}
+.cal-grid-message[hidden]{display:none}
+.cal-month-view{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:28px repeat(6,minmax(72px,1fr));min-height:100%;overflow:auto;border:1px solid #dedede;border-radius:6px}
+.cal-month-weekday{display:flex;align-items:center;justify-content:center;font-size:13px;color:#666;border-bottom:1px solid #dedede}
+.cal-month-cell{min-width:0;border-right:1px solid #eaeaea;border-bottom:1px solid #eaeaea;padding:3px;overflow:hidden}
+.cal-month-cell.is-outside{background:#f7f7f5}
+.cal-month-cell>button{border:0;background:none;border-radius:4px;width:28px;height:28px;font:inherit;font-size:13px;text-align:center;cursor:pointer}
+.cal-month-cell>button[aria-current=date]{background:#f4f4f2}
+.cal-month-event{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;font:inherit;font-size:12px;padding:2px 4px;border:1px solid #dedede;border-radius:4px;background:#f0f0f0;color:#292929;margin:2px 0;cursor:pointer}
+.cal-month-event.deadline{background:#292929;color:#fff;border-color:#292929}
+.cal-month-event.external{background:#f4f4f2;border-style:dashed}
+.cal-navigation{margin-bottom:10px;flex-wrap:wrap}
+.cal-navigation [data-cal-step]{width:56px;display:flex;align-items:center;justify-content:center;gap:1px}
+.cal-navigation [data-cal-step="-1"]:after{content:'←';font-size:12px;color:#666}
+.cal-navigation [data-cal-step="1"]:after{content:'→';font-size:12px;color:#666}
+.cal-navigation .cal-range{font-size:20px;margin-left:4px;flex:1}
+.cal-navigation input[type=date]{font:inherit;font-size:15px;height:40px;border:1px solid #bdbdbd;border-radius:6px;padding:5px 8px}
+.cal-nav-shortcut{font-size:12px;color:#666;margin-left:4px}
+.cal-detail-google{font-size:14px;color:#666}
+.cal-dialog .preview-note.quiet{font-size:11px;color:#9a9a9a;background:none;padding:0;margin:0}
+.cal-quick-preview{border:1px solid #eaeaea;border-radius:6px;padding:14px;display:grid;gap:8px}
+.cal-quick-preview strong{font-weight:400}
+.cal-quick-actions{display:flex;justify-content:flex-end;gap:10px}
+.cal-calendar-toggle{display:none}
+.calendar-page{min-width:0;position:relative}
+.calendar-page :focus-visible{outline:2px solid #292929;outline-offset:5px}
+@media(max-width:1100px){.cal-workspace{grid-template-columns:190px minmax(0,1fr);gap:10px}.cal-rail{padding:9px}}
+@media(min-width:701px) and (max-width:900px){.cal-rail{display:none}.cal-rail.is-open{display:block;position:absolute;z-index:5;background:#fff;top:170px;left:20px;right:20px;max-height:70dvh}.cal-workspace{grid-template-columns:minmax(0,1fr)}.cal-calendar-toggle{display:inline-flex}}
+@media(max-width:700px){
+  .page-content.calendar-page{padding:18px 12px 72px}
+  .calendar-page .page-heading{margin-bottom:12px}
+  .cal-workspace{grid-template-columns:minmax(0,1fr);gap:8px}
+  .cal-rail{display:none}
+  .cal-rail.is-open{display:block;position:absolute;z-index:5;background:#fff;top:155px;left:12px;right:12px;max-height:65dvh}
+  .cal-calendar-toggle{display:inline-flex}
+  .cal-heading-actions .wire-button,.cal-navigation .wire-button{min-height:42px;font-size:15px;padding:8px 11px}
+  .cal-navigation{gap:5px;margin-bottom:8px}
+  .cal-navigation .cal-range{font-size:16px;min-width:120px}
+  .cal-toolbar{gap:6px;margin-bottom:8px}
+  .cal-quick-add{flex-basis:100%}
+  .cal-quick-add input{height:44px;font-size:16px}
+  .cal-view-switch button{font-size:14px;padding:8px}
+  .cal-head,.cal-allday,.cal-body{grid-template-columns:48px minmax(0,1fr)}
+  .cal-date{grid-column:2}
+  .cal-day-body:not([hidden]){grid-column:2}
+  .cal-allday>div:first-child{grid-column:1}
+  .cal-date strong{font-size:21px}
+  .cal-hours span{font-size:12px}
+  .cal-event{font-size:15px}
+  .cal-form-row{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.cal-event,.cal-view-switch button{transition:none}}
 
 </style>
 <style data-source="tool-pages.css">
@@ -1334,16 +1439,19 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 })();
 
 </script>
+  <script src="calendar-tools.js"></script>
   <script data-source="calendar.js">
 (() => {
   const store=window.Articul8;
+  const tools=window.CalendarTools;
   const HOUR=72, DAY=86400000, STEP=15;
-  const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const today=()=>tools.localDate();
   const stamp=value=>Date.parse(value.length===10?value+'T00:00:00Z':value+'Z');
   const iso=ms=>new Date(ms).toISOString().slice(0,16);
-  const dayAdd=(day,n)=>iso(stamp(day)+n*DAY).slice(0,10);
-  const weekStart=day=>dayAdd(day,-(new Date(day+'T12:00Z').getUTCDay()+6)%7);
+  const dayAdd=(day,n)=>tools.addDays(day,n);
+  const weekStart=day=>tools.weekStart(day);
   const clock=value=>value.slice(11,16);
+  const localClock=()=>{const now=new Date();return `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;};
   const mins=value=>Number(value.slice(11,13))*60+Number(value.slice(14,16));
   const at=(date,minutes)=>iso(stamp(date)+minutes*60000);
   const fmt=(value,options)=>new Date(stamp(value)).toLocaleDateString('en-US',{...options,timeZone:'UTC'});
@@ -1352,10 +1460,29 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   const icon=(path)=>`<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}"/></svg>`;
   const close=icon('m6 6 12 12M6 18 18 6');
   const trash=icon('M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7');
-  let week=weekStart(today()),root=null,scrollTop=9*HOUR-16,drag=null,frame=0;
+  let anchor=today(),view=matchMedia('(max-width: 700px)').matches?'day':'week',root=null,scrollTop=0,drag=null,frame=0;
+  let external={events:[],calendars:[],status:'unconfigured',updatedAt:null,message:''};
+  let showTasks=true,showDeadlines=true,visibleExternal=new Set(),miniMonth=anchor,nowTimer=null;
   const dialog=document.createElement('dialog');dialog.className='cal-dialog';document.body.append(dialog);
-  const dates=()=>Array.from({length:7},(_,i)=>dayAdd(week,i));
+  const startDate=()=>view==='week'?weekStart(anchor):anchor;
+  const dates=()=>view==='week'?Array.from({length:7},(_,i)=>dayAdd(startDate(),i)):view==='month'?monthDates(anchor):[anchor];
+  function monthDates(value) {
+    const first=value.slice(0,7)+'-01',start=weekStart(first);
+    return Array.from({length:42},(_,i)=>dayAdd(start,i));
+  }
+  const localEvents=()=>store.state.calendarEvents.filter(e=>(e.kind==='deadline'?showDeadlines:showTasks));
+  const displayedEvents=()=>[...localEvents(),...external.events.filter(e=>visibleExternal.has(e.calendarId))];
+  const emitRange=()=>window.dispatchEvent(new CustomEvent('concentr8:calendar-range',{detail:getRange()}));
+  function getRange() {
+    const days=dates();
+    if(view==='month'){
+      const from=anchor.slice(0,7)+'-01';
+      return {from,to:tools.localDate(new Date(Number(anchor.slice(0,4)),Number(anchor.slice(5,7)),1))};
+    }
+    return {from:days[0],to:dayAdd(days[days.length-1],1)};
+  }
   const getEvent=id=>store.state.calendarEvents.find(e=>e.id===id);
+  const getExternalEvent=id=>external.events.find(e=>e.id===id);
   function timeLabel(event) {
     if(event.allDay)return shortDate(event.start)+' · All day';
     if(event.kind==='deadline')return shortDate(event.start)+' · '+clock(event.start);
@@ -1385,30 +1512,81 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     const {event,start,end,last}=item;
     const height=Math.max(18,(end-start)/60*HOUR-2),compact=height<60,titleLines=height>=90?2:1;
     const left=(item.lane||0)/(item.columns||1)*100,width=100/(item.columns||1);
-    return `<button type="button" class="cal-event ${event.kind==='deadline'?'deadline':''} ${compact?'compact':''} ${ghost?'cal-ghost':''}" ${ghost?'tabindex="-1" aria-hidden="true"':`data-cal-event="${esc(event.id)}" aria-label="${esc(event.title+', '+(event.kind==='deadline'?'deadline, ':'')+timeLabel(event))}" title="${esc(event.title+' · '+timeLabel(event))}"`} style="--cal-title-lines:${titleLines};top:${start/60*HOUR}px;height:${height}px;left:calc(${left}% + 4px);width:calc(${width}% - 8px)"><span class="cal-event-title">${event.kind==='deadline'?'Due · ':''}${esc(event.title)}</span><span class="cal-event-time">${clock(event.start)}${event.kind==='plan'?'–'+clock(event.end):''}</span>${event.kind==='plan'&&last&&!ghost?'<span class="cal-resize" data-cal-resize aria-hidden="true"></span>':''}</button>`;
+    const google=event.kind==='google';
+    return `<button type="button" class="cal-event ${event.kind==='deadline'?'deadline':''} ${google?'external':''} ${compact?'compact':''} ${ghost?'cal-ghost':''}" ${ghost?'tabindex="-1" aria-hidden="true"':`data-cal-event="${esc(event.id)}" ${google?'data-cal-external-event="true"':''} aria-label="${esc(event.title+', '+(google?'Google, read only, ':'')+(event.kind==='deadline'?'deadline, ':'')+timeLabel(event))}" title="${esc(event.title+' · '+timeLabel(event))}"`} style="--cal-title-lines:${titleLines};top:${start/60*HOUR}px;height:${height}px;left:calc(${left}% + 4px);width:calc(${width}% - 8px)"><span class="cal-event-title">${event.kind==='deadline'?'Due · ':''}${esc(event.title)}</span><span class="cal-event-time">${event.allDay?'All day':clock(event.start)+(event.kind==='plan'||google?'–'+clock(event.end):'')}</span>${event.kind==='plan'&&last&&!ghost?'<span class="cal-resize" data-cal-resize aria-hidden="true"></span>':''}</button>`;
   }
+  function drawNow() {
+    if(!root||view==='month')return;
+    const now=new Date(),date=today(),minutes=now.getHours()*60+now.getMinutes();
+    root.querySelectorAll('.cal-now-line').forEach(line=>line.remove());
+    const column=root.querySelector(`[data-cal-date="${date}"]`);
+    if(!column||minutes<0||minutes>=1440)return;
+    const line=document.createElement('div');line.className='cal-now-line';line.style.top=`${minutes/60*HOUR}px`;line.setAttribute('aria-hidden','true');column.append(line);
+  }
+  function drawMessages() {
+    if(!root)return;
+    const message=root.querySelector('.cal-grid-message, .cal-month-empty');if(!message)return;
+    const visible=displayedEvents().filter(event=>dates().some(date=>touchesDate(event,date)));
+    message.hidden=visible.length>0;
+    message.textContent=visible.length?'':'No events in this range. Use New to plan study time.';
+  }
+  // AI-GENERATED: calendar-only presentation for the approved wireframes.
   function render() {
-    const days=dates();
-    const range=week.slice(0,7)===days[6].slice(0,7)?`${fmt(week,{month:'long',day:'numeric'})}–${Number(days[6].slice(8))}, ${days[6].slice(0,4)}`:fmt(week,{month:'short',day:'numeric'})+' – '+fmt(days[6],{month:'short',day:'numeric',year:'numeric'});
-    const allDay=store.state.calendarEvents.filter(e=>e.allDay&&days.includes(e.start.slice(0,10)));
-    return `<div class="page-heading"><h1>Calendar</h1><div class="cal-heading-actions"><button class="wire-button" type="button" data-cal-new>+ New</button></div></div><div class="cal-navigation"><button class="wire-button" type="button" data-cal-today>Today</button><button class="icon-button" type="button" data-cal-week="-1" aria-label="Previous week">${icon('m14 6-6 6 6 6')}</button><button class="icon-button" type="button" data-cal-week="1" aria-label="Next week">${icon('m10 6 6 6-6 6')}</button><span class="cal-range">${range}</span></div><div class="cal-scroll" tabindex="0" aria-label="Weekly calendar"><div class="cal-table"><div class="cal-head"><div></div>${days.map(date=>`<div class="cal-date ${date===today()?'is-today':''}"><span>${fmt(date,{weekday:'short'})}</span><strong>${Number(date.slice(8))}</strong></div>`).join('')}</div>${allDay.length?`<div class="cal-allday"><div>Due</div>${days.map(date=>`<div data-all-day="${date}">${allDay.filter(e=>e.start.startsWith(date)).map(e=>`<button class="cal-deadline-day" type="button" data-cal-event="${esc(e.id)}" title="${esc(e.title+' · '+shortDate(e.start))}">${esc(e.title)}</button>`).join('')}</div>`).join('')}</div>`:''}<div class="cal-body"><div class="cal-hours">${Array.from({length:24},(_,h)=>`<span style="top:${h*HOUR}px">${String(h).padStart(2,'0')}:00</span>`).join('')}</div>${days.map(date=>`<div class="cal-day-body" data-cal-date="${date}" aria-label="${fmt(date,{weekday:'long',month:'long',day:'numeric'})}"></div>`).join('')}</div></div></div>`;
+    const days=dates(),range=view==='day'?fmt(anchor,{weekday:'long',month:'long',day:'numeric',year:'numeric'}):view==='month'?fmt(anchor,{month:'long',year:'numeric'}):`${fmt(days[0],{month:'short',day:'numeric'})} – ${fmt(days[6],{month:'short',day:'numeric',year:'numeric'})}`;
+    const monthCells=monthDates(miniMonth),miniHead=fmt(miniMonth,{month:'long',year:'numeric'});
+    const stateText=external.status==='loading'?'Google calendars are updating. Your tasks remain available.':
+      external.status==='error'?(external.message||'Google calendars could not be loaded.'):
+      external.status==='stale'?`Showing saved Google events${external.updatedAt?' · last updated '+external.updatedAt:''}.`:
+      external.status==='unconfigured'?'Google Calendar is not set up yet. Local tasks remain available.':
+      external.status==='ready'?'Google Calendar events are read only.':'';
+    const stateMarkup=stateText?`${esc(stateText)}${external.status==='error'?' <button type="button" data-cal-retry>Retry</button>':''}`:'';
+    const rangeMarkup=`<span class="cal-range">${esc(range)}</span><label class="sr-only" for="cal-go-date">Go to date</label><input id="cal-go-date" type="date" value="${esc(anchor)}" aria-label="Go to date"><span class="cal-nav-shortcut">G</span>`;
+    const rail=`<aside class="cal-rail" aria-label="Calendar visibility"><div class="cal-month-head"><button class="icon-button" type="button" data-cal-month="-1" aria-label="Previous month">${icon('m14 6-6 6 6 6')}</button><strong>${esc(miniHead)}</strong><button class="icon-button" type="button" data-cal-month="1" aria-label="Next month">${icon('m10 6 6 6-6 6')}</button></div><div class="cal-month-grid" aria-label="${esc(miniHead)}">${['M','T','W','T','F','S','S'].map(d=>`<span aria-hidden="true">${d}</span>`).join('')}${monthCells.map(date=>`<button type="button" class="${date.slice(0,7)!==miniMonth.slice(0,7)?'is-outside':''} ${view==='week'&&weekStart(date)===weekStart(anchor)?'is-in-range':''}" data-cal-date-jump="${date}" aria-label="${fmt(date,{weekday:'long',month:'long',day:'numeric',year:'numeric'})}" aria-pressed="${date===anchor}" ${date===today()?'aria-current="date"':''}>${Number(date.slice(8))}</button>`).join('')}</div><h2>Calendars</h2><div class="cal-visibility"><label><input type="checkbox" data-cal-filter="tasks" ${showTasks?'checked':''}>Tasks</label><label><input type="checkbox" data-cal-filter="deadlines" ${showDeadlines?'checked':''}>Deadlines</label>${external.calendars.map(cal=>`<label><input type="checkbox" data-cal-external="${esc(cal.id)}" ${visibleExternal.has(cal.id)?'checked':''}>${esc(cal.name)}</label>`).join('')}</div><p class="cal-external-state ${external.status==='error'?'is-error':''}" role="status" aria-live="polite" ${stateText?'':'hidden'}>${stateMarkup}</p></aside>`;
+    const quick=`<form class="cal-quick-add" data-cal-quick><label class="sr-only" for="cal-quick-input">Quick add a study plan</label><input id="cal-quick-input" name="quick" autocomplete="off" placeholder="Quick add: study Tuesday 3pm 2h"><button class="wire-button solid" type="submit">Add</button></form>`;
+    const body=view==='month'?`<div class="cal-month-view">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-month-weekday">${d}</div>`).join('')}${days.map(date=>`<section class="cal-month-cell ${date.slice(0,7)!==anchor.slice(0,7)?'is-outside':''}" data-cal-month-day="${date}"><button type="button" data-cal-date-jump="${date}" aria-label="Go to ${fmt(date,{month:'long',day:'numeric'})}">${Number(date.slice(8))}</button><div data-cal-month-events="${date}"></div></section>`).join('')}</div><p class="cal-month-empty cal-grid-message" role="status" aria-live="polite" hidden></p>`:
+      `<div class="cal-scroll" tabindex="0" aria-label="${view==='day'?'Daily':'Weekly'} calendar"><div class="cal-table" style="--cal-days:${days.length}"><div class="cal-head"><div></div>${days.map(date=>`<div class="cal-date ${date===today()?'is-today':''}"><span>${fmt(date,{weekday:'short'})}</span><strong>${Number(date.slice(8))}</strong></div>`).join('')}</div><div class="cal-allday"><div>Due</div>${days.map(date=>`<div data-all-day="${date}"></div>`).join('')}</div><div class="cal-body"><div class="cal-hours">${Array.from({length:24},(_,h)=>`<span style="top:${h*HOUR}px">${String(h).padStart(2,'0')}:00</span>`).join('')}</div>${days.map(date=>`<div class="cal-day-body" data-cal-date="${date}" aria-label="${fmt(date,{weekday:'long',month:'long',day:'numeric'})}"></div>`).join('')}</div><div class="cal-grid-message" role="status" aria-live="polite" hidden></div></div></div>`;
+    return `<div class="page-heading"><h1>Calendar</h1><span class="preview-note quiet calendar-ai-note">AI generated</span><div class="cal-heading-actions"><button class="wire-button" type="button" data-cal-new>+ New <span class="cal-shortcut">N</span></button></div></div><div class="cal-navigation"><button class="wire-button" type="button" data-cal-today>Today <span class="cal-shortcut">T</span></button><button class="icon-button" type="button" data-cal-step="-1" aria-label="Previous ${view==='day'?'day':'range'} (left arrow)" title="Left arrow">${icon('m14 6-6 6 6 6')}</button><button class="icon-button" type="button" data-cal-step="1" aria-label="Next ${view==='day'?'day':'range'} (right arrow)" title="Right arrow">${icon('m10 6 6 6-6 6')}</button>${rangeMarkup}<button class="wire-button cal-calendar-toggle" type="button" data-cal-toggle>Calendars</button></div><div class="cal-toolbar">${quick}<div class="cal-view-switch" role="group" aria-label="Calendar view">${['day','week','month'].map(v=>`<button type="button" data-cal-view="${v}" aria-pressed="${view===v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div></div><div class="cal-workspace">${rail}<main class="cal-main">${body}</main></div>`;
   }
   function drawEvents() {
     if(!root)return;
-    const all=store.state.calendarEvents.flatMap(segments);
-    root.querySelectorAll('[data-cal-date]').forEach(column=>{column.innerHTML=lanes(all.filter(s=>s.date===column.dataset.calDate)).map(item=>block(item)).join('');});
+    const all=displayedEvents();
+    if(view==='month'){
+      root.querySelectorAll('[data-cal-month-events]').forEach(cell=>{
+        const date=cell.dataset.calMonthEvents;
+        cell.innerHTML=all.filter(event=>touchesDate(event,date)).map(event=>`<button type="button" class="cal-month-event ${event.kind==='deadline'?'deadline':''} ${event.kind==='google'?'external':''}" data-cal-event="${esc(event.id)}" ${event.kind==='google'?'data-cal-external-event="true"':''}>${esc(event.title)}</button>`).join('');
+      });
+      drawMessages();
+      return;
+    }
+    const dayList=dates();
+    root.querySelectorAll('[data-all-day]').forEach(cell=>{
+      cell.innerHTML=all.filter(event=>event.allDay&&touchesDate(event,cell.dataset.allDay)).map(event=>`<button type="button" class="cal-deadline-day ${event.kind==='google'?'external':''}" data-cal-event="${esc(event.id)}" ${event.kind==='google'?'data-cal-external-event="true"':''}>${esc(event.title)}</button>`).join('');
+    });
+    const timed=all.filter(event=>!event.allDay).flatMap(segments);
+    root.querySelectorAll('[data-cal-date]').forEach(column=>{column.innerHTML=lanes(timed.filter(s=>s.date===column.dataset.calDate)).map(item=>block(item)).join('');});
+    drawNow();drawMessages();
+  }
+  // Multi-day and all-day Google ranges have an exclusive end, unlike a deadline.
+  function touchesDate(event,date) {
+    if(event.kind==='deadline')return event.start.slice(0,10)===date;
+    return stamp(event.start)<stamp(dayAdd(date,1))&&stamp(event.end)>stamp(date);
   }
   function redraw() {
     if(!root)return;
     const scroller=root.querySelector('.cal-scroll');if(scroller)scrollTop=scroller.scrollTop;
-    root.innerHTML=render();root.querySelector('.cal-scroll').scrollTop=scrollTop;drawEvents();
+    root.innerHTML=render();
+    const nextScroller=root.querySelector('.cal-scroll');if(nextScroller)nextScroller.scrollTop=scrollTop;
+    drawEvents();
   }
   function mount(element) {
     root=element;root.classList.add('calendar-page');
-    root.querySelector('.cal-scroll').scrollTop=scrollTop;drawEvents();
+    if(view!=='month'&&scrollTop===0){const now=new Date();scrollTop=Math.max(0,now.getHours()*HOUR-48);}
+    root.querySelector('.cal-scroll')?.scrollTo(0,scrollTop);drawEvents();emitRange();
+    clearInterval(nowTimer);nowTimer=setInterval(drawNow,60000);
   }
   function unmount() {
     cancelDrag();
+    clearInterval(nowTimer);nowTimer=null;
     if(root){scrollTop=root.querySelector('.cal-scroll')?.scrollTop||scrollTop;root.classList.remove('calendar-page');root=null;}
     if(dialog.open)dialog.close();
   }
@@ -1420,6 +1598,11 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     dialog.querySelector('[data-cal-close]').onclick=()=>dialog.close();
   }
   function details(id) {
+    const externalEvent=getExternalEvent(id);
+    if(externalEvent){
+      showDialog(externalEvent.title,`<div class="cal-detail-type cal-detail-google">Google · Read only</div><div class="cal-detail-time">${esc(timeLabel(externalEvent))}</div>${externalEvent.notes?`<div class="cal-detail-notes">${esc(externalEvent.notes)}</div>`:''}`);
+      return;
+    }
     const event=getEvent(id);if(!event){announce('This event was deleted.');return;}
     const task=store.state.tasks.find(t=>t.id===event.taskId);
     showDialog(event.title,`<div class="cal-detail-type">${event.kind==='deadline'?'Deadline':'Plan'}${task?.done?' · Complete':''}</div><div class="cal-detail-time">${esc(timeLabel(event))}</div>${event.notes?`<div class="cal-detail-notes">${esc(event.notes)}</div>`:''}${task?.steps?.length?`<div class="cal-detail-notes">${task.steps.filter(s=>s.done).length} / ${task.steps.length} steps complete</div>`:''}<div class="cal-detail-footer"><button type="button" class="wire-button solid focus-entry" data-start-focus>Start focus</button><button class="wire-button" type="button" data-edit-detail>Edit</button></div>`);
@@ -1430,7 +1613,8 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   function editor(input={},messageId=null) {
     const existing=input.id?getEvent(input.id):null;
     if(input.id&&!existing){announce('This event was deleted.');return;}
-    const value={title:'',kind:'plan',start:today()+'T09:00',end:today()+'T10:00',allDay:false,notes:'',taskId:null,...input};
+    const defaultStart=anchor===today()?`${today()}T${localClock()}`:`${anchor}T09:00`;
+    const value={title:'',kind:'plan',start:defaultStart,end:iso(stamp(defaultStart)+3600000),allDay:false,notes:'',taskId:null,...input};
     const isDeadline=value.kind==='deadline';
     showDialog(existing?'Edit event':'New event',`<form class="cal-form"><label class="cal-field">Title<input name="title" aria-label="Event title" maxlength="200" required value="${esc(value.title)}" autocomplete="off"></label><div class="cal-form-row"><label class="cal-field">Type<select name="kind" aria-label="Type"><option value="plan" ${!isDeadline?'selected':''}>Plan</option><option value="deadline" ${isDeadline?'selected':''}>Deadline</option></select></label><label class="cal-field">To-do<select name="taskId" aria-label="To-do"><option value="">New to-do</option>${store.state.tasks.map(t=>`<option value="${esc(t.id)}" ${t.id===value.taskId?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label></div><label class="cal-checkbox" data-all-day-field ${!isDeadline?'hidden':''}><input type="checkbox" name="allDay" ${value.allDay?'checked':''}>All day</label><label class="cal-field"><span data-start-label>${isDeadline?'Due':'Start'}</span><input type="${value.allDay?'date':'datetime-local'}" name="start" aria-label="Start" value="${esc(value.allDay?value.start.slice(0,10):value.start)}" required step="${value.allDay?'1':'60'}"></label><label class="cal-field" data-end-field ${isDeadline?'hidden':''}>End<input type="datetime-local" name="end" aria-label="End" value="${esc(value.end)}" step="60" ${isDeadline?'':'required'}></label><label class="cal-field">Notes<textarea name="notes" maxlength="2000" rows="2">${esc(value.notes)}</textarea></label><p class="cal-error" role="alert" hidden></p><div class="cal-form-footer">${existing?`<button class="icon-button cal-delete" type="button" aria-label="Delete event">${trash}</button>`:''}<button class="wire-button" type="button" data-cancel>Cancel</button><button class="wire-button solid" type="submit">Save</button></div></form>`);
     const form=dialog.querySelector('form'),f=form.elements;
@@ -1458,7 +1642,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       const error=form.querySelector('.cal-error');
       if(!next.title){error.textContent='Add a title.';error.hidden=false;f.title.focus();return;}
       if(next.kind==='plan'&&next.end<=next.start){error.textContent='End must be after start.';error.hidden=false;f.end.focus();return;}
-      try{store.saveEvent(next,messageId);dialog.close();week=weekStart(next.start.slice(0,10));if(root){scrollTop=Math.max(0,mins(next.start)/60*HOUR-HOUR);redraw();}}catch(_){error.textContent='Check the title and times.';error.hidden=false;}
+      try{store.saveEvent(next,messageId);dialog.close();anchor=next.start.slice(0,10);if(root){scrollTop=Math.max(0,mins(next.start)/60*HOUR-HOUR);redraw();emitRange();}}catch(_){error.textContent='Check the title and times.';error.hidden=false;}
     };
   }
   function remove(id) {
@@ -1508,6 +1692,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   document.addEventListener('pointerdown',event=>{
     if(!root||event.button!==0||!root.contains(event.target))return;
     const blockElement=event.target.closest('[data-cal-event]');
+    if(blockElement?.hasAttribute('data-cal-external-event'))return;
     const column=event.target.closest('[data-cal-date]');
     if(!blockElement&&!column)return;
     const existing=blockElement?getEvent(blockElement.dataset.calEvent):null;
@@ -1534,13 +1719,63 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   window.addEventListener('blur',cancelDrag);
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&drag){event.preventDefault();cancelDrag();}});
   document.addEventListener('click',event=>{
-    if(!root||!root.contains(event.target))return;
+    if(!root||(!root.contains(event.target)&&!dialog.contains(event.target)))return;
     const button=event.target.closest('button');if(!button)return;
-    if(button.hasAttribute('data-cal-new'))editor({start:week+'T09:00',end:week+'T10:00'});
-    if(button.hasAttribute('data-cal-week')){week=dayAdd(week,Number(button.dataset.calWeek)*7);redraw();}
-    if(button.hasAttribute('data-cal-today')){week=weekStart(today());redraw();}
-    if(button.hasAttribute('data-cal-event')&&event.detail===0)details(button.dataset.calEvent);
+    if(button.hasAttribute('data-cal-new')){const start=`${anchor}T${anchor===today()?localClock():'09:00'}`;editor({start,end:iso(stamp(start)+3600000)});}
+    if(button.hasAttribute('data-cal-step')){const direction=Number(button.dataset.calStep);if(view==='month'){anchor=tools.localDate(new Date(Number(anchor.slice(0,4)),Number(anchor.slice(5,7))-1+direction,1));}else anchor=dayAdd(anchor,direction*(view==='day'?1:7));miniMonth=anchor;redraw();emitRange();}
+    if(button.hasAttribute('data-cal-today')){anchor=today();miniMonth=anchor;scrollTop=Math.max(0,new Date().getHours()*HOUR-48);redraw();emitRange();}
+    if(button.hasAttribute('data-cal-view')){view=button.dataset.calView;scrollTop=view==='month'?0:Math.max(0,new Date().getHours()*HOUR-48);redraw();emitRange();}
+    if(button.hasAttribute('data-cal-date-jump')){anchor=button.dataset.calDateJump;miniMonth=anchor;view='day';scrollTop=Math.max(0,new Date().getHours()*HOUR-48);redraw();emitRange();}
+    if(button.hasAttribute('data-cal-month')){const date=new Date(Number(miniMonth.slice(0,4)),Number(miniMonth.slice(5,7))-1+Number(button.dataset.calMonth),1);miniMonth=tools.localDate(date);redraw();}
+    if(button.hasAttribute('data-cal-toggle'))root.querySelector('.cal-rail')?.classList.toggle('is-open');
+    if(button.hasAttribute('data-cal-event')&&(event.detail===0||button.hasAttribute('data-cal-external-event')||view==='month'))details(button.dataset.calEvent);
+    if(button.hasAttribute('data-cal-retry'))window.dispatchEvent(new CustomEvent('concentr8:calendar-retry'));
+    if(button.hasAttribute('data-cal-quick-confirm')){
+      const proposal=JSON.parse(dialog.dataset.quickProposal||'null');
+      if(proposal){store.saveEvent(proposal);dialog.close();anchor=proposal.start.slice(0,10);redraw();emitRange();}
+    }
+    if(button.hasAttribute('data-cal-quick-edit')){
+      const proposal=JSON.parse(dialog.dataset.quickProposal||'null');if(proposal)editor(proposal);
+    }
   });
+  rootlessEvents();
+  document.addEventListener('keydown',event=>{
+    if(!root||event.defaultPrevented||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey||dialog.open)return;
+    const target=event.target;
+    if(target?.isContentEditable||target?.closest('input,textarea,select,[contenteditable="true"],form'))return;
+    const key=event.key.toLowerCase();
+    if(key==='n'){event.preventDefault();const start=`${anchor}T${anchor===today()?localClock():'09:00'}`;editor({start,end:iso(stamp(start)+3600000)});}
+    else if(key==='t'){event.preventDefault();anchor=today();miniMonth=anchor;scrollTop=Math.max(0,new Date().getHours()*HOUR-48);redraw();emitRange();}
+    else if(key==='g'){event.preventDefault();root.querySelector('#cal-go-date')?.focus();}
+    else if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
+      event.preventDefault();const direction=event.key==='ArrowLeft'?-1:1;if(view==='month')anchor=tools.localDate(new Date(Number(anchor.slice(0,4)),Number(anchor.slice(5,7))-1+direction,1));else anchor=dayAdd(anchor,direction*(view==='day'?1:7));miniMonth=anchor;redraw();emitRange();
+    }
+  });
+  function rootlessEvents() {
+    document.addEventListener('change',event=>{
+      if(!root||!root.contains(event.target))return;
+      const input=event.target;
+      if(input.matches('[data-cal-filter="tasks"]'))showTasks=input.checked;
+      else if(input.matches('[data-cal-filter="deadlines"]'))showDeadlines=input.checked;
+      else if(input.matches('[data-cal-external]')){input.checked?visibleExternal.add(input.dataset.calExternal):visibleExternal.delete(input.dataset.calExternal);}
+      else if(input.matches('#cal-go-date')&&tools.validDate(input.value)){anchor=input.value;miniMonth=anchor;redraw();emitRange();return;}
+      if(input.matches('[data-cal-filter],[data-cal-external]')){drawEvents();drawMessages();}
+    });
+    document.addEventListener('submit',event=>{
+      if(!event.target.matches('[data-cal-quick]'))return;
+      event.preventDefault();
+      const input=event.target.elements.quick,text=input.value.trim();
+      const result=tools.parseQuickAdd(text,{today:today()});
+      if(result.status==='valid'){
+        const proposal=result.event;
+        dialog.dataset.quickProposal=JSON.stringify(proposal);
+        showDialog('Review study plan',`<p class="preview-note quiet">AI generated</p><div class="cal-quick-preview"><strong>${esc(proposal.title)}</strong><span>${esc(timeLabel(proposal))}</span></div><div class="cal-quick-actions"><button class="wire-button" type="button" data-cal-quick-edit>Edit</button><button class="wire-button solid" type="button" data-cal-quick-confirm>Add to Calendar</button></div>`);
+      }else{
+        const start=`${anchor}T${anchor===today()?localClock():'09:00'}`;
+        editor({title:text,start,end:iso(stamp(start)+3600000)});
+      }
+    });
+  }
   window.addEventListener('articul8:change',event=>{if(['calendar','restore','tasks','courses'].includes(event.detail.reason)){if(drag)cancelDrag();redraw();}});
 
   // Wireframe-only extraction of explicit dates/times; no AI service or inferred scheduling.
@@ -1597,14 +1832,24 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(button.dataset.calAction==='view'){
       const event=getEvent(message.eventId);if(!event)return;
       window.dispatchEvent(new CustomEvent('articul8:go',{detail:{page:'Calendar'}}));
-      week=weekStart(event.start.slice(0,10));scrollTop=Math.max(0,mins(event.start)/60*HOUR-HOUR);redraw();details(event.id);return;
+      anchor=event.start.slice(0,10);miniMonth=anchor;scrollTop=Math.max(0,mins(event.start)/60*HOUR-HOUR);redraw();emitRange();details(event.id);return;
     }
     const context=message.contextId?getEvent(message.contextId):null;
     if((message.contextId&&!context)||(message.proposal?.id&&!getEvent(message.proposal.id))){announce('This event was deleted.');return;}
     const value=message.proposal||context||{title:message.text.slice(0,200),taskId:message.taskId};
     if(button.dataset.calAction==='save')store.saveEvent(value,message.id);else editor(value,message.id);
   }
-  window.CalendarUI={render,mount,unmount,editor,details,interpret,messageMarkup,messageAction,timeLabel};
+  window.CalendarUI={render,mount,unmount,editor,details,interpret,messageMarkup,messageAction,timeLabel,getRange,setExternal(value={}) {
+    const priorCalendars=new Set(external.calendars.map(calendar=>calendar.id));
+    const calendars=Array.isArray(value.calendars)?value.calendars.map(calendar=>({id:String(calendar.id),name:String(calendar.name||'Google calendar')})):[];
+    const calendarIds=new Set(calendars.map(calendar=>calendar.id));
+    const events=Array.isArray(value.events)?value.events.filter(event=>event&&event.kind==='google'&&event.readOnly===true&&event.id!=null&&event.calendarId!=null&&tools.validDate(String(event.start||'').slice(0,10))&&tools.validDate(String(event.end||'').slice(0,10))).map(event=>({...event,id:String(event.id),calendarId:String(event.calendarId),title:String(event.title||'Untitled event'),start:String(event.start),end:String(event.end),notes:String(event.notes||''),allDay:!!event.allDay})).filter(event=>calendarIds.has(event.calendarId)):[];
+    external={events,calendars,status:['idle','loading','error','stale','ready','unconfigured'].includes(value.status)?value.status:'idle',updatedAt:value.updatedAt||null,message:value.message||''};
+    const nextIds=new Set(external.calendars.map(calendar=>calendar.id));
+    external.calendars.forEach(calendar=>{if(!priorCalendars.has(calendar.id))visibleExternal.add(calendar.id);});
+    for(const id of visibleExternal)if(!nextIds.has(id))visibleExternal.delete(id);
+    if(root)redraw();
+  }};
 })();
 
 </script>
