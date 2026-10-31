@@ -56,6 +56,11 @@ directly. Do not add new greys or new accent colors.
 | `.wire-button.solid` | The one main action | background `#292929`, white text |
 | `.icon-button` | Icon only (close, menu) | 44x44px, transparent, hover `#eee`; needs `aria-label` |
 | `.text-back` | "Back" link at the top | no border, 17px, color `#555` |
+| `.chat-action` (`.solid`, `.quiet`) | Small button under an answer of Concentr8 (ADR 0027) | 30px high, 14px text, 1px `--ink` border, radius 8px; Enter confirms the newest one (`kbd` hint) |
+| `.chat-note` / `.chat-undo` | Plain line "Added to to-do: … · Undo", no box | 14px, grey `#666` |
+| `.chat-tool` | Tool card inside the chat (name + Open) | 1px `#d6d6d6`, radius 12px, max 380px |
+| `.preview-note.quiet` | "AI generated" marker for Home, as quiet as possible | 11px, `#9a9a9a`, no box |
+| user message | Dark bubble: `--ink`, white text, radius 18px (answers have no bubble) | |
 | `.message-action` | Small text action in chat | underline on hover |
 | `.product-form` | Forms in dialogs | grid, gap 22px, inputs 48px high, 1px `#bbb` border, radius 6px |
 | `.cal-field` | Labelled field in calendar forms | same input look as `.product-form` |
@@ -66,7 +71,7 @@ directly. Do not add new greys or new accent colors.
 | `.stat-row` | Three numbers in a row | big 38px numbers |
 | `.template-grid` | Cards in 3 columns (2 when narrow) | gap 22px |
 | `.avatar` | Round initials | 40px, `#eee` |
-| `.mood` / `.mood-word` | Check-in words on Home | 8 words, wrap to 2 rows, selected = `#f4f4f2` + dark border |
+| `.up-next-row` / `.up-next-card` | "Up next" row on Home (AI generated, ADR 0026) | cards 230px wide, 1px `#eaeaea`, radius 8px, hover `#f7f7f5`, swipeable (scroll snap) |
 | `.detail-heading` | Header of a tool page: `.text-back`, `h1`, `.detail-actions` on the right | 28px title, actions push right |
 | `.detail-section`, `.detail-note`, `.detail-empty` | Block with 21px/500 title, grey note, empty text | notes `#737373`, 16px |
 | `.detail-search` | Search field with icon and button | 1px `#ccc`, radius 6px |

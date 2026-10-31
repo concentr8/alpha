@@ -62,9 +62,11 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | scripts/count-strings.js | Counts the English texts in the app (step 0 of docs/plans/languages.md); reads only, changes nothing | New |
 | frontend/concentr8-server.js | Connects the web app to the server: AI chat and phone call setup (ADR 0022) | New |
 | docs/plans/call-and-chat.md | Plan: phone call setup and AI chat in the app | New |
+| docs/decisions/0027-chat-actions-and-tools-in-chat.md | ADR: chat actions from the model, tools inside the chat, no stored chat | New |
 | docs/decisions/0022-frontend-talks-to-the-concentr8-server.md | ADR: what changed in the frozen frontend and why | New |
 | server/voice.js | ElevenLabs speech for the app: read aloud and voice input, limits and audio cache (ADR 0023) | New |
 | server/test/voice.test.js | Tests for the voice routes | New |
+| server/test/chat-actions.test.js | Tests for the chat `actions` (tool use): only valid actions get through, at most 2, bad times and unknown tools are dropped | New |
 | server/test/guest-chat.test.js | Tests for the AI chat without login (`POST /api/chat/guest`): limits per guest, per address and overall | New |
 | docs/plans/voice-on-azure.md | Plan: voice on the Azure server | New |
 | docs/decisions/0023-voice-on-the-node-server.md | ADR: voice moves from Heroku to the Node server | New |

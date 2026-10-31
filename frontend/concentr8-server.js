@@ -51,10 +51,17 @@
   }
 
   // --- AI chat ---
-  function addAssistantMessage(text) {
+  // Actions come from the server already checked. The app starts them as "pending" and the student confirms (a button or Enter);
+  // only add_todo runs at once, always with an Undo line.
+  function addAssistantMessage(text, actions = []) {
     const app = window.Articul8;
-    app.change((s) => { s.messages.push({ id: app.uid(), text, role: 'assistant', taskId: null, eventId: null, contextId: null, proposal: null }); }, 'assistant');
+    const id = app.uid();
+    const list = actions.map((a) => ({ ...a, state: a.type === 'open_tool' ? 'shown' : 'pending' }));
+    app.change((s) => { s.messages.push({ id, text, role: 'assistant', taskId: null, eventId: null, contextId: null, proposal: null, actions: list }); }, 'assistant');
+    list.forEach((a, i) => { if (a.type === 'add_todo') app.runAction(id, i, 'accept'); });
   }
+
+  const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
   // The last free messages say so, so the limit never comes as a surprise.
   function freeMessagesHint(remaining) {
@@ -73,9 +80,9 @@
       const tasks = app.state.tasks.filter((t) => !t.done).map((t) => t.title);
       const guest = !settings.token;
       const r = guest
-        ? await request('/api/chat/guest', 'POST', { guestId: guestId(), messages, tasks })
-        : await request('/api/chat', 'POST', { messages, tasks });
-      if (r.ok && r.data.reply) addAssistantMessage(r.data.reply + (guest ? freeMessagesHint(r.data.remaining) : ''));
+        ? await request('/api/chat/guest', 'POST', { guestId: guestId(), messages, tasks, today: localDate() })
+        : await request('/api/chat', 'POST', { messages, tasks, today: localDate() });
+      if (r.ok && r.data.reply) addAssistantMessage(r.data.reply + (guest ? freeMessagesHint(r.data.remaining) : ''), Array.isArray(r.data.actions) ? r.data.actions : []);
       else if (guest && r.status === 429) addAssistantMessage(r.error); // the server text already says how to continue
       else if (r.status === 401) addAssistantMessage('The server does not know you any more. Open Profile, Phone call and save again.');
       else addAssistantMessage(`I could not answer right now. ${r.error}`);

@@ -1135,9 +1135,49 @@ const CHAT_SYSTEM_PROMPT = [
   'Help them start, not plan forever: suggest one small first step they can begin in five minutes.',
   'Keep replies to 1 to 3 short sentences, plain words, no lists, no headings, no emoji.',
   'Ask at most one question at the end. Answer in the language the student writes in.',
-  'You can only talk. You cannot see their screen, open apps, call them or change anything in the app, so never say that you did.',
+  'You cannot see their screen, open apps or call them. The app lets you act only through the four tools below, always together with your normal reply, and you never say you used a tool.',
+  'add_todo: only when the student clearly says something they have to do ("I need to email my professor by Monday"); never for questions, feelings or ideas, and only say a task was added after you used it.',
+  'suggest_todo: when something might be a task and you are not sure. suggest_calendar: when a concrete time slot would help, in the student\'s local time.',
+  'open_tool: when one tool of the app would help right now. Use at most two tools per answer.',
   'The student may list their open tasks. Use them only when they help; never invent tasks or deadlines.',
 ].join(' ');
+
+// Why tools and not JSON in the text: the model is trained to call tools, the answer text stays plain, and a bad call
+// can simply be dropped. The server checks every call (cleanActions); the app decides what really happens.
+const CHAT_TOOL_IDS = ['timer', 'body', 'music', 'block', 'breathing', 'meditation', 'checklist'];
+const MAX_CHAT_ACTIONS = 2;
+const LOCAL_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+const TITLE_SCHEMA = { type: 'string', description: 'Short task title in the language of the student, at most 120 characters' };
+const CHAT_TOOLS = [
+  { name: 'add_todo', description: 'Add a task the student clearly said they have to do.', input_schema: { type: 'object', properties: { title: TITLE_SCHEMA }, required: ['title'] } },
+  { name: 'suggest_todo', description: 'Offer a button to add a possible task.', input_schema: { type: 'object', properties: { title: TITLE_SCHEMA }, required: ['title'] } },
+  {
+    name: 'suggest_calendar',
+    description: 'Offer a button to put a time block in the calendar. Times are local, format YYYY-MM-DDTHH:MM.',
+    input_schema: { type: 'object', properties: { title: TITLE_SCHEMA, start: { type: 'string' }, end: { type: 'string' } }, required: ['title', 'start', 'end'] },
+  },
+  { name: 'open_tool', description: 'Offer a card that opens one tool of the app.', input_schema: { type: 'object', properties: { tool: { type: 'string', enum: CHAT_TOOL_IDS } }, required: ['tool'] } },
+];
+
+const validLocalTime = (v) => typeof v === 'string' && LOCAL_TIME.test(v) && Number.isFinite(Date.parse(`${v}Z`)) && new Date(`${v}Z`).toISOString().slice(0, 16) === v;
+
+/** The tool calls of one Claude answer -> at most two checked actions. Anything odd is dropped, the reply text stays. */
+function cleanActions(blocks) {
+  const actions = [];
+  for (const block of blocks) {
+    if (actions.length >= MAX_CHAT_ACTIONS) break;
+    if (!block || block.type !== 'tool_use') continue;
+    const input = block.input || {};
+    const title = oneLine(input.title, 120);
+    let action = null;
+    if ((block.name === 'add_todo' || block.name === 'suggest_todo') && title) action = { type: block.name, title };
+    else if (block.name === 'suggest_calendar' && title && validLocalTime(input.start) && validLocalTime(input.end) && input.end > input.start) {
+      action = { type: 'suggest_calendar', title, start: input.start, end: input.end };
+    } else if (block.name === 'open_tool' && CHAT_TOOL_IDS.includes(input.tool)) action = { type: 'open_tool', tool: input.tool };
+    if (action && !actions.some((a) => JSON.stringify(a) === JSON.stringify(action))) actions.push(action);
+  }
+  return actions;
+}
 
 const CHAT_PER_DAY = Number(env.CHAT_PER_DAY || 100);
 
@@ -1161,13 +1201,20 @@ function cleanChatMessages(list) {
 async function claudeChat(body) {
   const messages = cleanChatMessages(body.messages);
   const tasks = (Array.isArray(body.tasks) ? body.tasks : []).slice(0, 10).map((t) => oneLine(t, 120)).filter(Boolean);
-  const system = tasks.length ? `${CHAT_SYSTEM_PROMPT}\nOpen tasks of the student: ${tasks.join('; ')}` : CHAT_SYSTEM_PROMPT;
+  // The app sends its local date, so "Thursday at 3" can become a real time. Only a plain date is accepted.
+  const today = /^\d{4}-\d{2}-\d{2}$/.test(String(body.today || '')) && Number.isFinite(Date.parse(`${body.today}T12:00Z`)) ? body.today : '';
+  const weekday = today ? new Date(`${today}T12:00Z`).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' }) : '';
+  const system = [
+    CHAT_SYSTEM_PROMPT,
+    today ? `Today is ${weekday}, ${today} (the student's local date).` : '',
+    tasks.length ? `Open tasks of the student: ${tasks.join('; ')}` : '',
+  ].filter(Boolean).join('\n');
   let res;
   try {
     res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model: claudeModel(), thinking: noThinking(), max_tokens: 300, system, messages }),
+      body: JSON.stringify({ model: claudeModel(), thinking: noThinking(), max_tokens: 400, system, messages, tools: CHAT_TOOLS }),
       signal: AbortSignal.timeout(20_000),
     });
   } catch (err) {
@@ -1181,13 +1228,16 @@ async function claudeChat(body) {
     throw httpError(502, why);
   }
   const answer = await res.json();
-  const reply = String((answer.content || []).find((c) => c.type === 'text')?.text || '').trim().slice(0, 1500);
+  const actions = cleanActions(answer.content || []);
+  let reply = String((answer.content || []).find((c) => c.type === 'text')?.text || '').trim().slice(0, 1500);
+  // The model sometimes only calls add_todo; the student still needs one line to read.
+  if (!reply && actions.some((a) => a.type === 'add_todo')) reply = 'Noted, I put that on your list.';
   if (!reply) {
     noteClaude('chat', false, 'empty answer');
     throw httpError(502, 'Claude sent an empty answer');
   }
   noteClaude('chat', true);
-  return { reply };
+  return { reply, actions };
 }
 
 async function route(req, res) {
