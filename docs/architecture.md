@@ -69,6 +69,7 @@ The frontend is frozen (ADR 0001). Only the backend changes for now.
 | server/test/chat-actions.test.js | Tests for the chat `actions` (tool use): only valid actions get through, at most 2, bad times and unknown tools are dropped | New |
 | server/test/guest-chat.test.js | Tests for the AI chat without login (`POST /api/chat/guest`): limits per guest, per address and overall | New |
 | docs/plans/voice-on-azure.md | Plan: voice on the Azure server | New |
+| docs/plans/chat-followups.md | Plan: follow-ups of the chat actions (due date, Back from chat cards, French "tu", translations) | New, waiting for a human go |
 | docs/decisions/0023-voice-on-the-node-server.md | ADR: voice moves from Heroku to the Node server | New |
 | .env.example | Names of required secrets | Works |
 
