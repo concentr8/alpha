@@ -99,6 +99,10 @@ reuse the same classes.
   Audio files added on the Music page stay in the browser.
 
 ## Accessibility already in place (keep it)
+Calendar's AI-generated “Find study time” rail block reuses form controls and
+wire buttons. It names the task and estimated minutes, shows the first free
+slot in words, then opens the existing editor with “Add to calendar”.
+
 - Visible focus ring on buttons and inputs.
 - The `hidden` attribute hides elements (`[hidden]` is forced to display none).
 - `.sr-only` text for screen readers, `aria-label` on icon buttons,
