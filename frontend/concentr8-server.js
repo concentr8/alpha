@@ -9,7 +9,7 @@
   const API = 'https://concentr8-api-ahc6ercddegqdaen.westus3-01.azurewebsites.net';
   const STORAGE_KEY = 'concentr8-server-v1';
   const MESSAGES_SENT = 12; // the server only uses the last 12 as well
-  const NOT_SET_UP = 'To chat with me, first set up your phone call under Profile, Phone call. That creates your account.';
+  const GUEST_KEY = 'concentr8-guest-v1'; // a random code that lets the server count free messages without an account
 
   // The token proves who the student is to the server; it stays in this browser, like all other data of the app.
   // From the phone number we keep only the last digits, to show which number is saved.
@@ -20,6 +20,19 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch (_) { /* private mode: the student signs up again next time */ }
   }
   let settings = load();
+
+  // Without an account the chat is free for a few messages a day (docs/plans/guest-chat.md). The code is random, made once,
+  // and tells the server nothing about the student. If storage is blocked, one code lives until the page is closed.
+  let memoryGuestId = null;
+  function guestId() {
+    try {
+      const saved = localStorage.getItem(GUEST_KEY);
+      if (/^[a-f0-9]{32}$/.test(saved || '')) return saved;
+    } catch (_) { /* storage blocked: use the code in memory */ }
+    if (!memoryGuestId) memoryGuestId = Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
+    try { localStorage.setItem(GUEST_KEY, memoryGuestId); } catch (_) { /* kept in memory only */ }
+    return memoryGuestId;
+  }
 
   async function request(path, method, body) {
     let res;
@@ -43,17 +56,27 @@
     app.change((s) => { s.messages.push({ id: app.uid(), text, role: 'assistant', taskId: null, eventId: null, contextId: null, proposal: null }); }, 'assistant');
   }
 
+  // The last free messages say so, so the limit never comes as a surprise.
+  function freeMessagesHint(remaining) {
+    if (!(remaining >= 0 && remaining <= 2)) return '';
+    const left = remaining === 0 ? 'No free messages left today' : `${remaining} free message${remaining === 1 ? '' : 's'} left today`;
+    return ` (${left}. Sign in under Profile, Phone call for more.)`;
+  }
+
   let asking = false;
   async function ask() {
     const app = window.Articul8;
     if (!app || asking) return;
-    if (!settings.token) { addAssistantMessage(NOT_SET_UP); return; }
     asking = true;
     try {
       const messages = app.state.messages.slice(-MESSAGES_SENT).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', text: m.text }));
       const tasks = app.state.tasks.filter((t) => !t.done).map((t) => t.title);
-      const r = await request('/api/chat', 'POST', { messages, tasks });
-      if (r.ok && r.data.reply) addAssistantMessage(r.data.reply);
+      const guest = !settings.token;
+      const r = guest
+        ? await request('/api/chat/guest', 'POST', { guestId: guestId(), messages, tasks })
+        : await request('/api/chat', 'POST', { messages, tasks });
+      if (r.ok && r.data.reply) addAssistantMessage(r.data.reply + (guest ? freeMessagesHint(r.data.remaining) : ''));
+      else if (guest && r.status === 429) addAssistantMessage(r.error); // the server text already says how to continue
       else if (r.status === 401) addAssistantMessage('The server does not know you any more. Open Profile, Phone call and save again.');
       else addAssistantMessage(`I could not answer right now. ${r.error}`);
     } finally { asking = false; }
