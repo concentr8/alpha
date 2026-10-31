@@ -39,7 +39,7 @@ B. **Translation layer** (recommended): the English text in the HTML stays the s
   (`eleven_multilingual_v2`), cues are saved per text, so each language is paid once.
 
 ## Decisions (Jonas, 2026-10-30)
-1. German with "du". French: Jonas answered "du" for both, so French uses "tu" (TODO: confirm with Jonas).
+1. German with "du". French: Jonas answered "du" for both, so French uses "tu" (confirmed by Jonas, 2026-10-30).
 2. Spanish from Spain (`es-ES`).
 3. Phone calls speak the chosen language too. The default is English; the student can change it in the settings.
 4. Jonas reads all four languages and checks the translations himself.
