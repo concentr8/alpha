@@ -15,7 +15,7 @@ the student sees a clean page, the three most urgent to-dos and the chat box. Pl
   earliest deadline, in one swipeable row (two lines per card: title, due date), plus a last card "All to-dos".
 - The full to-do list is the old right column. It is hidden and opens on "All to-dos" (close button or Escape).
 - The page is marked AI generated in an `AI-GENERATED:` comment. TODO: Jack redraws it; the visible `.preview-note`
-  is left out on purpose so the start screen stays clean, Jonas to confirm.
+  is a very quiet one-line variant (ADR 0027), as Jonas asked: as subtle as possible, but Jack can still see it.
 
 ## Consequences
 - Good: calmer first screen, one row of what matters next.

@@ -427,7 +427,7 @@ test('/api/chat: Claude answers a signed-in student with their last messages and
       tasks: ['Project 2', ''],
     }, s.token);
     assert.equal(r.status, 200);
-    assert.deepEqual(await r.json(), { reply: 'Open the spec and read only the first paragraph. Which one is it?' });
+    assert.deepEqual(await r.json(), { reply: 'Open the spec and read only the first paragraph. Which one is it?', actions: [] });
     const sent = claudeCalls[0].body;
     assert.deepEqual(sent.messages, [{ role: 'user', content: 'I cannot start\nmy project' }], 'starts with the student, same speaker merged');
     assert.match(sent.system, /Open tasks of the student: Project 2$/);

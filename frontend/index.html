@@ -152,7 +152,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .brand { font-size:26px; padding-left:12px; }
 .sidebar-toggle { width:36px; height:40px; }
 .nav { margin-top:44px; gap:6px; }
-.nav .nav-child { padding-left:44px; margin-top:-4px; }
 .app.sidebar-collapsed { grid-template-columns:52px minmax(360px,1fr) 336px; }
 .app.inner-page.sidebar-collapsed { grid-template-columns:52px minmax(0,1fr); }
 .sidebar-collapsed .sidebar { visibility:hidden; padding:0; border:0; }
@@ -190,7 +189,20 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .has-messages h1 { font-size:26px; margin-bottom:20px; }
 .has-messages .chat-composer { flex-shrink:0; }
 .chat-message { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
-.chat-message p { max-width:92%; background:#f2f2f2; padding:14px 18px; border-radius:8px; font-size:19px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
+.chat-message p { max-width:92%; background:var(--ink); color:#fff; padding:12px 18px; border-radius:18px; font-size:19px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
+.preview-note.quiet{background:none;padding:0;margin:8px 0 0;border-radius:0;font-size:11px;line-height:1.2;color:#9a9a9a;text-align:center}
+.chat-message.agent-message{align-items:flex-start;gap:10px;margin-top:10px}
+.chat-message.agent-message p{background:none;color:var(--ink);padding:0;border-radius:0;max-width:100%}
+.chat-actions{display:flex;flex-wrap:wrap;gap:6px}
+.chat-action{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border:1px solid var(--ink);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chat-action:hover{background:#f2f2f2}.chat-action.solid{background:var(--ink);color:#fff}.chat-action.solid:hover{background:#444}
+.chat-action.quiet{border-color:transparent;color:#666;padding:0 8px}
+.chat-action kbd{font:inherit;font-size:12px;color:#777;border-left:1px solid #ccc;padding-left:8px}
+.chat-note{margin:0;font-size:14px;color:#666}
+.chat-note::before{content:"\2713";margin-right:6px}
+.chat-undo{border:0;background:none;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.chat-tool{display:flex;align-items:center;gap:12px;width:min(380px,100%);box-sizing:border-box;padding:8px 8px 8px 14px;border:1px solid #d6d6d6;border-radius:12px;background:#fff}
+.chat-tool-icon{display:inline-flex;color:var(--ink)}.chat-tool-name{flex:1;font-size:15px}
 .message-action { background:transparent; border:0; padding:5px 3px; min-height:38px; font-size:18px; }
 .message-action:hover { text-decoration:underline; text-underline-offset:4px; }
 .message-action:disabled { color:#666; cursor:default; text-decoration:none; }
@@ -199,7 +211,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .agent h2 { font-size:24px; }
 .agent .conversation { flex:1; margin:22px 0 14px; }
 .agent .conversation:empty { display:flex; }
-.agent .chat-message p { font-size:18px; margin:0; color:var(--ink); }
+.agent .chat-message p { font-size:18px; margin:0; }
 .agent .chat-composer { padding:14px 10px 10px; min-height:120px; height:auto; flex-shrink:0; }
 .agent .chat-composer textarea { font-size:18px; }
 .agent.voice-active .conversation,.agent.voice-active .chat-composer,.agent.voice-active .chat-context{display:none!important}
@@ -215,7 +227,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   .sidebar { padding-left:12px; padding-right:12px; }
   .brand { font-size:24px; padding-left:8px; }
   .sidebar-toggle { width:32px; }
-  .nav .nav-child { padding-left:36px; }
   .check-in { width:calc(100% - 64px); }
   .todo { padding-left:24px; padding-right:20px; }
 }
@@ -224,7 +235,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   .sidebar { padding-left:8px; padding-right:8px; }
   .brand { font-size:22px; padding-left:4px; }
   .sidebar-toggle { width:28px; }
-  .nav .nav-child { padding-left:30px; }
   .check-in { width:calc(100% - 48px); }
   .check-in h1 { font-size:26px; }
   .chat-composer textarea { font-size:18px; }
@@ -439,8 +449,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       <div class="sidebar-header"><div class="brand">Concentr8</div><button class="icon-button sidebar-toggle" id="collapse-sidebar" type="button" aria-label="Collapse sidebar" aria-controls="sidebar" aria-expanded="true" title="Collapse sidebar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16m7-11-3 3 3 3"/></svg></button></div>
       <nav class="nav" aria-label="Main navigation">
         <button aria-current="page" type="button" data-page="Home">Home</button>
-        <button type="button" data-page="Toolbox">Toolbox</button>
-        <button class="nav-child" type="button" data-page="Workflow" aria-label="Workflow, under Toolbox">Workflow</button>
         <button type="button" data-page="Courses">Courses</button>
         <button type="button" data-page="Calendar">Calendar</button>
       </nav>
@@ -463,6 +471,8 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
             <button class="icon-button send-button" type="submit" aria-label="Send message" disabled><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V4m-7 7 7-7 7 7"/></svg></button>
           </div>
         </form>
+        <!-- AI-GENERATED: the whole Home page (greeting, Up next, chat actions) has no wireframe from Jack; kept as quiet as possible on purpose (ADR 0027). -->
+        <p class="preview-note quiet">AI generated · not drawn by Jack yet</p>
       </section>
     </main>
 
@@ -700,7 +710,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       if(current?.kind==='meditation'){session.phaseElapsedMs=0;session.phaseStartedAt=null;session.status='ready';}
     }
     if(value.canvas)clean.canvas={...clean.canvas,...value.canvas};
-    if (Array.isArray(value.messages)) clean.messages = value.messages.filter(m => m && typeof m.id === 'string' && typeof m.text === 'string').map(m => ({id:m.id, text:m.text.slice(0,2000), taskId:typeof m.taskId==='string'?m.taskId:null,eventId:typeof m.eventId==='string'?m.eventId:null,contextId:typeof m.contextId==='string'?m.contextId:null,proposal:validEvent(m.proposal)?cleanEvent(m.proposal):null,role:m.role==='assistant'?'assistant':'user'}));
+    // Chat messages are never restored: every start of the app is a clean page (ADR 0027).
     // Upgrade only unchanged sample titles; preserve personal edits and linked dates.
     const sampleTitles=[
       ['problem-set','Problem set','Computer Vision Assignment 1'],
@@ -724,7 +734,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   function update(change, reason) {
     change(state);
     let persisted = true;
-    try { localStorage.setItem(key, JSON.stringify({...state,draft:'',tools:{...state.tools,selected:[],customSelection:false}})); } catch (_) { persisted = false; }
+    try { localStorage.setItem(key, JSON.stringify({...state,messages:[],draft:'',tools:{...state.tools,selected:[],customSelection:false}})); } catch (_) { persisted = false; }
     window.dispatchEvent(new CustomEvent('articul8:change', {detail:{reason, persisted}}));
   }
   window.Articul8 = {
@@ -745,8 +755,8 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       const value = text.trim();
       if (!value) return;
       const context=state.calendarEvents.find(e=>e.id===state.agentEventId);
-      const proposal=window.CalendarUI?.interpret(value,context)||null;
-      update(s => {const task=s.tasks.find(t=>t.id===context?.taskId)||s.tasks.find(t=>t.title===value);s.messages.push({id:id(),text:value.slice(0,2000),taskId:task?.id||null,eventId:null,contextId:context?.id||null,proposal});s.draft='';s.taskContext=value;s.activeTaskId=task?.id||null;s.tools.customSelection=false;}, 'message');
+      const proposal=context?window.CalendarUI?.interpret(value,context)||null:null;
+      update(s => {s.messages.forEach(m=>(m.actions||[]).forEach(a=>{if(a.state==='pending')a.state='dismissed';}));const task=s.tasks.find(t=>t.id===context?.taskId)||s.tasks.find(t=>t.title===value);s.messages.push({id:id(),text:value.slice(0,2000),taskId:task?.id||null,eventId:null,contextId:context?.id||null,proposal});s.draft='';s.taskContext=value;s.activeTaskId=task?.id||null;s.tools.customSelection=false;}, 'message');
     },
     addTask(text, messageId) {
       const value = text.trim();
@@ -771,6 +781,33 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     },
     setStep(taskId,stepId,done) {update(s=>{const task=s.tasks.find(t=>t.id===taskId),step=task?.steps?.find(x=>x.id===stepId);if(step){step.done=done;task.done=task.steps.length>0&&task.steps.every(x=>x.done);}},'tasks');},
     addStep(taskId,text) {if(text.trim())update(s=>{const task=s.tasks.find(t=>t.id===taskId);if(task){(task.steps||=[]).push({id:id(),text:text.trim(),done:false});task.done=false;}},'tasks');},
+    /* Buttons and automatic adds of the chat. verb: accept | dismiss | undo. The model only suggests; this is the one place that changes data. */
+    runAction(messageId,index,verb) {
+      const action=state.messages.find(m=>m.id===messageId)?.actions?.[index];
+      if(verb==='dismiss'){update(s=>{s.messages.find(m=>m.id===messageId)?.actions?.forEach(a=>{if(a.state==='pending')a.state='dismissed';});},'chat-action');return;}
+      if(!action)return;
+      if(verb==='accept'&&action.state==='pending'&&action.type==='suggest_calendar'){
+        let eventId=null;
+        try{eventId=this.saveEvent({title:action.title,kind:'plan',start:action.start,end:action.end,allDay:false,taskId:null,notes:''});}catch(_){ /* The times were not valid after all: the button just goes away. */ }
+        update(s=>{const a=s.messages.find(m=>m.id===messageId)?.actions?.[index];if(a){a.state=eventId?'done':'dismissed';a.eventId=eventId;}},'chat-action');
+      } else if(verb==='accept'&&action.state==='pending'){
+        update(s=>{
+          const a=s.messages.find(m=>m.id===messageId).actions[index];
+          const match=s.tasks.find(t=>t.title===a.title);
+          const task=match||{id:id(),title:a.title,done:false,course:'',steps:[]};
+          if(!match)s.tasks.push(task);
+          s.activeTaskId=task.id;a.state='done';a.taskId=task.id;a.undoable=!match;
+        },'tasks');
+      } else if(verb==='undo'&&action.state==='done'&&action.undoable){
+        update(s=>{
+          const a=s.messages.find(m=>m.id===messageId).actions[index];
+          s.tasks=s.tasks.filter(t=>t.id!==a.taskId);
+          s.calendarEvents=s.calendarEvents.filter(e=>e.taskId!==a.taskId);
+          if(s.activeTaskId===a.taskId)s.activeTaskId=null;
+          a.state='undone';
+        },'tasks');
+      }
+    },
     saveEvent(input,messageId) {
       if(!validEvent(input))throw new Error('Check the title and times.');
       const event=cleanEvent({...input,id:input.id||id()});
@@ -799,7 +836,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if (event.key!==key) return;
     try {
       const previous=state,next=read(JSON.parse(event.newValue));
-      next.draft=previous.draft;
+      next.draft=previous.draft;next.messages=previous.messages;
       if(next.activeTaskId===previous.activeTaskId&&next.taskContext===previous.taskContext){next.tools.selected=previous.tools.selected;next.tools.customSelection=previous.tools.customSelection;}
       else {next.tools.selected=[];next.tools.customSelection=false;}
       state=next;window.dispatchEvent(new CustomEvent('articul8:change',{detail:{reason:'restore',persisted:true}}));
@@ -1873,8 +1910,42 @@ function setAgent(open, focusInput=true) {
     document.getElementById('collapse-sidebar').setAttribute('aria-expanded',String(!collapsed));
     inputs.forEach(sizeInput);
   }
+  /* AI-GENERATED: chat look and actions (docs/plans/home-chat-tools.md, ADR 0027). The student's messages are dark bubbles, answers of Concentr8 are plain text with small action buttons below. */
+  function pendingAction() {
+    for(let i=store.state.messages.length-1;i>=0;i--){
+      const index=(store.state.messages[i].actions||[]).findIndex(a=>a.state==='pending');
+      if(index>=0)return {messageId:store.state.messages[i].id,index};
+    }
+    return null;
+  }
+  function actionMarkup(message,next) {
+    const id=escapeHtml(message.id);
+    const parts=(message.actions||[]).map((action,index)=>{
+      const title=escapeHtml(action.title||'');
+      if(action.type==='open_tool'){
+        const tool=Product.tool(action.tool);
+        return `<div class="chat-tool"><span class="chat-tool-icon">${Product.icon(Product.paths[tool.icon]||'',18)}</span><span class="chat-tool-name">${escapeHtml(tool.name)}</span><button type="button" class="chat-action solid" data-chat-tool="${escapeHtml(action.tool)}">Open</button></div>`;
+      }
+      if(action.state==='done'&&action.type==='suggest_calendar')return `<p class="chat-note">Added to calendar: ${title}</p>`;
+      if(action.state==='done')return `<p class="chat-note">Added to to-do: ${title}${action.undoable?` · <button type="button" class="chat-undo" data-chat-action="undo" data-message="${id}" data-index="${index}">Undo</button>`:''}</p>`;
+      if(action.state==='undone')return `<p class="chat-note">Removed from to-do: ${title}</p>`;
+      if(action.state!=='pending')return '';
+      const label=action.type==='suggest_calendar'?`+ Calendar: ${escapeHtml(CalendarUI.timeLabel({kind:'plan',allDay:false,start:action.start,end:action.end}))}`:`+ To-do: ${title}`;
+      const hint=next&&next.messageId===message.id&&next.index===index?'<kbd aria-hidden="true">\u21b5</kbd>':'';
+      return `<button type="button" class="chat-action" data-chat-action="accept" data-message="${id}" data-index="${index}" title="${title}">${label}${hint}</button>`;
+    });
+    const buttons=parts.filter(x=>x.startsWith('<button'));
+    const rest=parts.filter(x=>!x.startsWith('<button'));
+    const dismiss=buttons.length?`<button type="button" class="chat-action quiet" data-chat-action="dismiss" data-message="${id}">Not now</button>`:'';
+    return rest.join('')+(buttons.length?`<div class="chat-actions">${buttons.join('')}${dismiss}</div>`:'');
+  }
   function renderMessages() {
-    const html=store.state.messages.map(message=>{/* AI-GENERATED: answers of Concentr8 sit on the left, the student's own messages stay on the right. */if(message.role==='assistant')return `<article class="chat-message" style="align-items:flex-start" aria-label="Concentr8"><p>${escapeHtml(message.text)}</p></article>`;const calendar=CalendarUI.messageMarkup(message);return `<article class="chat-message"><p>${escapeHtml(message.text)}</p><div class="message-actions"><button type="button" class="message-action" data-message-task="${escapeHtml(message.id)}" ${message.taskId?'disabled':''}>${message.taskId?'Added to to-do':'+ To-do'}</button>${message.proposal?'':calendar}<button type="button" class="message-action" data-message-tools="${escapeHtml(message.id)}">Tools</button></div>${message.proposal?calendar:''}</article>`;}).join('');
+    const next=pendingAction();
+    const html=store.state.messages.map(message=>{
+      if(message.role==='assistant')return `<article class="chat-message agent-message" aria-label="Concentr8"><p>${escapeHtml(message.text)}</p>${actionMarkup(message,next)}</article>`;
+      const calendar=message.contextId||message.eventId||message.proposal?CalendarUI.messageMarkup(message):'';
+      return `<article class="chat-message user-message"><p>${escapeHtml(message.text)}</p>${calendar?`<div class="message-actions">${calendar}</div>`:''}</article>`;
+    }).join('');
     conversations.forEach(log=>{log.innerHTML=html;log.scrollTop=log.scrollHeight;});
     checkIn.classList.toggle('has-messages',store.state.messages.length>0);
   }
@@ -1956,7 +2027,11 @@ function setAgent(open, focusInput=true) {
       store.setDraft(input.value);
     });
     input.addEventListener('keydown',event=>{
-      if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();form.requestSubmit();}
+      if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){
+        event.preventDefault();
+        const next=input.value.trim()?null:pendingAction();
+        if(next)store.runAction(next.messageId,next.index,'accept');else form.requestSubmit();
+      }
     });
     form.addEventListener('submit',event=>{
       event.preventDefault();
@@ -1970,14 +2045,12 @@ function setAgent(open, focusInput=true) {
     });
   });
   conversations.forEach(log=>log.addEventListener('click',event=>{
-    const toolsButton=event.target.closest('[data-message-tools]');
-    if(toolsButton){const message=store.state.messages.find(m=>m.id===toolsButton.dataset.messageTools);if(message){if(!message.taskId)store.addTask(message.text,message.id);else store.selectTask(message.taskId);store.change(s=>{s.tools.customSelection=false;},'tools');Product.go('Toolbox');}return;}
+    const toolButton=event.target.closest('[data-chat-tool]');
+    if(toolButton){Product.go('Toolbox',toolButton.dataset.chatTool);return;}
+    const actionButton=event.target.closest('[data-chat-action]');
+    if(actionButton){store.runAction(actionButton.dataset.message,Number(actionButton.dataset.index),actionButton.dataset.chatAction);return;}
     const calendarButton=event.target.closest('[data-cal-message]');
-    if(calendarButton){CalendarUI.messageAction(calendarButton);return;}
-    const button=event.target.closest('[data-message-task]');
-    if(!button)return;
-    const message=store.state.messages.find(m=>m.id===button.dataset.messageTask);
-    if(message)store.addTask(message.text,message.id);
+    if(calendarButton)CalendarUI.messageAction(calendarButton);
   }));
   taskList.addEventListener('change',event=>{
     if(event.target.matches('[data-task-check]'))store.completeTask(event.target.dataset.taskCheck,event.target.checked);

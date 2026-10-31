@@ -37,7 +37,7 @@ UNVERIFIED means not checked yet.
 
 | action | meaning | what the app shows |
 |---|---|---|
-| `add_todo { title, due? }` | the student clearly stated a task | task is added; line "Added to to-do: <title> · Undo" |
+| `add_todo { title }` (`due` is TODO, ADR 0027) | the student clearly stated a task | task is added; line "Added to to-do: <title> · Undo" |
 | `suggest_todo { title }` | maybe a task | small button "+ To-do: <title>" |
 | `suggest_calendar { title, start, end }` | a task with a time slot | small button "+ Calendar: <time>" |
 | `tool { id }` | a tool would help right now | inline card with a Start button (timer, breathing, music ...) |
@@ -74,6 +74,6 @@ UNVERIFIED means not checked yet.
 
 ## Steps (after the go, one pull request each)
 1. Start screen only (frontend, no server). Before/after screenshots, nothing else changes. DONE locally 2026-10-30, ADR 0026.
-2. `actions` in `/api/chat` and `/api/chat/guest` with tests in `server/test/`. `.env.example` unchanged.
-3. Render actions in the chat, remove the fixed message row, new bubble look.
-4. Take Toolbox and Workflow out of the sidebar. ADR, `docs/architecture.md` and `docs/design.md` updated in each PR.
+2. DONE locally. `actions` in `/api/chat` and `/api/chat/guest` with tests in `server/test/`. `.env.example` unchanged.
+3. DONE locally. Render actions in the chat, remove the fixed message row, new bubble look.
+4. DONE locally. Take Toolbox and Workflow out of the sidebar. ADR, `docs/architecture.md` and `docs/design.md` updated in each PR.
