@@ -242,6 +242,14 @@ function openingLine(u) {
   return `${greeting}, this is Concentr8. You have ${count} coming up. ${list}. Which one will you start with?`;
 }
 
+/** Midday and night calls use fixed lines for now; the morning call keeps the Claude greeting. */
+function slotOpeningLine(u, kind) {
+  if (kind === 'midday') {
+    return `${greetingFor(u)}, this is Concentr8. Quick midday check-in. What is the one thing you want to get done this afternoon, and when will you start?`;
+  }
+  return 'Good evening, this is Concentr8. Before you wind down: what got done today, and what is the one small first step for tomorrow?';
+}
+
 /**
  * Claude writes the call's greeting from the student's real deadlines. Any failure (no key, timeout, odd answer)
  * falls back to the fixed openingLine(u), so a call is never blocked by Claude.
@@ -685,7 +693,7 @@ async function placeCall(req, u, opts = {}) {
   g.calls += 1;
   u.lastCallAt = new Date().toISOString();
   u.lastCallStatus = 'queued';
-  logCall(u, opts.reason === 'stuck' ? 'stuck' : 'morning');
+  logCall(u, opts.reason === 'stuck' ? 'stuck' : opts.kind || 'morning');
   save();
   return callId;
 }
@@ -810,7 +818,7 @@ async function placeCartesiaCall(u, to, opts = {}) {
   }
   const variables = stuck
     ? { user_id: u.id, opening_line: stuckOpeningLine(opts.task), task: opts.task || 'their task' }
-    : { user_id: u.id, opening_line: await claudeOpeningLine(u) };
+    : { user_id: u.id, call_kind: opts.kind || 'morning', opening_line: opts.kind && opts.kind !== 'morning' ? slotOpeningLine(u, opts.kind) : await claudeOpeningLine(u) };
   const res = await fetch('https://api.cartesia.ai/agents/calls', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Cartesia-Version': env.CARTESIA_VERSION || '2026-08-14', 'Content-Type': 'application/json' },
@@ -995,7 +1003,53 @@ function webhookUser(url, params) {
   return userByPhone(direction.startsWith('inbound') || !direction ? from : to) || userByPhone(to);
 }
 
-/** Applies { phoneNumber, callTime, timezone, paused } to a student; throws 400 on bad values. */
+// ---------- three daily calls: morning, midday, night (docs/plans/calling-feature.md) ----------
+const CALL_KINDS = ['morning', 'midday', 'night'];
+const DEFAULT_SLOT_TIME = { morning: '08:00', midday: '12:30', night: '21:30' };
+
+/**
+ * Every student has all three slots, each with its own time and on/off switch. Old records only had `callTime`:
+ * it becomes the morning slot (still on), the other two start switched off, so nobody gets a call they did not ask for.
+ * Why lazy: records are read from disk as they are, so the slots are filled in the first time someone asks.
+ */
+function slotsOf(u) {
+  if (!u.callSlots || typeof u.callSlots !== 'object') u.callSlots = {};
+  for (const kind of CALL_KINDS) {
+    const slot = u.callSlots[kind] && typeof u.callSlots[kind] === 'object' ? u.callSlots[kind] : (u.callSlots[kind] = {});
+    if (!HHMM.test(slot.time || '')) slot.time = kind === 'morning' && HHMM.test(u.callTime || '') ? u.callTime : DEFAULT_SLOT_TIME[kind];
+    if (typeof slot.enabled !== 'boolean') slot.enabled = kind === 'morning';
+  }
+  return u.callSlots;
+}
+
+/** What the app sees: time and switch only. */
+const publicSlots = (u) => Object.fromEntries(CALL_KINDS.map((k) => [k, { time: slotsOf(u)[k].time, enabled: slotsOf(u)[k].enabled }]));
+
+// The morning call keeps its old field (`lastAutoCallDate`, also set by /cron/morning); the others keep their own.
+const lastCallDateOf = (u, kind) => (kind === 'morning' ? u.lastAutoCallDate : slotsOf(u)[kind].lastDate);
+function setLastCallDate(u, kind, date) {
+  if (kind === 'morning') u.lastAutoCallDate = date;
+  else slotsOf(u)[kind].lastDate = date;
+}
+
+/** Checks { morning: {time, enabled}, ... } and applies it; throws 400 before changing anything if a value is wrong. */
+function applyCallSlots(u, input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw httpError(400, 'callSlots must be an object like {"midday": {"time": "12:30", "enabled": true}}');
+  for (const [kind, value] of Object.entries(input)) {
+    if (!CALL_KINDS.includes(kind)) throw httpError(400, `Unknown call "${kind}". Use morning, midday or night.`);
+    if (!value || typeof value !== 'object') throw httpError(400, `callSlots.${kind} must be an object`);
+    if (value.time !== undefined && !HHMM.test(String(value.time))) throw httpError(400, `callSlots.${kind}.time must look like 08:00`);
+    if (value.enabled !== undefined && typeof value.enabled !== 'boolean') throw httpError(400, `callSlots.${kind}.enabled must be true or false`);
+  }
+  const slots = slotsOf(u);
+  for (const [kind, value] of Object.entries(input)) {
+    if (value.time !== undefined) slots[kind].time = value.time;
+    if (value.enabled !== undefined) slots[kind].enabled = value.enabled;
+  }
+  u.callTime = slots.morning.time; // older app versions still read and send callTime
+}
+
+/** Applies { phoneNumber, callTime, callSlots, timezone, paused } to a student; throws 400 on bad values. */
 function applySettings(u, body) {
   if (typeof body.phoneNumber === 'string' && body.phoneNumber.trim()) {
     const phone = normalizePhone(body.phoneNumber);
@@ -1005,7 +1059,9 @@ function applySettings(u, body) {
   if (typeof body.callTime === 'string') {
     if (!HHMM.test(body.callTime)) throw httpError(400, 'callTime must look like 08:00');
     u.callTime = body.callTime;
+    slotsOf(u).morning.time = body.callTime;
   }
+  if (body.callSlots !== undefined) applyCallSlots(u, body.callSlots);
   if (typeof body.timezone === 'string') {
     if (!validTimezone(body.timezone)) throw httpError(400, 'Unknown timezone');
     u.timezone = body.timezone;
@@ -1224,7 +1280,7 @@ async function route(req, res) {
       return send(res, 200, { tasks: u.tasks });
     }
     if (p === '/api/me' && m === 'GET') {
-      return send(res, 200, { id: u.id, phoneNumber: phoneOf(u), callTime: u.callTime, timezone: u.timezone, paused: u.paused });
+      return send(res, 200, { id: u.id, phoneNumber: phoneOf(u), callTime: u.callTime, callSlots: publicSlots(u), timezone: u.timezone, paused: u.paused });
     }
     if (p === '/api/me/impact' && m === 'GET') {
       return send(res, 200, { ...impactOf([u]), summary: await impactSummary(u) });
@@ -1310,7 +1366,7 @@ async function route(req, res) {
     t.focusTask = task;
     t.startTime = startTime;
     u.lastCallStatus = 'completed';
-    markCommitted(u, 'morning');
+    markCommitted(u, CALL_KINDS.includes(body.call_kind) ? body.call_kind : 'morning');
     save();
     // The closing line is fixed here, so every planning call ends the same way (docs/CALL-SCRIPT.md).
     const when = startTime.replace(/\.$/, '');
@@ -1411,24 +1467,27 @@ const server = http.createServer((req, res) => {
 // ---------- daily scheduler ----------
 
 /** Places today's morning call for everyone whose call time just passed. Returns how many calls were started. */
-function schedulerTick() {
+function schedulerTick(now = new Date()) {
   let started = 0;
   for (const u of Object.values(data.users)) {
     if (u.paused || !phoneOf(u)) continue;
     if (u.id !== 'owner' && !u.consentAt) continue;
-    const date = localDate(u);
-    if (u.lastAutoCallDate === date) continue;
-    // Fire once in the first 15 minutes after the call time (survives a restart a few minutes late).
-    const [th, tm] = (u.callTime || '08:00').split(':').map(Number);
-    const [nh, nm] = localHHMM(u).split(':').map(Number);
-    const late = nh * 60 + nm - (th * 60 + tm);
-    if (late < 0 || late > 15) continue;
-    u.lastAutoCallDate = date;
-    save();
-    started += 1;
-    placeCall(null, u)
-      .then((sid) => console.log(`[${new Date().toISOString()}] morning call placed for ${u.id}: ${sid}`))
-      .catch((err) => console.error(`morning call for ${u.id} failed:`, err.message));
+    const date = localDate(u, now);
+    const [nh, nm] = localHHMM(u, now).split(':').map(Number);
+    for (const kind of CALL_KINDS) {
+      const slot = slotsOf(u)[kind];
+      if (!slot.enabled || lastCallDateOf(u, kind) === date) continue;
+      // Fire once in the first 15 minutes after the call time (survives a restart a few minutes late).
+      const [th, tm] = slot.time.split(':').map(Number);
+      const late = nh * 60 + nm - (th * 60 + tm);
+      if (late < 0 || late > 15) continue;
+      setLastCallDate(u, kind, date);
+      save();
+      started += 1;
+      placeCall(null, u, { kind })
+        .then((sid) => console.log(`[${new Date().toISOString()}] ${kind} call placed for ${u.id}: ${sid}`))
+        .catch((err) => console.error(`${kind} call for ${u.id} failed:`, err.message));
+    }
   }
   return started;
 }
