@@ -159,10 +159,10 @@ def test_call_for_an_unknown_schedule_says_so() -> None:
 # --- what the call says and what is logged -----------------------------------
 
 
-def test_the_call_script_names_articul8_and_says_it_is_an_ai() -> None:
+def test_the_call_script_names_concentr8_and_says_it_is_an_ai() -> None:
     script = asyncio.run(llm_claude.write_call_script("Essay outline"))
 
-    assert "Articul8" in script
+    assert "Concentr8" in script
     assert "AI" in script
     assert "Essay outline" in script
 
