@@ -392,6 +392,11 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .cal-quick-preview strong{font-weight:400}
 .cal-quick-actions{display:flex;justify-content:flex-end;gap:10px}
 .cal-calendar-toggle{display:none}
+.cal-find-time{display:grid;gap:9px;margin-top:18px;font-size:14px}
+.cal-find-time label{display:grid;gap:4px}
+.cal-find-time input,.cal-find-time select{width:100%;min-width:0;font:inherit;padding:8px;border:1px solid #bbb;border-radius:6px;background:#fff}
+.cal-find-time .wire-button{font-size:14px;padding:8px;min-height:40px}
+.cal-find-time p{margin:0;overflow-wrap:break-word}
 .calendar-page{min-width:0;position:relative}
 .calendar-page :focus-visible{outline:2px solid #292929;outline-offset:5px}
 @media(max-width:1100px){.cal-workspace{grid-template-columns:190px minmax(0,1fr);gap:10px}.cal-rail{padding:9px}}
@@ -1463,6 +1468,18 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   let anchor=today(),view=matchMedia('(max-width: 700px)').matches?'day':'week',root=null,scrollTop=0,drag=null,frame=0;
   let external={events:[],calendars:[],status:'unconfigured',updatedAt:null,message:''};
   let showTasks=true,showDeadlines=true,visibleExternal=new Set(),miniMonth=anchor,nowTimer=null;
+  let suggestedSlot=null;
+  // AI-GENERATED: calendar-only task estimation; other page schemas stay unchanged.
+  function findTimeMarkup() {
+    const tasks=store.state.tasks.filter(task=>!task.done);
+    return `<section aria-label="Find time for a task"><h2>Find study time</h2><form class="cal-find-time" data-cal-find-time><label>Task<select name="task" required><option value="">Choose a task</option>${tasks.map(task=>`<option value="${esc(task.id)}">${esc(task.title)}</option>`).join('')}</select></label><label>Estimated minutes<input name="duration" type="number" min="1" max="780" required placeholder="e.g. 45"></label><button class="wire-button" type="submit">Find time</button><p data-cal-time-result role="status" aria-live="polite"></p><button class="wire-button" type="button" data-cal-use-time hidden>Add to calendar</button></form></section>`;
+  }
+  function availability(duration) {
+    if(external.calendars.length&&external.status!=='ready')throw new Error('Refresh Google Calendar before finding a free slot.');
+    const now=new Date(),rounded=now.getSeconds()?new Date(now.getTime()+60000):now;
+    const wallNow=tools.localDate(rounded)+'T'+String(rounded.getHours()).padStart(2,'0')+':'+String(rounded.getMinutes()).padStart(2,'0');
+    return tools.findFreeSlot([...store.state.calendarEvents,...external.events],duration,wallNow);
+  }
   const dialog=document.createElement('dialog');dialog.className='cal-dialog';document.body.append(dialog);
   const startDate=()=>view==='week'?weekStart(anchor):anchor;
   const dates=()=>view==='week'?Array.from({length:7},(_,i)=>dayAdd(startDate(),i)):view==='month'?monthDates(anchor):[anchor];
@@ -1549,6 +1566,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   }
   function drawEvents() {
     if(!root)return;
+    if(!root.querySelector('[data-cal-find-time]'))root.querySelector('.cal-rail')?.insertAdjacentHTML('beforeend',findTimeMarkup());
     const all=displayedEvents();
     if(view==='month'){
       root.querySelectorAll('[data-cal-month-events]').forEach(cell=>{
@@ -1721,6 +1739,15 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   document.addEventListener('click',event=>{
     if(!root||(!root.contains(event.target)&&!dialog.contains(event.target)))return;
     const button=event.target.closest('button');if(!button)return;
+    if(button.hasAttribute('data-cal-use-time')&&suggestedSlot){
+      const form=button.closest('form'),task=store.state.tasks.find(task=>task.id===form.elements.task.value);
+      try{
+        const slot=availability(Number(form.elements.duration.value));
+        if(task&&slot)editor({...slot,title:task.title,taskId:task.id});
+        else form.querySelector('[data-cal-time-result]').textContent='That slot is no longer available. Find time again.';
+      }catch(error){form.querySelector('[data-cal-time-result]').textContent=error.message;}
+      return;
+    }
     if(button.hasAttribute('data-cal-new')){const start=`${anchor}T${anchor===today()?localClock():'09:00'}`;editor({start,end:iso(stamp(start)+3600000)});}
     if(button.hasAttribute('data-cal-step')){const direction=Number(button.dataset.calStep);if(view==='month'){anchor=tools.localDate(new Date(Number(anchor.slice(0,4)),Number(anchor.slice(5,7))-1+direction,1));}else anchor=dayAdd(anchor,direction*(view==='day'?1:7));miniMonth=anchor;redraw();emitRange();}
     if(button.hasAttribute('data-cal-today')){anchor=today();miniMonth=anchor;scrollTop=Math.max(0,new Date().getHours()*HOUR-48);redraw();emitRange();}
@@ -1755,6 +1782,14 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     document.addEventListener('change',event=>{
       if(!root||!root.contains(event.target))return;
       const input=event.target;
+      if(input.closest('[data-cal-find-time]')){
+        const form=input.closest('form');form.querySelector('[data-cal-use-time]').hidden=true;suggestedSlot=null;
+        if(input.name==='task'){
+          let saved={};try{saved=JSON.parse(localStorage.getItem('concentr8-calendar-estimates')||'{}');}catch(_){}
+          const task=store.state.tasks.find(task=>task.id===input.value);
+          form.elements.duration.value=task?.estimatedMinutes||saved[input.value]||'';
+        }
+      }
       if(input.matches('[data-cal-filter="tasks"]'))showTasks=input.checked;
       else if(input.matches('[data-cal-filter="deadlines"]'))showDeadlines=input.checked;
       else if(input.matches('[data-cal-external]')){input.checked?visibleExternal.add(input.dataset.calExternal):visibleExternal.delete(input.dataset.calExternal);}
@@ -1762,6 +1797,18 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       if(input.matches('[data-cal-filter],[data-cal-external]')){drawEvents();drawMessages();}
     });
     document.addEventListener('submit',event=>{
+      if(event.target.matches('[data-cal-find-time]')){
+        event.preventDefault();
+        const form=event.target,duration=Number(form.elements.duration.value),task=form.elements.task.value;
+        try{
+          let saved={};try{saved=JSON.parse(localStorage.getItem('concentr8-calendar-estimates')||'{}');}catch(_){}
+          saved[task]=duration;try{localStorage.setItem('concentr8-calendar-estimates',JSON.stringify(saved));}catch(_){}
+          suggestedSlot=availability(duration);
+          form.querySelector('[data-cal-time-result]').textContent=suggestedSlot?timeLabel({...suggestedSlot,kind:'plan'}):'No free slot in the next 7 days between 08:00 and 21:00.';
+          form.querySelector('[data-cal-use-time]').hidden=!suggestedSlot;
+        }catch(error){form.querySelector('[data-cal-time-result]').textContent=error.message;form.querySelector('[data-cal-use-time]').hidden=true;}
+        return;
+      }
       if(!event.target.matches('[data-cal-quick]'))return;
       event.preventDefault();
       const input=event.target.elements.quick,text=input.value.trim();

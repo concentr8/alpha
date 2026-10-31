@@ -77,6 +77,8 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/calendar-redesign.md | Approved calendar-only redesign plan | New |
 | docs/plans/calendar-wireframes.md | Text wireframes for Jack before implementation | New |
 | docs/plans/calendar-find-time.md | Approved calendar-only availability plan | New |
+| server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
+| docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
 | server/test/calendar-tools.test.js | Node built-in tests for calendar date boundaries and quick-add valid, invalid and ambiguous input | New |
 | docs/decisions/0028-calendar-redesign.md | Calendar-only design, parsing, timezone and read-only external-event boundaries | New |
