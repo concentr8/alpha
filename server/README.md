@@ -74,6 +74,9 @@ The server finds its own public address on Replit. Elsewhere, set `PUBLIC_URL`.
 | `VALIDATE_TWILIO_SIGNATURE` | off | set `true` to reject webhooks not signed by Twilio |
 | `ANTHROPIC_MODEL` | `claude-haiku-5-5` | model for first steps and the optional natural replies |
 | `CHAT_PER_DAY` | `100` | AI chat answers per student per day (`POST /api/chat`) |
+| `GUEST_CHAT_PER_DAY` | `12` | free chat messages per visitor per day without login (`POST /api/chat/guest`, UTC day) |
+| `GUEST_CHAT_PER_IP_PER_DAY` | `30` | free chat messages per IP address per day (kept in memory only) |
+| `GUEST_CHAT_GLOBAL_PER_DAY` | `200` | free chat messages for all visitors together per day, the brake for the Claude bill |
 | `ELEVENLABS_API_KEY` | none | ElevenLabs key for spoken cues and voice input (`/api/voice/*`); without it voice is off |
 | `ELEVENLABS_VOICE_ID` | none | the voice that reads aloud |
 | `ELEVENLABS_TTS_MODEL` / `ELEVENLABS_STT_MODEL` | `eleven_multilingual_v2` / `scribe_v2` | models for speaking and listening |
