@@ -62,6 +62,51 @@ The server finds its own public address on Replit. Elsewhere, set `PUBLIC_URL`.
 
 ## Other settings
 
+### Optional Google Calendar, read only
+
+Set these **on the Node server**, never the frontend:
+
+| Name | Meaning |
+|---|---|
+| `GOOGLE_CLIENT_ID` | Google OAuth web client ID |
+| `GOOGLE_CLIENT_SECRET` | Its client secret |
+| `GOOGLE_REDIRECT_URI` | Exact registered HTTPS callback, ending `/google/callback` |
+| `TOKEN_ENCRYPTION_KEY` | 32 random bytes encoded as 64 hexadecimal characters |
+
+Unset or invalid configuration returns “Not set up yet”; all existing app
+features remain available. Local development alone may use an HTTP localhost
+callback. Enable Calendar API in the Google project and register the callback
+exactly. Review consent-screen audience/testing/verification requirements
+before sharing with students. A school admin may block third-party access.
+Do not put setup credentials or private feed addresses in issues or PRs.
+
+The student uses their existing Concentr8 account, then Profile > Settings >
+Google Calendar. Only `calendar.readonly` is requested. Choose up to three
+calendars; events are not editable here. Disconnect removes stored credentials
+and selections and attempts Google revocation. The server data file contains
+only encrypted refresh tokens per student; the encryption key must be backed
+up securely outside that file. Key rotation requires reconnecting.
+
+Routes and shapes: `docs/plans/google-calendar.md` (from repository root).
+`GET /google/status` is public and returns only `{configured}`. Other Google
+data routes require the existing Bearer token; no query-key authentication.
+Selection is `POST /google/calendars` with `{calendarIds:[...]}`.
+Events accept RFC3339 `from`/exclusive `to`, maximum 62 days, and optional IANA
+`timezone` (falls back to the student's stored timezone). No write routes.
+
+OAuth state/tickets are process-local and expire after five minutes. This
+matches the existing single-process data-file server: use one instance or
+sticky routing. A multi-instance deployment needs shared transient storage
+and a shared durable account store before enabling this connection.
+
+Source references:
+- https://developers.google.com/identity/protocols/oauth2/web-server
+- https://developers.google.com/workspace/calendar/api/v3/reference/events/list
+- https://developers.google.com/workspace/calendar/api/v3/reference/calendarList/list
+
+Live consent must be checked with configured credentials; mocked tests are
+not a claim that a particular school's admin permits this OAuth app.
+
 | Name | Default | What it does |
 |---|---|---|
 | `PORT` | `3000` | |
