@@ -13,7 +13,7 @@ from src.calls.router import router as calls_router
 from src.config import settings
 from src.voice.router import router as voice_router
 
-app = FastAPI(title="Articul8 API")
+app = FastAPI(title="Concentr8 API")
 
 # CORS: browsers block a page from calling another address unless the server
 # allows it. We allow only the frontend's address(es) from the settings.

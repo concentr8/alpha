@@ -10,7 +10,7 @@ Request:  POST https://api.elevenlabs.io/v1/convai/twilio/outbound-call
           (US region: api.us.elevenlabs.io). Required fields: agent_id,
           agent_phone_number_id, to_number. Per-call script goes in
           conversation_initiation_client_data.conversation_config_override:
-          agent.first_message (must name Articul8 and say it is an AI) and
+          agent.first_message (must name Concentr8 and say it is an AI) and
           agent.prompt.prompt (= our instruction). Answer: success, message,
           conversation_id, callSid.
 Needs in ElevenLabs agent settings (from the older guide): authentication on, and
