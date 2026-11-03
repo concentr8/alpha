@@ -1,6 +1,6 @@
 // Purpose: adds the approved read-only Google Calendar connection to Profile Settings and Calendar.
 // Called by: frontend/index.html after calendar.js; runtime hooks on articul8:navigate and the initial hash.
-// Calls: Concentr8's existing connection/API and CalendarUI.setExternal; Google events never enter Articul8.
+// Calls: Concentr8's existing connection/API and CalendarUI.setExternal; Google events never enter Concentr8.
 (() => {
   'use strict';
 

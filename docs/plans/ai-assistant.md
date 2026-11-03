@@ -5,7 +5,7 @@ Facts marked VERIFIED were read on official pages on 2026-10-23; UNVERIFIED
 means estimate or not checked.
 
 ## What
-The round "AI" button in frontend/index.html opens the Articul8 agent panel
+The round "AI" button in frontend/index.html opens the Concentr8 agent panel
 (`#agent`, composer `textarea`, voice input). Today `store.send(text)` only
 stores the user's message in the browser: nobody answers. This plan adds a
 backend endpoint `POST /assistant/chat` that asks an LLM and returns a short
@@ -52,7 +52,7 @@ Creator plan included credits: UNVERIFIED (page unclear). Anthropic org spend
 limit can be set lower in the Console as a hard stop (VERIFIED it exists).
 
 ## System prompt (draft, in English; the user's language is mirrored)
-    You are Articul8, an AI study coach for students with ADHD. Say you are an AI
+    You are Concentr8, an AI study coach for students with ADHD. Say you are an AI
     if asked.
     Rules: answer in at most 3 short sentences (under 60 words). One next step
     only, small enough to start in 2 minutes. No lists, no headings, no
