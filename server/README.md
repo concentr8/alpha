@@ -72,6 +72,7 @@ Set these **on the Node server**, never the frontend:
 | `GOOGLE_CLIENT_SECRET` | Its client secret |
 | `GOOGLE_REDIRECT_URI` | Exact registered HTTPS callback, ending `/google/callback` |
 | `TOKEN_ENCRYPTION_KEY` | 32 random bytes encoded as 64 hexadecimal characters |
+| `GOOGLE_SIGNIN_REDIRECT_URI` | Sign in with Google (same client ID and secret). Exact registered callback, ending `/auth/google/callback`. Asks for `openid email` only; Calendar stays a separate opt-in. New students need `OPEN_SIGNUPS=true`. |
 
 Unset or invalid configuration returns “Not set up yet”; all existing app
 features remain available. Local development alone may use an HTTP localhost

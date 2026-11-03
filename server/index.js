@@ -13,6 +13,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const voice = require('./voice');
 const { createGoogleCalendar } = require('./google-calendar');
+const { createGoogleSignin } = require('./google-signin');
 
 const env = process.env;
 const PORT = Number(env.PORT || 3000);
@@ -1254,6 +1255,17 @@ const googleCalendar = createGoogleCalendar({
   env, users: data.users, save, authenticate: userFromRequest, send,
 });
 
+// Sign-in with Google (ADR 0032): openid email only. Calendar access is a separate opt-in (the lines above).
+const googleSignin = createGoogleSignin({
+  env, users: data.users, save, newUser, sha256, send,
+  newSignupAllowed: openSignups,
+  countSignup: () => {
+    const g = globalToday();
+    if (g.signups >= MAX_SIGNUPS_PER_DAY) throw httpError(429, 'Too many sign-ups today. Try again tomorrow.');
+    g.signups += 1;
+  },
+});
+
 async function route(req, res) {
   const url = new URL(req.url, 'http://localhost');
   const p = url.pathname.replace(/\/+$/, '') || '/';
@@ -1270,6 +1282,7 @@ async function route(req, res) {
 
   if (m === 'OPTIONS') return send(res, 204, '', 'text/plain');
   if (await googleCalendar.handle(req, res, url)) return;
+  if (await googleSignin.handle(req, res, url)) return;
   if (p === '/' && m === 'GET') {
     const page = require('path').join(__dirname, 'public', 'index.html');
     let html;
@@ -1455,7 +1468,12 @@ async function route(req, res) {
       return send(res, 200, { status: r.status, body: await r.json().catch(() => null) });
     }
     if (p === '/api/settings' && m === 'POST') {
-      applySettings(u, JSON.parse((await readBody(req)) || '{}'));
+      const body = JSON.parse((await readBody(req)) || '{}');
+      // Students who sign in with Google have no phone number. The first number is the moment they agree to calls.
+      const addsFirstNumber = typeof body.phoneNumber === 'string' && body.phoneNumber.trim() && !u.consentAt && u.id !== 'owner';
+      if (addsFirstNumber && body.consent !== true) throw httpError(400, 'You need to agree to get phone calls.');
+      applySettings(u, body);
+      if (addsFirstNumber) u.consentAt = new Date().toISOString();
       save();
       return send(res, 200, { ok: true });
     }

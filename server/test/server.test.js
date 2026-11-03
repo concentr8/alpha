@@ -234,3 +234,22 @@ test('health does not leak secrets or phone numbers', async () => {
   assert.equal(h.signupsOpen, true);
   assert.equal(JSON.stringify(h).includes('+1'), false);
 });
+
+test('a student who signed in with Google agrees to calls with the first phone number', async () => {
+  const crypto = require('node:crypto');
+  const token = 'google-student-token';
+  data.users.g1 = { id: 'g1', googleSub: 'sub-g1', email: 'student@example.edu', tokenHash: crypto.createHash('sha256').update(token).digest('hex'), phoneNumber: null, consentAt: null, callTime: '08:00', timezone: 'America/Los_Angeles', tasks: [], today: {}, calls: { date: null, count: 0 } };
+  const noConsent = await api('/api/settings', { method: 'POST', key: token, body: { phoneNumber: '+15555550100' } });
+  assert.equal(noConsent.status, 400);
+  assert.equal(data.users.g1.phoneNumber, null, 'no number is saved without the agreement');
+  assert.equal(data.users.g1.consentAt, null);
+
+  const withConsent = await api('/api/settings', { method: 'POST', key: token, body: { phoneNumber: '+15555550100', consent: true } });
+  assert.equal(withConsent.status, 200);
+  assert.equal(data.users.g1.phoneNumber, '+15555550100');
+  assert.ok(data.users.g1.consentAt);
+
+  const later = await api('/api/settings', { method: 'POST', key: token, body: { phoneNumber: '+15555550101' } });
+  assert.equal(later.status, 200, 'the agreement is asked once, not for every change');
+  delete data.users.g1;
+});
