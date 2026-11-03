@@ -79,3 +79,6 @@ Home without sign-in keeps the 12 free chat messages (guest chat plan).
 
 ## Verification
 `cd server && npm test`. Live consent cannot be tested without the real Google configuration and a real account.
+
+## Update 2026-11-03: sign-in must be visible
+Jonas: signing in with Google on the web version is very important, and "Personal information" alone made no sense. The Profile page and Profile, Personal information now show "Continue with Google" (or "Sign out" when signed in); "Account & subscription" is renamed "Sign in & subscription". Still to decide with Jack: a sign-in entry in the sidebar.
