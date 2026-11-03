@@ -88,6 +88,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | server/google-signin.js | Sign in with Google: ticket, state, cookie, PKCE, account by Google `sub`, token handed to the app once (ADR 0032) | New |
 | server/test/google-signin.test.js | Mocked Google: whole flow, openid email only, bad tokens, wrong cookie or state, expiry, closed sign-ups, limits, no leaks | New |
 | docs/decisions/0032-sign-in-with-google.md | ADR: Google sign-in, phone only for calls, calendar stays a separate opt-in | New |
+| docs/decisions/0033-calendar-required-after-sign-in.md | ADR: after signing in the calendar step is required; phone and Canvas come later, optional | New |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |

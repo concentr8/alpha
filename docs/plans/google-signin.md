@@ -1,6 +1,9 @@
 # Plan: sign in with Google, calendar access required
 
-Status: DRAFT, waiting for a human go. No code until then.
+Status: PARTLY BUILT. The server sign-in is merged (PR #34, ADR 0032) with its own routes `/auth/google/...` and `openid email` only.
+The calendar rule is decided in ADR 0033 (2026-11-03): required, as a second step right after signing in. Where this plan says
+"one consent screen" or "four scopes", ADR 0032 and 0033 win. Still open: the sign-in page and calendar step in the app,
+the Google settings (`GOOGLE_SIGNIN_REDIRECT_URI` in Azure and the second redirect URI in the Google client), switching off `/api/register`.
 Purpose: read by the team before building; replaces phone number plus invite code as the way in.
 
 ## Goal
