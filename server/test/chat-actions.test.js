@@ -133,6 +133,8 @@ test('the prompt makes the chat take a brain dump, ask until each to-do is compl
   const system = lastClaudeRequest.system;
   assert.match(system, /starts from a blank page and gets out everything/);
   assert.match(system, /one short question per reply until each to-do is complete/);
+  assert.match(system, /at most six questions in total/);
+  assert.match(system, /Add nothing to the list \(no add_todo\) before you have summed up/);
   assert.match(system, /Do not suggest a timer or any other tool before you understand/);
   assert.match(system, /how long each one takes/);
   assert.match(system, /for the timer only after the student agreed to a plan or asked for it/);
