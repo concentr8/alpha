@@ -583,6 +583,8 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
           <h2 id="up-next-title">Up next</h2>
           <ul class="up-next-row" id="up-next-list"></ul>
         </section>
+        <!-- AI-GENERATED: no wireframe from Jack for the Quick start button; built from .wire-button (CON-38). -->
+        <div class="quick-start"><button class="wire-button solid" type="button" data-quick-start>Quick start · 10 min</button></div>
         <div class="conversation" id="home-conversation" role="log" aria-label="Conversation" aria-live="polite"></div>
         <form class="composer chat-composer" id="main-composer">
           <textarea rows="1" aria-label="What's on your mind?" placeholder="What’s on your mind?" autocomplete="off" maxlength="2000"></textarea>
@@ -729,6 +731,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 @media(max-width:960px){.page-content[aria-label="Toolbox"]>:is(.product-heading,.detail-heading)>h1{font-size:26px}}
 /* AI-GENERATED: clean start screen (docs/plans/home-chat-tools.md). Home has two columns; the full to-do list opens on demand. */
 .up-next { margin-bottom:22px; }
+.quick-start { margin:0 0 22px; }
 .up-next h2 { font-size:17px; font-weight:400; color:#666; margin:0 0 10px; }
 .up-next-row { display:flex; gap:10px; margin:0; padding:0 0 4px; list-style:none; overflow-x:auto; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; }
 .up-next-row > li { flex:0 0 230px; min-width:0; scroll-snap-align:start; }
@@ -2339,6 +2342,8 @@ function setAgent(open, focusInput=true) {
     else if(reason==='tasks'){renderTasks();renderUpNext();renderMessages();}
     else renderAll();
   });
+  /* Quick start (CON-38): the shortest way into a focus session, a checklist and a 10 minute timer for the task in focus. */
+  document.addEventListener('click',event=>{if(event.target.closest('[data-quick-start]'))FocusUI.setup({selected:['checklist','timer'],minutes:10,origin:'Home'});});
   window.addEventListener('articul8:agent-open',()=>{renderDraft();const log=conversations[1];log.scrollTop=log.scrollHeight;});
   document.getElementById('collapse-sidebar').addEventListener('click',()=>{store.setCollapsed(true);document.getElementById('open-sidebar').focus();});
   document.getElementById('open-sidebar').addEventListener('click',()=>{store.setCollapsed(false);document.getElementById('collapse-sidebar').focus();});
