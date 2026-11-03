@@ -915,6 +915,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
           const a=s.messages.find(m=>m.id===messageId).actions[index];
           const match=s.tasks.find(t=>t.title===a.title);
           const task=match||{id:id(),title:a.title,done:false,course:'',steps:[]};
+          if(a.minutes&&!task.estimatedMinutes)task.estimatedMinutes=a.minutes; /* the time the student confirmed in the chat (CON-35) */
           if(!match)s.tasks.push(task);
           s.activeTaskId=task.id;a.state='done';a.taskId=task.id;a.undoable=!match;
         },'tasks');
@@ -1482,7 +1483,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   // AI-GENERATED: calendar-only task estimation; other page schemas stay unchanged.
   function findTimeMarkup() {
     const tasks=store.state.tasks.filter(task=>!task.done);
-    return `<section aria-label="Find time for a task"><h2>Find study time</h2><form class="cal-find-time" data-cal-find-time><label>Task<select name="task" required><option value="">Choose a task</option>${tasks.map(task=>`<option value="${esc(task.id)}">${esc(task.title)}</option>`).join('')}</select></label><label>Estimated minutes<input name="duration" type="number" min="1" max="780" required placeholder="e.g. 45"></label><button class="wire-button" type="submit">Find time</button><p data-cal-time-result role="status" aria-live="polite"></p><button class="wire-button" type="button" data-cal-use-time hidden>Add to calendar</button></form></section>`;
+    return `<section aria-label="Find time for a task"><h2>Find study time</h2><form class="cal-find-time" data-cal-find-time><label>Task<select name="task" required><option value="">Choose a task</option>${tasks.map(task=>`<option value="${esc(task.id)}">${esc(task.title)}${task.estimatedMinutes?` (${Number(task.estimatedMinutes)} min)`:''}</option>`).join('')}</select></label><label>Estimated minutes<input name="duration" type="number" min="1" max="780" required placeholder="e.g. 45"></label><button class="wire-button" type="submit">Find time</button><p data-cal-time-result role="status" aria-live="polite"></p><button class="wire-button" type="button" data-cal-use-time hidden>Add to calendar</button></form></section>`;
   }
   function availability(duration) {
     if ((external.calendars.length && external.status !== 'ready') || ['loading', 'error', 'stale'].includes(external.status)) {
@@ -2249,10 +2250,11 @@ function setAgent(open, focusInput=true) {
         return `<div class="chat-tool"><span class="chat-tool-icon">${Product.icon(Product.paths[tool.icon]||'',18)}</span><span class="chat-tool-name">${escapeHtml(tool.name)}</span><button type="button" class="chat-action solid" data-chat-tool="${escapeHtml(action.tool)}">Open</button></div>`;
       }
       if(action.state==='done'&&action.type==='suggest_calendar')return `<p class="chat-note">Added to calendar: ${title}</p>`;
-      if(action.state==='done')return `<p class="chat-note">Added to to-do: ${title}${action.undoable?` · <button type="button" class="chat-undo" data-chat-action="undo" data-message="${id}" data-index="${index}">Undo</button>`:''}</p>`;
+      const minutesText=action.minutes?` (${Number(action.minutes)} min)`:'';
+      if(action.state==='done')return `<p class="chat-note">Added to to-do: ${title}${minutesText}${action.undoable?` · <button type="button" class="chat-undo" data-chat-action="undo" data-message="${id}" data-index="${index}">Undo</button>`:''}</p>`;
       if(action.state==='undone')return `<p class="chat-note">Removed from to-do: ${title}</p>`;
       if(action.state!=='pending')return '';
-      const label=action.type==='suggest_calendar'?`+ Calendar: ${escapeHtml(CalendarUI.timeLabel({kind:'plan',allDay:false,start:action.start,end:action.end}))}`:`+ To-do: ${title}`;
+      const label=action.type==='suggest_calendar'?`+ Calendar: ${escapeHtml(CalendarUI.timeLabel({kind:'plan',allDay:false,start:action.start,end:action.end}))}`:`+ To-do: ${title}${minutesText}`;
       const hint=next&&next.messageId===message.id&&next.index===index?'<kbd aria-hidden="true">\u21b5</kbd>':'';
       return `<button type="button" class="chat-action" data-chat-action="accept" data-message="${id}" data-index="${index}" title="${title}">${label}${hint}</button>`;
     });
@@ -2273,7 +2275,7 @@ function setAgent(open, focusInput=true) {
   }
   function renderTasks() {
     const focusedId=document.activeElement?.dataset.taskCheck;
-    taskList.innerHTML=store.state.tasks.map(task=>`<li class="task"><input type="checkbox" data-task-check="${escapeHtml(task.id)}" aria-label="Complete ${escapeHtml(task.title)}" ${task.done?'checked':''}><button class="task-title" type="button" data-discuss-task="${escapeHtml(task.id)}" aria-label="Discuss ${escapeHtml(task.title)}">${escapeHtml(task.title)}</button></li>`).join('');
+    taskList.innerHTML=store.state.tasks.map(task=>`<li class="task"><input type="checkbox" data-task-check="${escapeHtml(task.id)}" aria-label="Complete ${escapeHtml(task.title)}" ${task.done?'checked':''}><button class="task-title" type="button" data-discuss-task="${escapeHtml(task.id)}" aria-label="Discuss ${escapeHtml(task.title)}">${escapeHtml(task.title)}${task.estimatedMinutes?` · ${Number(task.estimatedMinutes)} min`:''}</button></li>`).join('');
     if(focusedId)Array.from(taskList.querySelectorAll('input')).find(input=>input.dataset.taskCheck===focusedId)?.focus();
   }
   /* AI-GENERATED: greeting, "Up next" and the on-demand to-do list of the clean start screen (docs/plans/home-chat-tools.md). */
