@@ -94,6 +94,9 @@ test('every student has their own tasks, answers and settings', async () => {
   const meB = await (await api('/api/me', { key: b.token })).json();
   assert.equal(meB.callTime, '09:30');
   assert.equal(meB.phoneNumber, '+14155552222');
+  assert.equal(meB.email, null, 'an account made by phone number has no email');
+  data.users[b.userId].email = 'student@example.edu';
+  assert.equal((await (await api('/api/me', { key: b.token })).json()).email, 'student@example.edu');
 });
 
 test('wrong or missing tokens are refused; the owner key still works', async () => {
