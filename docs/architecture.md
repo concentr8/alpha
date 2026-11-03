@@ -82,6 +82,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/google-calendar.md | Approved read-only OAuth, frontend contract and future ICS fallback | New |
 | docs/plans/google-signin.md | Plan: sign in with Google only, calendar required | New, waiting for a human go |
 | docs/plans/estimate-time-first.md | Plan: chat to-dos keep their confirmed time estimate and show it in the to-do list and calendar (CON-35) | New |
+| docs/plans/brain-dump-and-profile-picture.md | Plan: Home brain dump, due dates from the chat, profile picture (CON-32, 33, 34, 36) | New |
 | docs/plans/start-focus-minimal.md | Plan: Start focus dialog with one field, everything else under Advanced | New |
 | docs/plans/quickstart-button.md | Plan: Quick start button on Home, one click into a 10 minute focus session (CON-38) | New |
 | server/google-calendar.js | Per-student read-only OAuth, encrypted refresh credentials, calendar selection and event pagination | New |
