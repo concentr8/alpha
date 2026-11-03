@@ -103,23 +103,51 @@
   const randomHex = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  async function signIn() {
+  // --- Google windows: a small window on the web, the default browser in the desktop app (ADR 0035) ---
+  const BLOCKED_WINDOW_TEXT = 'Sign-in window was blocked. Click to open it in your browser.';
+  const isDesktop = () => Boolean(window.concentr8Desktop); // set by app/preload.js, only inside the desktop app
+
+  // Why the empty window first: browsers allow a new window only during the click, and the Google address comes later from
+  // the server. The desktop app sends every new window to the default browser (app/main.js), so there it opens nothing.
+  function openGoogleWindow(name) {
+    if (isDesktop()) return null;
+    const popup = window.open('about:blank', name, 'popup,width=560,height=720');
+    if (popup) { try { popup.opener = null; } catch (_) { /* we only need to see when it closes */ } }
+    return popup;
+  }
+
+  // A new tab on the web (works right after a click), the default browser in the desktop app.
+  function openInBrowser(url) {
+    window.open(url, '_blank', 'noopener');
+  }
+
+  // Why a counter: when Google opened in the browser, the student may close that tab and click again. The new click
+  // starts a new attempt, and the older one stops asking the server.
+  let signInAttempt = 0;
+
+  // onBrowser({ blocked, url }) is called when the sign-in continues in the browser instead of a small window:
+  // blocked=false in the desktop app (the browser is already open), blocked=true on the web when the window was blocked
+  // (then the caller shows a button that opens url). The Google link works once, so it is opened at most once.
+  async function signIn({ onBrowser } = {}) {
     if (settings.token) return { ok: true };
+    const attempt = ++signInAttempt;
     const poll = randomHex();
-    const popup = window.open('about:blank', 'concentr8-google-signin', 'popup,width=560,height=720');
-    if (!popup) return { ok: false, error: 'Allow the sign-in window to open, then try again.' };
-    try { popup.opener = null; } catch (_) { /* we only need to see when it closes */ }
-    const closeWindow = () => { if (!popup.closed) popup.close(); };
+    const popup = openGoogleWindow('concentr8-google-signin');
+    const closeWindow = () => { if (popup && !popup.closed) popup.close(); };
     const start = await request('/auth/google/start', 'POST', { poll });
     if (!start.ok) { closeWindow(); return { ok: false, error: start.status === 503 ? 'Google sign-in is not set up yet.' : start.error }; }
     let target;
     try { target = new URL(start.data.authorizationUrl); } catch (_) { target = null; }
     if (!target || target.origin !== new URL(API).origin || target.pathname !== '/auth/google/login') { closeWindow(); return { ok: false, error: 'The server returned an invalid sign-in link.' }; }
-    popup.location.href = target.href;
+    if (popup) popup.location.href = target.href;
+    else if (isDesktop()) { openInBrowser(target.href); if (onBrowser) onBrowser({ blocked: false, url: target.href }); }
+    else if (onBrowser) onBrowser({ blocked: true, url: target.href });
+    else return { ok: false, error: BLOCKED_WINDOW_TEXT };
     const until = Date.now() + 5 * 60 * 1000;
     let closedAt = 0;
     while (Date.now() < until) {
       await wait(1500);
+      if (attempt !== signInAttempt) { closeWindow(); return { ok: false, cancelled: true }; }
       const r = await request('/auth/google/token', 'POST', { poll });
       if (r.status === 200 && r.data.token) {
         closeWindow();
@@ -131,7 +159,8 @@
         return { ok: true };
       }
       if (r.status !== 202 && r.status !== 0) { closeWindow(); return { ok: false, error: r.error }; }
-      if (popup.closed) { closedAt = closedAt || Date.now(); if (Date.now() - closedAt > 4000) return { ok: false, error: 'The sign-in was not finished.' }; }
+      // Without a window of our own (browser tab, desktop app) we cannot see a close, so we ask until the five minutes end.
+      if (popup && popup.closed) { closedAt = closedAt || Date.now(); if (Date.now() - closedAt > 4000) return { ok: false, error: 'The sign-in was not finished.' }; }
     }
     closeWindow();
     return { ok: false, error: 'The sign-in took too long. Try again.' };
@@ -247,5 +276,5 @@
   });
 
   // The page is drawn by index.html after callPage() returns, so the check runs right after it.
-  window.Concentr8 = { api: API, ask, signIn, signOut, isSignedIn: () => Boolean(settings.token), connection: () => (settings.token ? { url: API, token: settings.token } : null), callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
+  window.Concentr8 = { api: API, ask, signIn, signOut, isDesktop, openGoogleWindow, openInBrowser, blockedWindowText: BLOCKED_WINDOW_TEXT, isSignedIn: () => Boolean(settings.token), connection: () => (settings.token ? { url: API, token: settings.token } : null), callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
 })();

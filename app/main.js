@@ -4,6 +4,7 @@
 const { app, BrowserWindow, shell, ipcMain, Notification } = require('electron');
 const path = require('node:path');
 const { setupBridge } = require('./desktop/bridge');
+const { opensInBrowser } = require('./desktop/links');
 
 // Why two places: when the app is packaged, electron-builder copies frontend/ next to the app
 // (see "extraResources" in package.json). When started from the repo, we use the folder itself.
@@ -21,9 +22,10 @@ function openWindow() {
   });
   win.loadFile(frontendFile());
 
-  // Why: links to other sites open in the normal browser, so the app window never leaves the app.
+  // Why: links to other sites open in the normal browser, so the app window never leaves the app. This includes the Google
+  // sign-in (ADR 0035). Empty windows ("about:blank") are refused quietly, so the page knows it must use the browser.
   win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    if (opensInBrowser(url)) shell.openExternal(url);
     return { action: 'deny' };
   });
 }

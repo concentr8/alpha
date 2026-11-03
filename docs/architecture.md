@@ -47,7 +47,8 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | .github/workflows/deploy-server.yml | Tests server/, deploys it to the Azure web app `concentr8-api`, then checks `/api/health` | New |
 | docs/plans/download-site.md | Plan: download site, app builds, stable releases | New |
 | docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
-| app/main.js | Desktop app: opens `frontend/index.html` in a window | New |
+| app/main.js | Desktop app: opens `frontend/index.html` in a window; web links (and the Google sign-in) go to the default browser | New |
+| app/desktop/links.js | Decides which addresses may go to the default browser: only http and https (ADR 0035) | New |
 | app/preload.js | The one door from the page to the desktop part: `window.concentr8Desktop` (ADR 0024) | New |
 | app/desktop/rules.js | Decides work, neutral or distraction for the program or page on screen | New (ported from the Cal Hacks app) |
 | app/desktop/apps.js | Turns names in the block list ("YouTube") into app and website rules | New |
@@ -94,7 +95,8 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/decisions/0032-sign-in-with-google.md | ADR: Google sign-in, phone only for calls, calendar stays a separate opt-in | New |
 | docs/decisions/0033-calendar-required-after-sign-in.md | ADR: after signing in the calendar step is required; phone and Canvas come later, optional | New |
 | docs/decisions/0034-google-name-with-profile-scope.md | ADR: sign-in also asks for the Google name (`profile` scope); the app fills the name only while it is empty | New |
-| frontend/concentr8-signin.js | Sign-in page ("Continue with Google") and the calendar step that cannot be closed (ADR 0032, 0033). AI generated | New |
+| docs/decisions/0035-google-sign-in-in-default-browser.md | ADR: desktop sign-in opens in the default browser; a blocked window shows "Open in browser" | New |
+| frontend/concentr8-signin.js | Sign-in page ("Continue with Google") and the calendar step that cannot be closed (ADR 0032, 0033); continues in the browser when no window can open (ADR 0035). AI generated | New |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |

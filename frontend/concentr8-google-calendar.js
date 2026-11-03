@@ -1,6 +1,7 @@
 // Purpose: adds the approved read-only Google Calendar connection to Profile Settings and Calendar.
 // Called by: frontend/index.html after calendar.js; runtime hooks on articul8:navigate and the initial hash.
-// Calls: Concentr8's existing connection/API and CalendarUI.setExternal; Google events never enter Concentr8.
+// Calls: Concentr8's existing connection/API, its Google windows (ADR 0035) and CalendarUI.setExternal; Google events never
+//        enter Concentr8.
 (() => {
   'use strict';
 
@@ -46,6 +47,8 @@
   let generation = 0;
   let oauthPopup = null;
   let popupPoll = null;
+  let browserUrl = ''; // the Google address behind "Open in browser"; it works only once
+  const BROWSER_WAIT = 'Finish in your browser, then come back to Concentr8.';
   let lastRefresh = 0;
   let lastAccountCheck = 0;
 
@@ -58,7 +61,7 @@
     + '<p class="google-calendar-status" data-google-status role="status" aria-live="polite">Checking Google Calendar setup…</p>'
     + '<section data-google-calendar-list hidden><h3>Choose calendars</h3><p class="detail-note">Choose up to three calendars to show in your study planner.</p><div class="cal-field"><span>Calendars to display</span><div data-google-calendar-options></div></div><p class="detail-note" data-google-selection-count></p></section>'
     + '<p class="cal-error" data-google-error role="alert" hidden></p>'
-    + '<div class="dialog-actions"><button class="wire-button" type="button" data-google-connect>Connect Google Calendar</button><button class="wire-button" type="button" data-google-save hidden>Save selection</button><button class="wire-button" type="button" data-google-disconnect hidden>Disconnect</button></div>';
+    + '<div class="dialog-actions"><button class="wire-button" type="button" data-google-browser hidden>Open in browser</button><button class="wire-button" type="button" data-google-connect>Connect Google Calendar</button><button class="wire-button" type="button" data-google-save hidden>Save selection</button><button class="wire-button" type="button" data-google-disconnect hidden>Disconnect</button></div>';
   document.body.append(dialog);
 
   function showStatus(text) {
@@ -130,6 +133,30 @@
     popupPoll = null;
     if (oauthPopup && !oauthPopup.closed) oauthPopup.close();
     oauthPopup = null;
+    hideBrowserButton();
+  }
+
+  function hideBrowserButton() {
+    browserUrl = '';
+    const button = dialog.querySelector('[data-google-browser]');
+    if (button) button.hidden = true;
+  }
+
+  // Google continues in the browser: by itself in the desktop app, after a click when the browser blocked the window.
+  // Coming back to Concentr8 checks the connection again (focus listener at the end of this file).
+  function continueInBrowser(url) {
+    const desktop = window.Concentr8.isDesktop();
+    if (desktop) window.Concentr8.openInBrowser(url);
+    browserUrl = desktop ? '' : url;
+    dialog.querySelector('[data-google-browser]').hidden = desktop;
+    showStatus(desktop ? BROWSER_WAIT : window.Concentr8.blockedWindowText);
+  }
+
+  function openBrowser() {
+    if (!browserUrl) return;
+    window.Concentr8.openInBrowser(browserUrl);
+    hideBrowserButton();
+    showStatus(BROWSER_WAIT);
   }
 
   function normalizeCalendars(data) {
@@ -234,6 +261,7 @@
     lastAccountCheck = Date.now();
     const currentToken = authToken() || '';
     const ownGeneration = generation;
+    hideBrowserButton();
     showError('');
     showStatus('Checking Google Calendar setup…');
     try {
@@ -364,17 +392,17 @@
     showError('');
     showStatus('Preparing a secure Google sign-in…');
     try {
-      popup = window.open('about:blank', 'concentr8-google-calendar', 'popup,width=560,height=720');
-      if (!popup) throw new Error('Allow the sign-in window to open, then try again.');
+      hideBrowserButton();
+      popup = window.Concentr8.openGoogleWindow('concentr8-google-calendar');
       oauthPopup = popup;
-      try { popup.opener = null; } catch (_) { /* keep the window reference for close polling */ }
       const result = await request('/google/login', 'POST', {});
-      if (ownGeneration !== generation || token !== authToken()) { popup.close(); return; }
+      if (ownGeneration !== generation || token !== authToken()) { if (popup) popup.close(); return; }
       const destination = new URL(result.authorizationUrl);
       const trusted = new URL(baseUrl());
       if (destination.origin !== trusted.origin || destination.pathname !== '/google/login' || !destination.searchParams.has('ticket')) {
         throw new Error('The server returned an invalid Google sign-in link.');
       }
+      if (!popup) { continueInBrowser(destination.href); return; }
       popup.location.href = destination.href;
       clearInterval(popupPoll);
       const started = Date.now();
@@ -506,6 +534,7 @@
     if (event.target.closest('[data-google-close]')) dialog.close();
     if (event.target.closest('[data-open-google-calendar]')) openDialog();
     if (event.target.closest('[data-google-connect]')) connectGoogle();
+    if (event.target.closest('[data-google-browser]')) openBrowser();
     if (event.target.closest('[data-google-save]')) saveCalendars();
     if (event.target.closest('[data-google-disconnect]')) disconnect();
   });
@@ -531,8 +560,9 @@
     }
     updateIdentity();
   });
+  // Why also when the dialog is open: after connecting in the browser the student comes back here (ADR 0035).
   window.addEventListener('focus', () => {
-    if (calendarVisible && !updateIdentity()) loadAccount();
+    if ((calendarVisible || dialog.open) && !updateIdentity()) loadAccount();
   });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && calendarVisible) {
