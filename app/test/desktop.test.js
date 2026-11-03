@@ -1,4 +1,4 @@
-// Purpose: checks the blocker logic without a Mac: rules, block list names, AppleScript text, the AI check and the loop.
+// Purpose: checks the desktop logic without a Mac: rules, block list names, AppleScript text, the AI check, the loop and links.
 // Called by: `npm test` in app/ and the CI workflow.
 // Calls: app/desktop/*.js with fake platforms, fake servers and fake phone numbers where needed (none are used here).
 const test = require('node:test');
@@ -9,6 +9,7 @@ const { createMacPlatform, asString } = require('../desktop/platform');
 const { judgeActivity, createCachedJudge, createServerAsker, usefulLocation } = require('../desktop/relevance');
 const { createBlocker, isRestorableUrl } = require('../desktop/blocker');
 const { safeServer } = require('../desktop/bridge');
+const { opensInBrowser } = require('../desktop/links');
 
 const ctx = (activity, intent = 'write essay about Hamlet') => ({ activity: { at: 0, url: null, title: null, ...activity }, intent });
 const rules = rulesFromNames(['YouTube', 'Steam', 'Notion']);
@@ -192,4 +193,13 @@ test('Linux: reads program and title through xdotool, and gives up quietly witho
   const missing = createLinuxPlatform(async () => { throw new Error('xdotool: not found'); });
   assert.equal(await missing.activity(), null);
   assert.equal(await missing.closeTab('Firefox'), false);
+});
+
+test('only web addresses go to the default browser (ADR 0035)', () => {
+  assert.equal(opensInBrowser('https://api.concentr8.app/auth/google/login?ticket=abc'), true);
+  assert.equal(opensInBrowser('http://localhost:8787/auth/google/login'), true);
+  assert.equal(opensInBrowser('about:blank'), false); // made macOS ask which app should open it
+  assert.equal(opensInBrowser('file:///etc/passwd'), false);
+  assert.equal(opensInBrowser('javascript:alert(1)'), false);
+  assert.equal(opensInBrowser(''), false);
 });
