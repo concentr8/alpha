@@ -319,11 +319,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .calendar-page{min-width:0}
 .calendar-page .page-heading{align-items:center}
 .calendar-page .page-heading h1{margin:0}
-.calendar-ai-note{font-size:11px;color:#9a9a9a;margin-left:8px}
 .cal-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;flex-shrink:0}
-.cal-quick-add{display:flex;align-items:center;gap:8px;flex:1 1 300px;min-width:180px}
-.cal-quick-add input{font:inherit;font-size:16px;min-width:0;flex:1;height:48px;padding:8px 12px;border:1px solid #bbb;border-radius:6px}
-.cal-shortcut{font-size:12px;color:#666;margin-left:4px}
 .cal-view-switch{display:flex;gap:4px}
 .cal-view-switch button{font:inherit;font-size:16px;padding:9px 12px;background:white;border:1px solid transparent;border-radius:6px;cursor:pointer}
 .cal-view-switch button[aria-pressed=true]{background:#f4f4f2;border-color:#ccc}
@@ -391,16 +387,10 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .cal-month-event.external{background:#f4f4f2;border-style:dashed}
 .cal-navigation{margin-bottom:10px;flex-wrap:wrap}
 .cal-navigation [data-cal-step]{width:56px;display:flex;align-items:center;justify-content:center;gap:1px}
-.cal-navigation [data-cal-step="-1"]:after{content:'←';font-size:12px;color:#666}
-.cal-navigation [data-cal-step="1"]:after{content:'→';font-size:12px;color:#666}
 .cal-navigation .cal-range{font-size:20px;margin-left:4px;flex:1}
 .cal-navigation input[type=date]{font:inherit;font-size:15px;height:40px;border:1px solid #bdbdbd;border-radius:6px;padding:5px 8px}
-.cal-nav-shortcut{font-size:12px;color:#666;margin-left:4px}
 .cal-detail-google{font-size:14px;color:#666}
 .cal-dialog .preview-note.quiet{font-size:11px;color:#9a9a9a;background:none;padding:0;margin:0}
-.cal-quick-preview{border:1px solid #eaeaea;border-radius:6px;padding:14px;display:grid;gap:8px}
-.cal-quick-preview strong{font-weight:400}
-.cal-quick-actions{display:flex;justify-content:flex-end;gap:10px}
 .cal-calendar-toggle{display:none}
 .cal-find-time{display:grid;gap:9px;margin-top:18px;font-size:14px}
 .cal-find-time label{display:grid;gap:4px}
@@ -422,13 +412,9 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   .cal-navigation{gap:5px;margin-bottom:8px}
   .cal-navigation .cal-range{font-size:16px;min-width:120px}
   .cal-toolbar{gap:6px;margin-bottom:8px}
-  .cal-quick-add{flex-basis:100%}
-  .cal-quick-add input{height:44px;font-size:16px}
   .cal-view-switch button{font-size:14px;padding:8px}
-  .cal-head,.cal-allday,.cal-body{grid-template-columns:48px minmax(0,1fr)}
-  .cal-date{grid-column:2}
-  .cal-day-body:not([hidden]){grid-column:2}
-  .cal-allday>div:first-child{grid-column:1}
+  .cal-table{min-width:calc(48px + var(--cal-days,7) * 96px)}
+  .cal-head,.cal-allday,.cal-body{grid-template-columns:48px repeat(var(--cal-days,7),minmax(0,1fr))}
   .cal-date strong{font-size:21px}
   .cal-hours span{font-size:12px}
   .cal-event{font-size:15px}
@@ -570,41 +556,43 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       <nav class="nav" aria-label="Main navigation">
         <button aria-current="page" type="button" data-page="Home">Home</button>
         <button type="button" data-page="Courses">Courses</button>
+        <button type="button" data-page="Toolbox">Toolbox</button>
+        <button type="button" data-page="To Do List">To Do List</button>
+        <button type="button" data-page="Data">Data</button>
         <button type="button" data-page="Calendar">Calendar</button>
       </nav>
       <button class="profile" type="button" data-page="Profile">Profile</button>
     </aside>
 
     <main class="workspace" aria-label="Home">
+      <header class="chat-toolbar" aria-label="Chat controls">
+        <button class="wire-button chat-switcher" id="chat-history-toggle" type="button" aria-expanded="false" aria-controls="chat-history"><span id="chat-switcher-title">New chat</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      </header>
+      <section class="chat-history" id="chat-history" aria-labelledby="chat-history-title" hidden>
+        <h2 id="chat-history-title" class="sr-only">Chats</h2>
+        <button class="chat-menu-new" id="new-chat" type="button"><span aria-hidden="true">＋</span>New chat</button>
+        <div id="chat-search-wrap" hidden><label class="sr-only" for="chat-history-search">Search chats</label><input id="chat-history-search" type="search" placeholder="Search chats" autocomplete="off"></div>
+        <div id="chat-history-list"></div>
+      </section>
       <section class="check-in" aria-labelledby="check-in-title">
         <h1 id="check-in-title">Hello</h1>
-        <!-- AI-GENERATED: no wireframe from Jack for the Home question (CON-33). -->
-        <p class="plate-question">What's on your plate right now?</p>
-        <!-- AI-GENERATED: no wireframe from Jack for the clean start screen; built from existing tokens (docs/plans/home-chat-tools.md). -->
-        <section class="up-next" aria-labelledby="up-next-title">
-          <h2 id="up-next-title">Up next</h2>
-          <ul class="up-next-row" id="up-next-list"></ul>
-        </section>
-        <!-- AI-GENERATED: no wireframe from Jack for the Quick start button; built from .wire-button (CON-38). -->
-        <div class="quick-start"><button class="wire-button solid" type="button" data-quick-start>Quick start · 10 min</button></div>
+        <p class="home-question">What's on your plate right now?</p>
         <div class="conversation" id="home-conversation" role="log" aria-label="Conversation" aria-live="polite"></div>
+        <div class="quick-start-options">
+          <button class="wire-button" id="quick-start" type="button">Quick Start <span aria-hidden="true">↗</span></button>
+          <span>Plan a focus session</span>
+        </div>
+        <div class="focus-chat-actions" id="focus-chat-actions" hidden><button class="wire-button" id="chat-start-focus" type="button">Start focus session</button><span>Review your task and time before starting.</span></div>
         <form class="composer chat-composer" id="main-composer">
-          <textarea rows="1" aria-label="What's on your plate right now?" placeholder="Tell me everything that is on your mind" autocomplete="off" maxlength="2000"></textarea>
+          <textarea rows="1" aria-label="What's on your mind?" placeholder="What’s on your mind?" autocomplete="off" maxlength="2000"></textarea>
           <div class="composer-actions">
             <div class="voice-control"><button class="icon-button voice-button" type="button" data-voice="main" aria-label="Start voice input" aria-pressed="false" title="Voice input"><svg class="mic-symbol" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v4M8 22h8"/></svg><svg class="stop-symbol" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor"/></svg></button><span class="voice-status" aria-live="polite" hidden></span></div>
             <button class="icon-button send-button" type="submit" aria-label="Send message" disabled><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V4m-7 7 7-7 7 7"/></svg></button>
           </div>
         </form>
-        <!-- AI-GENERATED: the whole Home page (greeting, Up next, chat actions) has no wireframe from Jack; kept as quiet as possible on purpose (ADR 0027). -->
-        <p class="preview-note quiet">AI generated · not drawn by Jack yet</p>
       </section>
     </main>
 
-    <aside class="todo" id="all-todos" aria-labelledby="todo-title" hidden>
-      <div class="todo-header"><h2 id="todo-title">To-do</h2><div class="todo-header-actions"><button class="icon-button" id="add-task-toggle" type="button" aria-label="Add a to-do" aria-controls="add-task-form" aria-expanded="false" title="Add a to-do"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button class="icon-button" type="button" data-close-todos aria-label="Close to-do list" title="Close">×</button></div></div>
-      <ul class="tasks" id="home-tasks"></ul>
-      <form id="add-task-form" class="add-task-form" hidden><input aria-label="New to-do" placeholder="Add a to-do" maxlength="2000" autocomplete="off"><button class="icon-button" type="submit" aria-label="Save to-do"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></button></form>
-    </aside>
     <main id="page-content" class="page-content" hidden></main>
   </div>
 
@@ -614,7 +602,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     <div class="conversation" id="agent-conversation" role="log" aria-label="Shared conversation" aria-live="polite"></div>
     <div id="agent-composer-mount"></div>
   </section>
-  <button class="ai-toggle" id="ai-toggle" aria-label="Open Concentr8 Agent" aria-controls="agent" aria-expanded="false" aria-keyshortcuts="Shift" title="Concentr8 Agent · Shift" type="button">AI</button>
+  <button class="ai-toggle" id="ai-toggle" aria-label="Open Concentr8 Agent" aria-controls="agent" aria-expanded="false" title="Concentr8 Agent" type="button" hidden>AI</button>
   <div class="notice" id="notice" role="status" hidden></div>
 
   <style data-source="product.css">
@@ -731,31 +719,9 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .page-content[aria-label="Toolbox"]>:is(.product-heading,.detail-heading)>.text-back{min-height:48px}
 .page-content[aria-label="Toolbox"]>.detail-heading .detail-actions .wire-button{height:48px;padding-block:10px}
 @media(max-width:960px){.page-content[aria-label="Toolbox"]>:is(.product-heading,.detail-heading)>h1{font-size:26px}}
-/* AI-GENERATED: clean start screen (docs/plans/home-chat-tools.md). Home has two columns; the full to-do list opens on demand. */
-.up-next { margin-bottom:22px; }
-.plate-question { font-size:20px; margin:0 0 18px; color:#444; }
-.page-content > .dialog-actions { justify-content:flex-start; margin-bottom:24px; }
-.sidebar .profile { display:flex; align-items:center; gap:12px; }
-.sidebar .profile .avatar { width:32px; height:32px; font-size:15px; }
-.avatar img { width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; }
-.profile-picture { margin:12px 0 8px; }
-.profile-picture .avatar { width:72px; height:72px; font-size:30px; }
-.focus-advanced { margin:4px 0 16px; }
-.focus-advanced summary { cursor:pointer; color:#666; font-size:16px; margin-bottom:12px; }
-.quick-start { margin:0 0 22px; }
-.up-next h2 { font-size:17px; font-weight:400; color:#666; margin:0 0 10px; }
-.up-next-row { display:flex; gap:10px; margin:0; padding:0 0 4px; list-style:none; overflow-x:auto; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; }
-.up-next-row > li { flex:0 0 230px; min-width:0; scroll-snap-align:start; }
-.up-next-card { display:flex; flex-direction:column; gap:2px; width:100%; padding:12px 14px; border:1px solid #eaeaea; border-radius:8px; background:#fff; text-align:left; font:inherit; color:inherit; cursor:pointer; }
-.up-next-card:hover { background:#f7f7f5; }
-.up-next-card strong { font-weight:500; font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.up-next-card span { font-size:15px; color:#666; }
-.has-messages .up-next { display:none; }
-.todo-header-actions { display:flex; align-items:center; gap:4px; }
 @media(min-width:761px){
 .app:not(.inner-page) { grid-template-columns:224px minmax(360px,1fr); }
 .app:not(.inner-page).sidebar-collapsed { grid-template-columns:52px minmax(360px,1fr); }
-.app.todo-open .todo { position:fixed; top:0; right:0; bottom:0; width:336px; z-index:20; background:#fff; }
 }
 @media(min-width:761px) and (max-width:1250px){ .app:not(.inner-page) { grid-template-columns:188px minmax(360px,1fr); } }
 @media(min-width:761px) and (max-width:960px){ .app:not(.inner-page) { grid-template-columns:160px minmax(360px,1fr); } }
@@ -779,9 +745,69 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 .ai-toggle{right:16px;bottom:16px}
 }
 </style>
+<style data-source="chat-navigation.css">
+/* Jack's local MVP layout: shared tokens, a wider chat and independent pages. */
+.check-in{max-width:860px;top:clamp(150px,25vh,240px)}
+.check-in h1{margin-bottom:12px}
+.home-question{font-size:27px;line-height:1.4;margin-bottom:32px;letter-spacing:-.4px}
+.chat-toolbar{position:absolute;top:28px;left:32px;right:32px;display:flex;align-items:center;gap:8px;z-index:2}
+.chat-toolbar .chat-switcher{min-height:40px;max-width:min(420px,100%);min-width:0;font-size:16px;font-weight:500;padding:8px 12px;gap:10px;border:0;border-radius:24px;background:#f4f4f2}
+.chat-switcher span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-switcher svg{color:#777;flex-shrink:0;transition:transform .15s ease}
+.chat-switcher[aria-expanded=true] svg{transform:rotate(180deg)}
+.chat-toolbar .chat-switcher:hover,.chat-toolbar .chat-switcher[aria-expanded=true]{background:#eaeaea}
+.chat-history{position:absolute;top:76px;left:32px;width:400px;max-width:calc(100% - 64px);max-height:calc(100dvh - 108px);overflow:auto;padding:8px;background:#fff;border:1px solid var(--line);border-radius:12px;z-index:3;box-shadow:0 8px 24px #0000000d}
+.chat-menu-new{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:10px 12px;border:0;border-radius:7px;background:#f4f4f2;text-align:left;font-size:16px;font-weight:500}
+.chat-menu-new:hover{background:#eaeaea}
+#chat-history-list{border-top:1px solid #eaeaea;margin-top:8px;padding-top:4px}
+.chat-history .chat-history-group{font-size:13px;color:#777;font-weight:400;padding:12px 12px 6px;margin:0}
+.chat-history input{width:calc(100% - 16px);min-width:0;font:inherit;font-size:14px;padding:9px 10px;border:1px solid #dedede;border-radius:6px;margin:12px 8px 0}
+.chat-history-row{display:flex;align-items:center;gap:14px;text-align:left;width:100%;min-height:44px;padding:10px 12px;border:0;border-radius:7px;background:transparent}
+.chat-history-row:hover{background:#f7f7f5}
+.chat-history-row[aria-current=true]{background:#f4f4f2}
+.chat-history-row strong{flex:1;min-width:0;font-size:15px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-history-row .chat-history-meta{display:flex;gap:8px;flex-shrink:0;font-size:12px;color:#777}
+.chat-history .detail-empty{font-size:14px;padding:16px 12px}
+.has-messages #check-in-title{display:none}
+.quick-start-options,.focus-chat-actions{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-shrink:0}
+.quick-start-options .wire-button,.focus-chat-actions .wire-button{font-size:16px;min-height:40px;padding:8px 14px;border-color:#dedede}
+.quick-start-options>span,.focus-chat-actions>span{color:#777;font-size:14px}
+.check-in.has-messages{top:98px;height:calc(100dvh - 126px);min-height:300px;margin-bottom:28px}
+.has-messages h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.has-messages .home-question,.has-messages .quick-start-options{display:none}
+.chat-pending{font-size:16px;color:#777;padding:10px 0}
+.calendar-page .page-heading{min-height:48px;margin-bottom:52px}
+.cal-toolbar{justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.cal-toolbar .cal-navigation{margin:0;gap:6px;flex-wrap:nowrap;min-width:0}
+.cal-toolbar-actions{display:flex;align-items:center;gap:16px;margin-left:auto;flex-shrink:0}
+.cal-toolbar .wire-button,.cal-toolbar .icon-button,.cal-toolbar .cal-view-switch button{height:40px;min-height:40px;font-size:16px}
+.cal-toolbar .wire-button{padding:8px 16px}
+.cal-toolbar [data-cal-step]{width:36px}
+.cal-toolbar .cal-range{font-size:20px;margin-left:8px;white-space:nowrap}
+.cal-toolbar .cal-view-switch{align-items:center}
+@media(max-width:1100px){.cal-toolbar{gap:12px}.cal-toolbar .cal-range{font-size:18px}.cal-toolbar-actions{gap:10px}}
+@media(max-width:700px){
+  .calendar-page .page-heading{margin-bottom:24px}
+  .cal-toolbar .cal-navigation{flex-wrap:wrap;width:100%}
+  .cal-toolbar .cal-range{order:1;flex-basis:100%;margin:6px 0 0;font-size:16px;white-space:normal}
+  .cal-toolbar-actions{width:100%;justify-content:space-between}
+  .cal-toolbar .wire-button{padding:8px 12px}
+}
+@media(max-width:760px){
+  .chat-toolbar{position:relative;top:auto;left:auto;right:auto;margin:25px 16px 0 60px;flex-wrap:wrap}
+  .chat-history{position:fixed;top:74px;left:16px;width:400px;max-width:calc(100% - 32px)}
+  .check-in{top:0;margin:80px auto 32px}
+  .check-in.has-messages{top:0;margin:24px auto;height:calc(100dvh - 118px);min-height:300px}
+  .home-question{font-size:24px}
+  .quick-start-options,.focus-chat-actions{gap:10px;flex-wrap:wrap}
+  .sidebar{overflow-y:auto}
+  .nav{margin-top:24px}
+}
+</style>
   <button class="resume-focus" id="resume-focus" type="button" hidden aria-label="Return to active focus session"></button>
   <script src="concentr8-server.js"></script>
 <script src="concentr8-blocker.js"></script>
+  <script src="chat-history.js"></script>
   <script data-source="app-state.js">
 /* One local record shared by Home and the agent on every page. */
 (() => {
@@ -799,7 +825,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     workflows:[], sessions:[], activeSession:null,
     tools:{favorites:[],selected:[],customSelection:false,blockedApps:[],sound:'brown'},
     wellness:{saved:[]}, social:{messages:{}}, usage:{days:{}},
-    profile:{name:'',email:'',avatar:''}, settings:{focusMinutes:25,autoAdvance:true}, canvas:{schoolUrl:'',imported:[]},
+    profile:{name:'',email:''}, settings:{focusMinutes:25,autoAdvance:true}, canvas:{schoolUrl:'',imported:[]},
     calendarEvents: [
       {id:'plan-problem',title:'Computer Vision Assignment 1',kind:'plan',start:day(0)+'T10:00',end:day(0)+'T11:30',taskId:'problem-set',notes:'',allDay:false},
       {id:'plan-essay',title:'Rhetoric Essay 1: Argument Analysis',kind:'plan',start:day(2)+'T12:00',end:day(2)+'T13:00',taskId:'essay-outline',notes:'',allDay:false},
@@ -814,7 +840,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   });
   function read(value) {
     const clean = initial();
-    if (!value || value.version !== 2) return clean;
+    if (!value || value.version !== 2) return ChatHistory.restore(clean, null);
     clean.draft = typeof value.draft === 'string' ? value.draft.slice(0, 2000) : '';
     clean.collapsed = value.collapsed === true;
     if(Array.isArray(value.calendarEvents))clean.calendarEvents=value.calendarEvents.filter(e=>validEvent(e)&&typeof e.id==='string').map(cleanEvent);
@@ -832,7 +858,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(value.wellness&&Array.isArray(value.wellness.saved))clean.wellness.saved=value.wellness.saved.filter(x=>x&&typeof x.id==='string'&&typeof x.title==='string'&&typeof x.date==='string'&&Array.isArray(x.cues)&&x.cues.length&&x.cues.every(c=>Number.isFinite(c.at)&&typeof c.text==='string'));
     if(value.social?.messages&&typeof value.social.messages==='object')clean.social.messages=value.social.messages;
     if(value.usage?.days&&typeof value.usage.days==='object')clean.usage.days=value.usage.days;
-    if(value.profile){clean.profile={...clean.profile,...value.profile};if(!/^data:image\/(jpeg|png|webp);base64,/.test(clean.profile.avatar||'')||clean.profile.avatar.length>120000)clean.profile.avatar='';}
+    if(value.profile)clean.profile={...clean.profile,...value.profile};
     if(value.settings)clean.settings={...clean.settings,...value.settings};
     const session=clean.activeSession;
     if(session&&!session.workflowId&&session.status!=='review'&&session.phases.some(p=>p.kind==='meditation')){
@@ -844,7 +870,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       if(current?.kind==='meditation'){session.phaseElapsedMs=0;session.phaseStartedAt=null;session.status='ready';}
     }
     if(value.canvas)clean.canvas={...clean.canvas,...value.canvas};
-    // Chat messages are never restored: every start of the app is a clean page (ADR 0027).
     // Upgrade only unchanged sample titles; preserve personal edits and linked dates.
     const sampleTitles=[
       ['problem-set','Problem set','Computer Vision Assignment 1'],
@@ -858,15 +883,16 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       const task=clean.tasks.find(t=>(t.id===key||t.source===key)&&t.title===oldTitle);
       if(task){task.title=title;clean.calendarEvents.forEach(e=>{if(e.taskId===task.id&&e.title===oldTitle)e.title=title;});}
     });
-    return clean;
+    return ChatHistory.restore(clean, value);
   }
-  let state = initial();
+  let state = ChatHistory.restore(initial(), null);
   try { state = read(JSON.parse(localStorage.getItem(key))); } catch (_) { /* Still usable without storage. */ }
-  // Composer text and checked tools belong to this browsing session, never defaults.
-  state.draft='';state.tools.selected=[];state.tools.customSelection=false;
+  // Tool selection is temporary; chat drafts belong to their saved conversation.
+  state.tools.selected=[];state.tools.customSelection=false;
   const id = () => typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   function update(change, reason) {
     change(state);
+    ChatHistory.sync(state, reason);
     let persisted = true;
     try { localStorage.setItem(key, JSON.stringify({...state,messages:[],draft:'',tools:{...state.tools,selected:[],customSelection:false}})); } catch (_) { persisted = false; }
     window.dispatchEvent(new CustomEvent('articul8:change', {detail:{reason, persisted}}));
@@ -876,12 +902,14 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     change:update,
     /* Back to a fresh start. The in-memory state is replaced too: other code saves it again when the page is left, which would bring the old data back. */
     reset() {
-      state = initial();
+      state = ChatHistory.restore(initial(), null);
       state.draft='';state.tools.selected=[];state.tools.customSelection=false;
       try { localStorage.removeItem(key); } catch (_) { /* Nothing stored, nothing to delete. */ }
       window.dispatchEvent(new CustomEvent('articul8:change', {detail:{reason:'restore', persisted:true}}));
     },
     uid:id,
+    newChat(mode='chat') { update(s=>{ChatHistory.start(s,mode);s.tools.selected=[];s.tools.customSelection=false;},'chat-select'); },
+    selectChat(chatId) { update(s=>{ChatHistory.select(s,chatId);s.tools.selected=[];s.tools.customSelection=false;},'chat-select'); },
     setDraft(text) { update(s => {s.draft=text.slice(0,2000);}, 'draft'); },
     setCollapsed(value) { update(s => {s.collapsed=Boolean(value);}, 'sidebar'); },
     setAgentEvent(eventId) { update(s=>{const event=s.calendarEvents.find(e=>e.id===eventId);s.agentEventId=event?.id||null;if(event?.taskId)s.activeTaskId=event.taskId;},'calendar-context'); },
@@ -929,15 +957,9 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
           const a=s.messages.find(m=>m.id===messageId).actions[index];
           const match=s.tasks.find(t=>t.title===a.title);
           const task=match||{id:id(),title:a.title,done:false,course:'',steps:[]};
-          if(a.minutes&&!task.estimatedMinutes)task.estimatedMinutes=a.minutes; /* the time the student confirmed in the chat (CON-35) */
           if(!match)s.tasks.push(task);
           s.activeTaskId=task.id;a.state='done';a.taskId=task.id;a.undoable=!match;
         },'tasks');
-        const done=state.messages.find(m=>m.id===messageId).actions[index];
-        if(done.due&&!state.calendarEvents.some(e=>e.taskId===done.taskId&&e.kind==='deadline')){
-          /* The final due date the student named in the chat becomes the task's deadline (the same rule the side panel and Up next read). */
-          try{this.saveEvent({title:done.title,kind:'deadline',start:done.due+'T17:00',end:done.due+'T17:00',allDay:false,taskId:done.taskId,notes:''});}catch(_){ /* a bad date only means no deadline */ }
-        }
       } else if(verb==='undo'&&action.state==='done'&&action.undoable){
         update(s=>{
           const a=s.messages.find(m=>m.id===messageId).actions[index];
@@ -976,7 +998,8 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if (event.key!==key) return;
     try {
       const previous=state,next=read(JSON.parse(event.newValue));
-      next.draft=previous.draft;next.messages=previous.messages;
+      const current=next.chats.find(c=>c.id===previous.activeChatId);
+      if(current)ChatHistory.activate(next,current);
       if(next.activeTaskId===previous.activeTaskId&&next.taskContext===previous.taskContext){next.tools.selected=previous.tools.selected;next.tools.customSelection=previous.tools.customSelection;}
       else {next.tools.selected=[];next.tools.customSelection=false;}
       state=next;window.dispatchEvent(new CustomEvent('articul8:change',{detail:{reason:'restore',persisted:true}}));
@@ -1092,12 +1115,12 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   }
   function setup({taskId,eventId,workflowId,selected,minutes,mode,origin='Toolbox'}={}) {
     const existing=S.state.activeSession;if(existing&&existing.status!=='review'){P.go('Focus');return;}
-    const task=S.state.tasks.find(t=>t.id===taskId); /* a new task is the starting point; an existing one only when the caller names it */
+    const task=S.state.tasks.find(t=>t.id===(taskId||S.state.activeTaskId));
     const event=S.state.calendarEvents.find(e=>e.id===eventId);
     const suggested=minutes||((event?.kind==='plan')?Math.max(1,Math.round((Date.parse(event.end+'Z')-Date.parse(event.start+'Z'))/60000)):S.state.settings.focusMinutes);
-    const d=P.open('Start focus',`<form class="product-form"><p class="detail-note" data-picked-task ${task?'':'hidden'}>${task?P.esc(task.title):''}</p><label data-new-task ${task?'hidden':''}>What will you work on?<input name="title" aria-label="New focus task" maxlength="200" value="${P.esc(P.context())}" ${task?'':'autofocus'}></label><details class="focus-advanced" ${workflowId||mode==='stopwatch'?'open':''}><summary>Advanced</summary><label>Task<select name="task" aria-label="Focus task"><option value="">New task</option>${S.state.tasks.map(t=>`<option value="${P.esc(t.id)}" ${t.id===task?.id?'selected':''}>${P.esc(t.title)}</option>`).join('')}</select></label><label>Workflow<select name="workflow" aria-label="Focus workflow"><option value="">Quick start</option>${S.state.workflows.filter(w=>w.nodes.length).map(w=>`<option value="${P.esc(w.id)}" ${w.id===workflowId?'selected':''}>${P.esc(w.name)}</option>`).join('')}</select></label><div data-duration ${workflowId?'hidden':''}><div class="product-form-row"><label>Minutes<input type="number" name="minutes" aria-label="Focus minutes" min="1" max="1440" value="${suggested}"></label><label>Timer<select name="mode" aria-label="Timer mode"><option value="countdown">Countdown</option><option value="stopwatch" ${mode==='stopwatch'?'selected':''}>Stopwatch</option></select></label></div></div></details><div class="dialog-actions"><button class="wire-button solid" type="submit">Start</button></div></form>`);
+    const d=P.open('Start focus',`<form class="product-form"><label>Task<select name="task" aria-label="Focus task"><option value="">New task</option>${S.state.tasks.map(t=>`<option value="${P.esc(t.id)}" ${t.id===task?.id?'selected':''}>${P.esc(t.title)}</option>`).join('')}</select></label><label data-new-task ${task?'hidden':''}>Task name<input name="title" aria-label="New focus task" maxlength="200" value="${P.esc(P.context())}"></label><label>Workflow<select name="workflow" aria-label="Focus workflow"><option value="">Quick start</option>${S.state.workflows.filter(w=>w.nodes.length).map(w=>`<option value="${P.esc(w.id)}" ${w.id===workflowId?'selected':''}>${P.esc(w.name)}</option>`).join('')}</select></label><div data-duration ${workflowId?'hidden':''}><div class="product-form-row"><label>Minutes<input type="number" name="minutes" aria-label="Focus minutes" min="1" max="1440" value="${suggested}"></label><label>Timer<select name="mode" aria-label="Timer mode"><option value="countdown">Countdown</option><option value="stopwatch" ${mode==='stopwatch'?'selected':''}>Stopwatch</option></select></label></div></div><div class="dialog-actions"><button class="wire-button solid" type="submit">Start</button></div></form>`);
     const form=d.querySelector('form'),f=form.elements;
-    f.task.onchange=()=>{const picked=S.state.tasks.find(t=>t.id===f.task.value),note=form.querySelector('[data-picked-task]');form.querySelector('[data-new-task]').hidden=!!picked;note.hidden=!picked;note.textContent=picked?picked.title:'';};
+    f.task.onchange=()=>{form.querySelector('[data-new-task]').hidden=!!f.task.value;};
     f.workflow.onchange=()=>{form.querySelector('[data-duration]').hidden=!!f.workflow.value;};
     form.onsubmit=e=>{e.preventDefault();let id=f.task.value;if(!id){if(!f.title.value.trim()){f.title.focus();return;}id=S.upsertTask({title:f.title.value,steps:[]});}start({taskId:id,workflowId:f.workflow.value,eventId,minutes:Number(f.minutes.value)||25,mode:f.mode.value,selected:selected||P.chosen(),origin});};
   }
@@ -1128,7 +1151,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(b.hasAttribute('data-focus-next'))advance();
     if(b.hasAttribute('data-focus-edit'))P.taskEditor(S.state.activeSession.taskId);
     if(b.hasAttribute('data-helpful'))S.change(s=>{const record=s.sessions.find(x=>x.id===s.activeSession.id);record.helpful=b.dataset.helpful==='yes';},'focus');
-    if(b.hasAttribute('data-focus-stats'))P.go('Profile','data');
+    if(b.hasAttribute('data-focus-stats'))P.go('Data');
     if(b.hasAttribute('data-focus-done')){const {origin,originPath}=S.state.activeSession;S.change(s=>{s.activeSession=null;},'focus');P.go(origin,originPath||'');}
   });
   document.addEventListener('change',event=>{const a=S.state.activeSession;if(!a)return;if(event.target.matches('[data-focus-step]'))S.setStep(a.taskId,event.target.dataset.focusStep,event.target.checked);if(event.target.matches('[data-focus-task]'))S.completeTask(a.taskId,event.target.checked);});
@@ -1381,7 +1404,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(path==='meditation-saved')return ToolPages.render(path);
     if(path&&P.tools.some(t=>t.id===path))return toolPage(path);
     const text=P.context(),selected=P.chosen(),recommended=P.recommend();
-    return heading('Toolbox')+'<div class="toolbox-task"><h2>'+(text?P.esc(text):'What are your tasks?')+'</h2><form id="toolbox-task-form" class="task-composer"><input aria-label="Enter a task" placeholder="'+(text?'Change task':'Enter a task')+'" maxlength="2000"><button class="icon-button" type="button" data-product-voice aria-label="Voice input">'+P.icon(P.paths.mic)+'</button><button class="icon-button" type="submit" aria-label="Use task">'+P.icon(P.paths.arrow)+'</button></form></div><div class="section-toolbar"><h2>'+(text?'Suggested tools':'Tools')+'</h2><button class="wire-button" type="button" data-favorites-filter aria-pressed="'+favoriteOnly+'">'+P.icon(P.paths.star,20)+'Favorites</button></div><div class="tool-cards">'+P.tools.filter(t=>!favoriteOnly||S.state.tools.favorites.includes(t.id)).map(t=>'<article class="tool-card '+(selected.includes(t.id)?'selected':'')+'"><div class="tool-card-top">'+toolIcon(t)+'<button type="button" class="icon-button favorite" data-favorite="'+t.id+'" aria-label="Favorite '+t.name+'" aria-pressed="'+S.state.tools.favorites.includes(t.id)+'">'+P.icon(P.paths.star,20)+'</button></div><button type="button" class="tool-card-name" data-tool-open="'+t.id+'">'+t.name+'</button><div class="tool-card-bottom"><span>'+(text&&recommended.includes(t.id)?'Suggested':'')+'</span><label class="tool-select"><input type="checkbox" data-tool-select="'+t.id+'" aria-label="Select '+t.name+'" '+(selected.includes(t.id)?'checked':'')+'></label></div></article>').join('')+'</div>'+(favoriteOnly&&!S.state.tools.favorites.length?'<p class="empty-message">No favorites yet.</p>':'')+'<div class="toolbox-actions"><button class="wire-button" type="button" data-tools-workflow>Create workflow</button><button class="wire-button solid" type="button" data-tools-start>Start focus</button></div>';
+    return heading('Toolbox')+'<div class="toolbox-task"><h2>'+(text?P.esc(text):'What are your tasks?')+'</h2><form id="toolbox-task-form" class="task-composer"><input aria-label="Enter a task" placeholder="'+(text?'Change task':'Enter a task')+'" maxlength="2000"><button class="icon-button" type="button" data-product-voice aria-label="Voice input">'+P.icon(P.paths.mic)+'</button><button class="icon-button" type="submit" aria-label="Use task">'+P.icon(P.paths.arrow)+'</button></form></div><div class="section-toolbar"><h2>'+(text?'Suggested tools':'Tools')+'</h2><button class="wire-button" type="button" data-favorites-filter aria-pressed="'+favoriteOnly+'">'+P.icon(P.paths.star,20)+'Favorites</button></div><div class="tool-cards">'+P.tools.filter(t=>t.id!=='checklist'&&(!favoriteOnly||S.state.tools.favorites.includes(t.id))).map(t=>'<article class="tool-card '+(selected.includes(t.id)?'selected':'')+'"><div class="tool-card-top">'+toolIcon(t)+'<button type="button" class="icon-button favorite" data-favorite="'+t.id+'" aria-label="Favorite '+t.name+'" aria-pressed="'+S.state.tools.favorites.includes(t.id)+'">'+P.icon(P.paths.star,20)+'</button></div><button type="button" class="tool-card-name" data-tool-open="'+t.id+'">'+t.name+'</button><div class="tool-card-bottom"><span>'+(text&&recommended.includes(t.id)?'Suggested':'')+'</span><label class="tool-select"><input type="checkbox" data-tool-select="'+t.id+'" aria-label="Select '+t.name+'" '+(selected.includes(t.id)?'checked':'')+'></label></div></article>').join('')+'</div>'+(favoriteOnly&&!P.tools.some(t=>t.id!=='checklist'&&S.state.tools.favorites.includes(t.id))?'<p class="empty-message">No favorites yet.</p>':'')+'<div class="toolbox-actions"><button class="wire-button" type="button" data-tools-workflow>Create workflow</button><button class="wire-button solid" type="button" data-tools-start>Start focus</button></div>';
   }
   function toolPage(id) {
     if(id!=='breathing')return ToolPages.render(id);
@@ -1402,19 +1425,18 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   let resetAsked=false;
   function resetDataSection(){
     const buttons=resetAsked?'<p>Really delete everything?</p><button class="wire-button" type="button" data-reset-data>Yes, delete all data</button> <button class="wire-button" type="button" data-reset-cancel>Cancel</button>':'<button class="wire-button" type="button" data-reset-data>Reset all data</button>';
-    return '<div class="profile-detail"><h2>Reset all data</h2><p class="preview-note">AI generated: Jack has not drawn this yet. It will be redrawn.</p><p>Deletes your tasks, courses, calendar, messages, focus history and block list from this browser. Your phone call account stays; delete it under Profile, Phone call. Export your data first if you want a copy.</p>'+buttons+'</div>';
+    return '<div class="profile-detail"><h2>Reset all data</h2><p>Deletes your tasks, courses, calendar, messages, focus history and block list from this browser. Your phone call account stays; delete it under Profile, Phone call. Export your data first if you want a copy.</p>'+buttons+'</div>';
   }
   window.addEventListener('articul8:navigate',()=>{resetAsked=false;}); /* leaving the page cancels a pending question */
   function stats(){return Insights.profile()+resetDataSection();}
   function profile(path) {
-    const avatarHtml=profile=>profile.avatar?'<span class="avatar"><img src="'+P.esc(profile.avatar)+'" alt=""></span>':'<span class="avatar">'+P.esc((profile.name||'Y').slice(0,1).toUpperCase())+'</span>';
     if(path==='stats'||path==='data')return stats();
-    if(path==='personal')return subheading('Personal information','Profile')+'<!-- AI-GENERATED: no wireframe from Jack for the profile picture; built from .avatar, .wire-button and .detail-note. --><div class="profile-identity profile-picture">'+avatarHtml(S.state.profile)+'<label class="wire-button">Choose picture<input type="file" accept="image/png,image/jpeg,image/webp" data-avatar-file hidden></label>'+(S.state.profile.avatar?'<button class="wire-button" type="button" data-avatar-remove>Remove</button>':'')+'</div><p class="detail-note" data-avatar-note role="status"></p>'+(window.Concentr8.isSignedIn()?'<p class="detail-note">Signed in with Google.</p><div class="dialog-actions"><button class="wire-button" type="button" data-signout>Sign out</button></div>':'<p class="detail-note">Sign in with Google to keep your account on every device.</p><div class="dialog-actions"><button class="wire-button solid" type="button" data-signin-open>Continue with Google</button></div>')+'<form class="product-form profile-form" id="profile-form"><label>Name<input name="name" aria-label="Name" maxlength="80" value="'+P.esc(S.state.profile.name)+'"></label><label>Email<input name="email" aria-label="Email" type="email" value="'+P.esc(S.state.profile.email)+'"'+(window.Concentr8.isSignedIn()&&S.state.profile.email?' readonly':'')+'></label>'+(window.Concentr8.isSignedIn()&&S.state.profile.email?'<p class="detail-note">Email from your Google account.</p>':'')+'<div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
+    if(path==='personal')return subheading('Personal information','Profile')+'<form class="product-form profile-form" id="profile-form"><label>Name<input name="name" aria-label="Name" maxlength="80" value="'+P.esc(S.state.profile.name)+'"></label><label>Email<input name="email" aria-label="Email" type="email" value="'+P.esc(S.state.profile.email)+'"></label><div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
     if(path==='call')return window.Concentr8.callPage(subheading('Phone call','Profile'));
-    if(path==='account')return subheading('Account & subscription','Profile')+(window.Concentr8.isSignedIn()?'<div class="profile-detail"><h2>Signed in with Google</h2><p>Your Google account is connected to Concentr8.</p><div class="dialog-actions"><button class="wire-button" type="button" data-signout>Sign out</button></div></div>':'<div class="profile-detail"><h2>Sign in</h2><p>Continue with Google to use Concentr8 on this device. Billing is not connected.</p><div class="dialog-actions"><button class="wire-button solid" type="button" data-signin-open>Continue with Google</button></div></div>');
+    if(path==='account')return subheading('Account & subscription','Profile')+'<div class="profile-detail"><h2>Local prototype</h2><p>Account and billing are not connected.</p></div>';
     if(path==='settings')return subheading('Settings','Profile')+'<form class="product-form profile-form" id="settings-form"><label>Default focus minutes<input name="minutes" aria-label="Default focus minutes" type="number" min="1" max="240" value="'+S.state.settings.focusMinutes+'"></label><label class="check-line"><input name="advance" type="checkbox" '+(S.state.settings.autoAdvance?'checked':'')+'>Advance workflow automatically</label><div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
     if(path==='privacy')return subheading('Privacy policy','Profile')+'<div class="profile-detail"><h2>Prototype data</h2><p>Tasks, messages and focus history stay in this browser’s local storage.</p><p>When you chat with the agent, your last messages and the titles of your open tasks are sent to the Concentr8 server and to Claude (Anthropic) to write an answer. The server keeps no chat history. Without an account you get 12 free messages a day; a random code made in this browser, not linked to you, counts them. If you set up the phone call, the server also stores your phone number, call time, time zone and open task titles until you delete your account.</p><p>Voice input uses your browser’s speech service and may send audio to its provider.</p><p>No Canvas or school account is connected. A production privacy policy is not yet available.</p><button class="wire-button" type="button" data-export-data>Export my data</button></div>';
-    return heading('Profile')+'<div class="profile-menu"><div class="profile-identity">'+avatarHtml(S.state.profile)+'<h2>'+P.esc(S.state.profile.name||'Your profile')+'</h2></div>'+(window.Concentr8.isSignedIn()?'':'<div class="dialog-actions"><button class="wire-button solid" type="button" data-signin-open>Continue with Google</button></div>')+[['personal','Personal information'],['account','Sign in & subscription'],['call','Phone call'],['settings','Settings'],['privacy','Privacy policy'],['data','Data']].map(([path,label])=>'<button type="button" data-profile="'+path+'"><span>'+label+'</span>'+P.icon(P.paths.arrow,22)+'</button>').join('')+'</div>';
+    return heading('Profile')+'<div class="profile-menu"><div class="profile-identity"><span class="avatar">'+P.esc((S.state.profile.name||'Y').slice(0,1).toUpperCase())+'</span><h2>'+P.esc(S.state.profile.name||'Your profile')+'</h2></div>'+[['personal','Personal information'],['account','Account & subscription'],['call','Phone call'],['settings','Settings'],['privacy','Privacy policy']].map(([path,label])=>'<button type="button" data-profile="'+path+'"><span>'+label+'</span>'+P.icon(P.paths.arrow,22)+'</button>').join('')+'</div>';
   }
   document.addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b)return;
@@ -1466,12 +1488,12 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(f.id==='toolbox-task-form'){e.preventDefault();const text=f.querySelector('input').value.trim();if(!text)return;S.send(text);S.change(s=>{s.tools.customSelection=false;},'context');P.ensureTask(text);}
     if(f.id==='tool-step-form'){e.preventDefault();S.addStep(P.currentTask().id,f.querySelector('input').value);}
     if(f.id==='block-form'){e.preventDefault();const value=f.querySelector('input').value.trim();if(value)S.change(s=>{if(!s.tools.blockedApps.includes(value))s.tools.blockedApps.push(value);},'tools');}
-    if(f.id==='profile-form'){e.preventDefault();const data={...S.state.profile,name:f.elements.name.value.trim(),email:f.elements.email.value.trim()};S.change(s=>s.profile=data,'profile');announce('Saved.');}
+    if(f.id==='profile-form'){e.preventDefault();const data={name:f.elements.name.value.trim(),email:f.elements.email.value.trim()};S.change(s=>s.profile=data,'profile');announce('Saved.');}
     if(f.id==='settings-form'){e.preventDefault();const data={focusMinutes:Number(f.elements.minutes.value),autoAdvance:f.elements.advance.checked};S.change(s=>s.settings=data,'settings');announce('Saved.');}
   });
   setInterval(()=>{if(!practice)return;const value=Math.min(60000,practice.elapsed+(practice.running?Date.now()-practice.started:0));const timer=document.querySelector('[data-practice-time]'),instruction=document.querySelector('[data-practice-instruction]');if(timer)timer.textContent=FocusUI.time(60000-value);if(instruction)instruction.textContent=value>=60000?'Complete':practice.kind==='breathing'?(Math.floor(value/1000)%10<4?'Breathe in':'Breathe out'):'Breathe naturally';document.querySelector('[data-practice-orb]')?.classList.toggle('inhale',practice.running&&Math.floor(value/1000)%10<4);if(value>=60000){practice.elapsed=60000;practice.running=false;const b=document.querySelector('[data-practice-start]');if(b)b.textContent='Again';}},250);
   function unmount(){practice=null;const a=S.state.activeSession,p=a?.phases[a.index];if(!(a?.status==='running'&&p?.tools.includes('music')&&!a.soundOff))P.Sound.stop();}
-  window.ProductPages={toolbox,courses,profile,unmount};
+  window.ProductPages={toolbox,courses,profile,stats,unmount};
 })();
 
 </script>
@@ -1503,7 +1525,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   // AI-GENERATED: calendar-only task estimation; other page schemas stay unchanged.
   function findTimeMarkup() {
     const tasks=store.state.tasks.filter(task=>!task.done);
-    return `<section aria-label="Find time for a task"><h2>Find study time</h2><form class="cal-find-time" data-cal-find-time><label>Task<select name="task" required><option value="">Choose a task</option>${tasks.map(task=>`<option value="${esc(task.id)}">${esc(task.title)}${task.estimatedMinutes?` (${Number(task.estimatedMinutes)} min)`:''}</option>`).join('')}</select></label><label>Estimated minutes<input name="duration" type="number" min="1" max="780" required placeholder="e.g. 45"></label><button class="wire-button" type="submit">Find time</button><p data-cal-time-result role="status" aria-live="polite"></p><button class="wire-button" type="button" data-cal-use-time hidden>Add to calendar</button></form></section>`;
+    return `<section aria-label="Find time for a task"><h2>Find study time</h2><form class="cal-find-time" data-cal-find-time><label>Task<select name="task" required><option value="">Choose a task</option>${tasks.map(task=>`<option value="${esc(task.id)}">${esc(task.title)}</option>`).join('')}</select></label><label>Estimated minutes<input name="duration" type="number" min="1" max="780" required placeholder="e.g. 45"></label><button class="wire-button" type="submit">Find time</button><p data-cal-time-result role="status" aria-live="polite"></p><button class="wire-button" type="button" data-cal-use-time hidden>Add to calendar</button></form></section>`;
   }
   function availability(duration) {
     if ((external.calendars.length && external.status !== 'ready') || ['loading', 'error', 'stale'].includes(external.status)) {
@@ -1588,13 +1610,12 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       external.status==='signin'?'Sign in to Concentr8 to view your Google calendars.':
       external.status==='ready'?'Google Calendar events are read only.':'';
     const stateMarkup=stateText?`${esc(stateText)}${external.status==='error'?' <button type="button" data-cal-retry>Retry</button>':''}`:'';
-    const rangeMarkup=`<span class="cal-range">${esc(range)}</span><label class="sr-only" for="cal-go-date">Go to date</label><input id="cal-go-date" type="date" value="${esc(anchor)}" aria-label="Go to date"><span class="cal-nav-shortcut">G</span>`;
+    const rangeMarkup=`<span class="cal-range">${esc(range)}</span>`;
     const rail=`<aside class="cal-rail" aria-label="Calendar visibility"><div class="cal-month-head"><button class="icon-button" type="button" data-cal-month="-1" aria-label="Previous month">${icon('m14 6-6 6 6 6')}</button><strong>${esc(miniHead)}</strong><button class="icon-button" type="button" data-cal-month="1" aria-label="Next month">${icon('m10 6 6 6-6 6')}</button></div><div class="cal-month-grid" aria-label="${esc(miniHead)}">${['M','T','W','T','F','S','S'].map(d=>`<span aria-hidden="true">${d}</span>`).join('')}${monthCells.map(date=>`<button type="button" class="${date.slice(0,7)!==miniMonth.slice(0,7)?'is-outside':''} ${view==='week'&&weekStart(date)===weekStart(anchor)?'is-in-range':''}" data-cal-date-jump="${date}" aria-label="${fmt(date,{weekday:'long',month:'long',day:'numeric',year:'numeric'})}" aria-pressed="${date===anchor}" ${date===today()?'aria-current="date"':''}>${Number(date.slice(8))}</button>`).join('')}</div><h2>Calendars</h2><div class="cal-visibility"><label><input type="checkbox" data-cal-filter="tasks" ${showTasks?'checked':''}>Tasks</label><label><input type="checkbox" data-cal-filter="deadlines" ${showDeadlines?'checked':''}>Deadlines</label>${external.calendars.map(cal=>`<label><input type="checkbox" data-cal-external="${esc(cal.id)}" ${visibleExternal.has(cal.id)?'checked':''}>${esc(cal.name)}</label>`).join('')}</div><p class="cal-external-state ${external.status==='error'?'is-error':''}" role="status" aria-live="polite" ${stateText?'':'hidden'}>${stateMarkup}</p></aside>`;
-    const quick=`<form class="cal-quick-add" data-cal-quick><label class="sr-only" for="cal-quick-input">Quick add a study plan</label><input id="cal-quick-input" name="quick" autocomplete="off" placeholder="Quick add: study Tuesday 3pm 2h"><button class="wire-button solid" type="submit">Add</button></form>`;
     const body=view==='month'?`<div class="cal-month-view">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-month-weekday">${d}</div>`).join('')}${days.map(date=>`<section class="cal-month-cell ${date.slice(0,7)!==anchor.slice(0,7)?'is-outside':''}" data-cal-month-day="${date}"><button type="button" data-cal-date-jump="${date}" aria-label="Go to ${fmt(date,{month:'long',day:'numeric'})}">${Number(date.slice(8))}</button><div data-cal-month-events="${date}"></div></section>`).join('')}</div><p class="cal-month-empty cal-grid-message" role="status" aria-live="polite" hidden></p>`:
       `<div class="cal-scroll" tabindex="0" aria-label="${view==='day'?'Daily':'Weekly'} calendar"><div class="cal-table" style="--cal-days:${days.length}"><div class="cal-head"><div></div>${days.map(date=>`<div class="cal-date ${date===today()?'is-today':''}"><span>${fmt(date,{weekday:'short'})}</span><strong>${Number(date.slice(8))}</strong></div>`).join('')}</div><div class="cal-allday"><div>Due</div>${days.map(date=>`<div data-all-day="${date}"></div>`).join('')}</div><div class="cal-body"><div class="cal-hours">${Array.from({length:24},(_,h)=>`<span style="top:${h*HOUR}px">${String(h).padStart(2,'0')}:00</span>`).join('')}</div>${days.map(date=>`<div class="cal-day-body" data-cal-date="${date}" aria-label="${fmt(date,{weekday:'long',month:'long',day:'numeric'})}"></div>`).join('')}</div><div class="cal-grid-message" role="status" aria-live="polite" hidden></div></div></div>`;
-    const chips=`<div class="cal-filter-chips" role="group" aria-label="Calendar filters"><button type="button" class="wire-button cal-filter-chip" data-cal-chip="tasks" aria-pressed="${showTasks}">Tasks</button>${external.calendars.map(cal=>`<button type="button" class="wire-button cal-filter-chip google" data-cal-chip="google" data-calendar-id="${esc(cal.id)}" aria-pressed="${visibleExternal.has(cal.id)}">${esc(cal.name)}</button>`).join('')}</div>`;
-     return `<div class="page-heading"><h1>Calendar</h1><span class="preview-note quiet calendar-ai-note">AI generated</span><div class="cal-heading-actions"><button class="wire-button" type="button" data-cal-new>+ New <span class="cal-shortcut">N</span></button></div></div><div class="cal-navigation"><button class="wire-button" type="button" data-cal-today>Today <span class="cal-shortcut">T</span></button><button class="icon-button" type="button" data-cal-step="-1" aria-label="Previous ${view==='day'?'day':'range'} (left arrow)" title="Left arrow">${icon('m14 6-6 6 6 6')}</button><button class="icon-button" type="button" data-cal-step="1" aria-label="Next ${view==='day'?'day':'range'} (right arrow)" title="Right arrow">${icon('m10 6 6 6-6 6')}</button>${rangeMarkup}<button class="wire-button cal-calendar-toggle" type="button" data-cal-toggle>Calendars</button></div><div class="cal-toolbar">${quick}<div class="cal-view-switch" role="group" aria-label="Calendar view">${['day','week','month'].map(v=>`<button type="button" data-cal-view="${v}" aria-pressed="${view===v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div></div>${chips}<div class="cal-workspace">${rail}<main class="cal-main">${body}</main></div>`;
+    const chips=`<div ${external.calendars.length?'':'hidden'} class="cal-filter-chips" role="group" aria-label="Calendar filters">${external.calendars.map(cal=>`<button type="button" class="wire-button cal-filter-chip google" data-cal-chip="google" data-calendar-id="${esc(cal.id)}" aria-pressed="${visibleExternal.has(cal.id)}">${esc(cal.name)}</button>`).join('')}</div>`;
+     return `<div class="page-heading"><h1>Calendar</h1></div><div class="cal-toolbar"><div class="cal-navigation"><button class="wire-button" type="button" data-cal-today>Today</button><button class="icon-button" type="button" data-cal-step="-1" aria-label="Previous ${view==='day'?'day':'range'} (left arrow)" title="Left arrow">${icon('m14 6-6 6 6 6')}</button><button class="icon-button" type="button" data-cal-step="1" aria-label="Next ${view==='day'?'day':'range'} (right arrow)" title="Right arrow">${icon('m10 6 6 6-6 6')}</button>${rangeMarkup}<button class="wire-button cal-calendar-toggle" type="button" data-cal-toggle>Calendars</button></div><div class="cal-toolbar-actions"><button class="wire-button" type="button" data-cal-new>+ New</button><div class="cal-view-switch" role="group" aria-label="Calendar view">${['day','week','month'].map(v=>`<button type="button" data-cal-view="${v}" aria-pressed="${view===v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div></div></div>${chips}<div class="cal-workspace">${rail}<main class="cal-main">${body}</main></div>`;
   }
   function drawEvents() {
     if(!root)return;
@@ -1795,13 +1816,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(button.hasAttribute('data-cal-toggle'))root.querySelector('.cal-rail')?.classList.toggle('is-open');
     if(button.hasAttribute('data-cal-event')&&(event.detail===0||button.hasAttribute('data-cal-external-event')||view==='month'))details(button.dataset.calEvent);
     if(button.hasAttribute('data-cal-retry'))window.dispatchEvent(new CustomEvent('concentr8:calendar-retry'));
-    if(button.hasAttribute('data-cal-quick-confirm')){
-      const proposal=JSON.parse(dialog.dataset.quickProposal||'null');
-      if(proposal){store.saveEvent(proposal);dialog.close();anchor=proposal.start.slice(0,10);redraw();emitRange();}
-    }
-    if(button.hasAttribute('data-cal-quick-edit')){
-      const proposal=JSON.parse(dialog.dataset.quickProposal||'null');if(proposal)editor(proposal);
-    }
   });
   rootlessEvents();
   document.addEventListener('keydown',event=>{
@@ -1811,7 +1825,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     const key=event.key.toLowerCase();
     if(key==='n'){event.preventDefault();const start=`${anchor}T${anchor===today()?localClock():'09:00'}`;editor({start,end:iso(stamp(start)+3600000)});}
     else if(key==='t'){event.preventDefault();anchor=today();miniMonth=anchor;scrollTop=Math.max(0,new Date().getHours()*HOUR-48);redraw();emitRange();}
-    else if(key==='g'){event.preventDefault();root.querySelector('#cal-go-date')?.focus();}
     else if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
       event.preventDefault();anchor=dayAdd(anchor,event.key==='ArrowLeft'?-1:1);miniMonth=anchor;redraw();emitRange();
     }
@@ -1831,7 +1844,6 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       if(input.matches('[data-cal-filter="tasks"]'))showTasks=input.checked;
       else if(input.matches('[data-cal-filter="deadlines"]'))showDeadlines=input.checked;
       else if(input.matches('[data-cal-external]')){input.checked?visibleExternal.add(input.dataset.calExternal):visibleExternal.delete(input.dataset.calExternal);}
-      else if(input.matches('#cal-go-date')&&tools.validDate(input.value)){anchor=input.value;miniMonth=anchor;redraw();emitRange();return;}
       if(input.matches('[data-cal-filter],[data-cal-external]')){syncFilterChips();drawEvents();drawMessages();}
     });
     document.addEventListener('submit',event=>{
@@ -1847,25 +1859,12 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
         }catch(error){form.querySelector('[data-cal-time-result]').textContent=error.message;form.querySelector('[data-cal-use-time]').hidden=true;}
         return;
       }
-      if(!event.target.matches('[data-cal-quick]'))return;
-      event.preventDefault();
-      const input=event.target.elements.quick,text=input.value.trim();
-      const result=tools.parseQuickAdd(text,{today:today()});
-      if(result.status==='valid'){
-        const proposal=result.event;
-        dialog.dataset.quickProposal=JSON.stringify(proposal);
-        showDialog('Review study plan',`<p class="preview-note quiet">AI generated</p><div class="cal-quick-preview"><strong>${esc(proposal.title)}</strong><span>${esc(timeLabel(proposal))}</span></div><div class="cal-quick-actions"><button class="wire-button" type="button" data-cal-quick-edit>Edit</button><button class="wire-button solid" type="button" data-cal-quick-confirm>Add to Calendar</button></div>`);
-      }else{
-        const start=`${anchor}T${anchor===today()?localClock():'09:00'}`;
-        editor({title:text,start,end:iso(stamp(start)+3600000)});
-      }
     });
   }
   function syncFilterChips() {
     if(!root)return;
     root.querySelectorAll('[data-cal-filter="tasks"]').forEach(input=>{input.checked=showTasks;});
     root.querySelectorAll('[data-cal-external]').forEach(input=>{input.checked=visibleExternal.has(input.dataset.calExternal);});
-    root.querySelectorAll('[data-cal-chip="tasks"]').forEach(button=>button.setAttribute('aria-pressed',String(showTasks)));
     root.querySelectorAll('[data-cal-chip="google"]').forEach(button=>button.setAttribute('aria-pressed',String(visibleExternal.has(button.dataset.calendarId))));
   }
   window.addEventListener('articul8:change',event=>{if(['calendar','restore','tasks','courses'].includes(event.detail.reason)){if(drag)cancelDrag();redraw();}});
@@ -2069,7 +2068,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
       if(current!==s)return;
       const text=transcript(s),result={text,base:s.base,submit:s.submit,surface:s.surface};
       release(s);
-      if(text)onComplete(result);else onError('No speech detected. Press Shift to try again.',null);
+      if(text)onComplete(result);else onError('No speech detected. Click the microphone to try again.',null);
     }
     function stopEngine(s) {
       if(!s.engine||!s.started)return;
@@ -2158,6 +2157,10 @@ function announce(message) {
 }
 let agentReturnFocus;
 function setAgent(open, focusInput=true) {
+  if(open&&!document.querySelector('.workspace').hidden){
+    if(focusInput)document.querySelector('#main-composer textarea').focus();
+    return;
+  }
   if (open && agent.hidden) agentReturnFocus=document.activeElement;
   if (!open) window.dispatchEvent(new CustomEvent('articul8:stop-voice',{detail:{surface:'agent'}}));
   agent.hidden=!open;
@@ -2185,10 +2188,7 @@ function setAgent(open, focusInput=true) {
   const forms=[mainForm,agentForm];
   const inputs=forms.map(form=>form.querySelector('textarea'));
   const conversations=[document.getElementById('home-conversation'),document.getElementById('agent-conversation')];
-  const taskList=document.getElementById('home-tasks');
   const contexts=forms.map(form=>{const context=document.createElement('div');context.className='chat-context';context.hidden=true;if(form===mainForm)form.before(context);else agent.querySelector('header').after(context);return context;});
-  const addTaskForm=document.getElementById('add-task-form');
-  const addTaskToggle=document.getElementById('add-task-toggle');
   const escapeHtml=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let storageNoticeShown=false;
   const voicePane=document.createElement('div');
@@ -2200,7 +2200,7 @@ function setAgent(open, focusInput=true) {
     onState:renderVoice,
     onComplete:({text,base,submit,surface})=>{
       const message=[base,text].filter(Boolean).join(' ');
-      if(submit){store.send(message);window.Concentr8?.ask();}else store.setDraft(message);
+      if(submit&&!window.Concentr8?.isAsking()){store.send(message);window.Concentr8?.ask();}else store.setDraft(message);
       (surface==='agent'?agentForm:mainForm).querySelector('textarea').focus();
     },
     onError:(message,draft)=>{
@@ -2216,7 +2216,7 @@ function setAgent(open, focusInput=true) {
     agent.classList.toggle('voice-active',inAgent);agent.dataset.voicePhase=state.phase;
     voicePane.hidden=!inAgent;
     voicePane.querySelector('.voice-message').textContent=inAgent?status:'';
-    voicePane.querySelector('.voice-hint').textContent=state.phase==='finishing'?'':'Shift to send';
+    voicePane.querySelector('.voice-hint').textContent=state.phase==='finishing'?'':'Click the stop button to finish';
     voiceFinish.disabled=state.phase==='finishing';
     voiceFinish.setAttribute('aria-label',state.submit?'Finish and send voice message':'Finish voice input');
     inputs.forEach(input=>{input.readOnly=state.active;});
@@ -2242,7 +2242,7 @@ function setAgent(open, focusInput=true) {
     inputs.forEach(input=>{
       if(input.value!==store.state.draft) input.value=store.state.draft;
       sizeInput(input);
-      input.form.querySelector('[type="submit"]').disabled=voiceCapture.active||!input.value.trim();
+      input.form.querySelector('[type="submit"]').disabled=voiceCapture.active||window.Concentr8?.isAsking()||!input.value.trim();
     });
   }
   function renderSidebar() {
@@ -2267,14 +2267,14 @@ function setAgent(open, focusInput=true) {
       const title=escapeHtml(action.title||'');
       if(action.type==='open_tool'){
         const tool=Product.tool(action.tool);
+        if(!tool)return '';
         return `<div class="chat-tool"><span class="chat-tool-icon">${Product.icon(Product.paths[tool.icon]||'',18)}</span><span class="chat-tool-name">${escapeHtml(tool.name)}</span><button type="button" class="chat-action solid" data-chat-tool="${escapeHtml(action.tool)}">Open</button></div>`;
       }
       if(action.state==='done'&&action.type==='suggest_calendar')return `<p class="chat-note">Added to calendar: ${title}</p>`;
-      const minutesText=(action.minutes?` (${Number(action.minutes)} min)`:'')+(action.due?` · due ${escapeHtml(action.due)}`:'');
-      if(action.state==='done')return `<p class="chat-note">Added to to-do: ${title}${minutesText}${action.undoable?` · <button type="button" class="chat-undo" data-chat-action="undo" data-message="${id}" data-index="${index}">Undo</button>`:''}</p>`;
+      if(action.state==='done')return `<p class="chat-note">Added to to-do: ${title}${action.undoable?` · <button type="button" class="chat-undo" data-chat-action="undo" data-message="${id}" data-index="${index}">Undo</button>`:''}</p>`;
       if(action.state==='undone')return `<p class="chat-note">Removed from to-do: ${title}</p>`;
       if(action.state!=='pending')return '';
-      const label=action.type==='suggest_calendar'?`+ Calendar: ${escapeHtml(CalendarUI.timeLabel({kind:'plan',allDay:false,start:action.start,end:action.end}))}`:`+ To-do: ${title}${minutesText}`;
+      const label=action.type==='suggest_calendar'?`+ Calendar: ${escapeHtml(CalendarUI.timeLabel({kind:'plan',allDay:false,start:action.start,end:action.end}))}`:`+ To-do: ${title}`;
       const hint=next&&next.messageId===message.id&&next.index===index?'<kbd aria-hidden="true">\u21b5</kbd>':'';
       return `<button type="button" class="chat-action" data-chat-action="accept" data-message="${id}" data-index="${index}" title="${title}">${label}${hint}</button>`;
     });
@@ -2285,106 +2285,91 @@ function setAgent(open, focusInput=true) {
   }
   function renderMessages() {
     const next=pendingAction();
-    const html=store.state.messages.map(message=>{
+    let html=store.state.messages.map(message=>{
       if(message.role==='assistant')return `<article class="chat-message agent-message" aria-label="Concentr8"><p>${escapeHtml(message.text)}</p>${actionMarkup(message,next)}</article>`;
       const calendar=message.contextId||message.eventId||message.proposal?CalendarUI.messageMarkup(message):'';
       return `<article class="chat-message user-message"><p>${escapeHtml(message.text)}</p>${calendar?`<div class="message-actions">${calendar}</div>`:''}</article>`;
     }).join('');
-    conversations.forEach(log=>{log.innerHTML=html;log.scrollTop=log.scrollHeight;});
+    if(window.Concentr8?.isAsking())html+='<p class="chat-pending" role="status">Concentr8 is thinking…</p>';
+    conversations.forEach(log=>{
+      // Usage/stat updates must not interrupt someone reading an older reply.
+      if(log.innerHTML!==html||log.dataset.chatId!==store.state.activeChatId){
+        log.innerHTML=html;log.dataset.chatId=store.state.activeChatId;log.scrollTop=log.scrollHeight;
+      }
+    });
+    const chat=store.state.chats.find(c=>c.id===store.state.activeChatId);
+    document.getElementById('focus-chat-actions').hidden=chat?.mode!=='focus'||store.state.messages.filter(m=>m.role!=='assistant').length<2||window.Concentr8?.isAsking();
     checkIn.classList.toggle('has-messages',store.state.messages.length>0);
   }
-  function renderTasks() {
-    const focusedId=document.activeElement?.dataset.taskCheck;
-    const byDue=[...store.state.tasks].sort((a,b)=>(deadlineOf(a)||'9').localeCompare(deadlineOf(b)||'9'));
-    taskList.innerHTML=byDue.map(task=>`<li class="task"><input type="checkbox" data-task-check="${escapeHtml(task.id)}" aria-label="Complete ${escapeHtml(task.title)}" ${task.done?'checked':''}><button class="task-title" type="button" data-discuss-task="${escapeHtml(task.id)}" aria-label="Discuss ${escapeHtml(task.title)}">${escapeHtml(task.title)}${task.estimatedMinutes?` · ${Number(task.estimatedMinutes)} min`:''}${deadlineOf(task)?` · ${dueLabel(deadlineOf(task))}`:''}</button></li>`).join('');
-    if(focusedId)Array.from(taskList.querySelectorAll('input')).find(input=>input.dataset.taskCheck===focusedId)?.focus();
-  }
-  /* AI-GENERATED: greeting, "Up next" and the on-demand to-do list of the clean start screen (docs/plans/home-chat-tools.md). */
   const greetingTitle=document.getElementById('check-in-title');
-  const upNextList=document.getElementById('up-next-list');
-  const allTodos=document.getElementById('all-todos');
-  const profileButton=document.querySelector('.sidebar .profile');
-  function renderProfileButton() {
-    const p=store.state.profile,mark=p.avatar?'<span class="avatar"><img src="'+escapeHtml(p.avatar)+'" alt=""></span>':'<span class="avatar">'+escapeHtml((p.name||'Y').slice(0,1).toUpperCase())+'</span>';
-    profileButton.innerHTML=mark+'<span>Profile</span>';
-  }
   function renderGreeting() {
-    renderProfileButton();
     const hour=new Date().getHours();
     const word=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
     const name=store.state.profile.name.trim();
-    greetingTitle.textContent=name?word+', '+name:word;
+    const chat=store.state.chats.find(c=>c.id===store.state.activeChatId);
+    greetingTitle.textContent=store.state.messages.length?ChatHistory.title(chat):(name?word+', '+name:word);
   }
-  // A task is due at its earliest "deadline" calendar event, the same rule the Toolbox pages use.
-  function deadlineOf(task) {
-    return store.state.calendarEvents.filter(e=>e.taskId===task.id&&e.kind==='deadline').map(e=>e.start).sort()[0]||'';
-  }
-  function dueLabel(start) {
-    if(!start)return 'No due date';
-    const todayLA=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-    const days=Math.round((Date.parse(start.slice(0,10)+'T12:00Z')-Date.parse(todayLA+'T12:00Z'))/86400000);
-    if(days<0)return 'Overdue';
-    if(days===0)return 'Due today';
-    if(days===1)return 'Due tomorrow';
-    const date=new Date(start.slice(0,10)+'T12:00Z');
-    return 'Due '+(days<=6?date.toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'}):date.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'}));
-  }
-  function renderUpNext() {
-    const open=store.state.tasks.filter(task=>!task.done);
-    // Tasks without a due date go last: '9' sorts after any date string.
-    const top=open.map(task=>({task,due:deadlineOf(task)})).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9')).slice(0,3);
-    upNextList.innerHTML=top.map(({task,due})=>`<li><button class="up-next-card" type="button" data-discuss-task="${escapeHtml(task.id)}"><strong>${escapeHtml(task.title)}</strong><span>${dueLabel(due)}</span></button></li>`).join('')
-      +`<li><button class="up-next-card" type="button" data-open-todos><strong>All to-dos</strong><span>${open.length} open</span></button></li>`;
-  }
-  upNextList.addEventListener('click',event=>{
-    if(event.target.closest('[data-open-todos]')){setAllTodos(true);return;}
-    const button=event.target.closest('[data-discuss-task]');
-    if(!button)return;
-    store.selectTask(button.dataset.discussTask);
-    store.setAgentEvent(null);
-    inputs[0].focus();
-  });
-  function setAllTodos(open) {
-    allTodos.hidden=!open;
-    app.classList.toggle('todo-open',open);
-    if(open)allTodos.querySelector('[data-close-todos]').focus();
-    else upNextList.querySelector('[data-open-todos]')?.focus();
-  }
-  allTodos.querySelector('[data-close-todos]').addEventListener('click',()=>setAllTodos(false));
-  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!allTodos.hidden)setAllTodos(false);});
   function renderContext() {
     const event=store.state.calendarEvents.find(e=>e.id===store.state.agentEventId);
     contexts.forEach(context=>{context.hidden=!event;context.innerHTML=event?`<button type="button" data-open-context><span>${escapeHtml(event.title)}</span><span>${escapeHtml(CalendarUI.timeLabel(event))}</span></button><button class="icon-button" type="button" data-clear-context aria-label="Clear selected event">×</button>`:'';});
   }
   contexts.forEach(context=>context.addEventListener('click',event=>{if(event.target.closest('[data-clear-context]'))store.setAgentEvent(null);else if(event.target.closest('[data-open-context]'))CalendarUI.details(store.state.agentEventId);}));
-  function renderAll() { renderDraft();renderGreeting();renderUpNext();renderSidebar();renderMessages();renderTasks();renderContext(); }
+  const historyPanel=document.getElementById('chat-history');
+  const historyToggle=document.getElementById('chat-history-toggle');
+  const historySearch=document.getElementById('chat-history-search');
+  function renderHistory(){
+    const current=store.state.chats.find(c=>c.id===store.state.activeChatId);
+    const label=current?.messages.length?ChatHistory.title(current):'New chat';
+    document.getElementById('chat-switcher-title').textContent=label;
+    historyToggle.title=label;
+    if(historyPanel.hidden)return;
+    const query=historySearch.value.trim().toLowerCase();
+    const chats=store.state.chats.filter(c=>(c.messages.length||c.draft.trim())&&(!query||[ChatHistory.title(c),...c.messages.map(m=>m.text)].join(' ').toLowerCase().includes(query))).sort((a,b)=>b.updatedAt-a.updatedAt);
+    document.getElementById('chat-search-wrap').hidden=store.state.chats.filter(c=>c.messages.length||c.draft.trim()).length<6;
+    const now=new Date(),yesterday=new Date(now);yesterday.setDate(yesterday.getDate()-1);
+    let previousGroup='';
+    document.getElementById('chat-history-list').innerHTML=chats.map(chat=>{
+      const date=new Date(chat.updatedAt),group=date.toDateString()===now.toDateString()?'Today':date.toDateString()===yesterday.toDateString()?'Yesterday':'Earlier';
+      const heading=group!==previousGroup?`<h3 class="chat-history-group">${group}</h3>`:'';previousGroup=group;
+      const time=now-date<60000?'just now':group==='Today'?date.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      return heading+`<button type="button" class="chat-history-row" data-chat-id="${escapeHtml(chat.id)}" title="${escapeHtml(ChatHistory.title(chat))}" ${chat.id===store.state.activeChatId?'aria-current="true"':''}><strong>${escapeHtml(ChatHistory.title(chat))}</strong><span class="chat-history-meta">${chat.id===store.state.activeChatId?'<span>Current</span>':''}<span>${chat.draft?'Draft':escapeHtml(time)}</span></span></button>`;
+    }).join('')||`<p class="detail-empty">${query?'No matching chats.':'Your conversations will appear here.'}</p>`;
+  }
+  function setHistory(open){
+    historyPanel.hidden=!open;
+    historyToggle.setAttribute('aria-expanded',String(open));
+    if(open){historySearch.value='';renderHistory();document.getElementById('new-chat').focus();}
+    else if(historyPanel.contains(document.activeElement))historyToggle.focus();
+  }
+  historyToggle.addEventListener('click',()=>setHistory(historyPanel.hidden));
+  historySearch.addEventListener('input',renderHistory);
+  historyPanel.addEventListener('click',event=>{
+    const button=event.target.closest('[data-chat-id]');
+    if(!button)return;
+    voiceCapture.cancel();store.selectChat(button.dataset.chatId);setHistory(false);inputs[0].focus();
+  });
+  document.addEventListener('click',event=>{
+    if(!historyPanel.hidden&&!historyPanel.contains(event.target)&&!historyToggle.contains(event.target))setHistory(false);
+  });
+  document.getElementById('new-chat').addEventListener('click',()=>{
+    voiceCapture.cancel();store.newChat();setHistory(false);inputs[0].focus();
+  });
+  document.getElementById('quick-start').addEventListener('click',()=>{
+    voiceCapture.cancel();store.newChat('focus');setHistory(false);
+    store.send('Help me plan a focus session.');window.Concentr8?.ask();inputs[0].focus();
+  });
+  document.getElementById('chat-start-focus').addEventListener('click',()=>FocusUI.setup({origin:'Home',selected:['timer']}));
+  window.addEventListener('concentr8:chat-pending',()=>{renderDraft();renderMessages();});
+  window.addEventListener('articul8:navigate',()=>setHistory(false));
+  function renderAll() { renderDraft();renderGreeting();renderSidebar();renderMessages();renderContext();renderHistory(); }
   window.addEventListener('articul8:change',event=>{
     const {reason,persisted}=event.detail;
     if(!persisted&&!storageNoticeShown){announce('Changes are saved for this session only.');storageNoticeShown=true;}
     if(reason==='draft')renderDraft();
     else if(reason==='sidebar')renderSidebar();
-    else if(reason==='tasks'){renderTasks();renderUpNext();renderMessages();}
+    else if(reason==='tasks'){renderMessages();}
     else renderAll();
   });
-
-  /* Profile picture: shrunk to 128 px in the browser and kept with the other profile data; it never leaves this device. */
-  document.addEventListener('change',event=>{
-    const input=event.target.closest?.('[data-avatar-file]');if(!input||!input.files[0])return;
-    const file=input.files[0],note=document.querySelector('[data-avatar-note]'),fail=text=>{if(note)note.textContent=text;};
-    if(file.size>8000000){fail('Pick a picture under 8 MB.');return;}
-    const url=URL.createObjectURL(file),img=new Image();
-    img.onerror=()=>{URL.revokeObjectURL(url);fail('That file could not be read as a picture.');};
-    img.onload=()=>{
-      const size=128,side=Math.min(img.width,img.height),canvas=document.createElement('canvas');canvas.width=canvas.height=size;
-      canvas.getContext('2d').drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,size,size);URL.revokeObjectURL(url);
-      Articul8.change(s=>{s.profile.avatar=canvas.toDataURL('image/jpeg',.85);},'profile');
-      window.dispatchEvent(new CustomEvent('articul8:rerender'));
-    };
-    img.src=url;
-  });
-  document.addEventListener('click',event=>{if(event.target.closest('[data-avatar-remove]')){Articul8.change(s=>{s.profile.avatar='';},'profile');window.dispatchEvent(new CustomEvent('articul8:rerender'));}});
-  /* Quick start (CON-38): one click starts a session, the checklist first, then a 10 minute timer, for the task in focus (or a new task "Quick focus"). */
-  document.addEventListener('click',event=>{if(event.target.closest('[data-quick-start]'))FocusUI.start({taskId:Product.ensureTask('Quick focus'),selected:['checklist','timer'],minutes:10,origin:'Home'});});
   window.addEventListener('articul8:agent-open',()=>{renderDraft();const log=conversations[1];log.scrollTop=log.scrollHeight;});
   document.getElementById('collapse-sidebar').addEventListener('click',()=>{store.setCollapsed(true);document.getElementById('open-sidebar').focus();});
   document.getElementById('open-sidebar').addEventListener('click',()=>{store.setCollapsed(false);document.getElementById('collapse-sidebar').focus();});
@@ -2406,6 +2391,7 @@ function setAgent(open, focusInput=true) {
     form.addEventListener('submit',event=>{
       event.preventDefault();
       if(voiceCapture.active){voiceCapture.finish({submit:true});return;}
+      if(window.Concentr8?.isAsking()){input.focus();return;}
       const text=input.value.trim();
       if(!text){input.focus();return;}
       voiceCapture.cancel();
@@ -2422,57 +2408,9 @@ function setAgent(open, focusInput=true) {
     const calendarButton=event.target.closest('[data-cal-message]');
     if(calendarButton)CalendarUI.messageAction(calendarButton);
   }));
-  taskList.addEventListener('change',event=>{
-    if(event.target.matches('[data-task-check]'))store.completeTask(event.target.dataset.taskCheck,event.target.checked);
-  });
-  taskList.addEventListener('click',event=>{
-    const button=event.target.closest('[data-discuss-task]');
-    if(!button)return;
-    const task=store.state.tasks.find(t=>t.id===button.dataset.discussTask);
-    store.selectTask(task.id);
-    store.setAgentEvent(null);
-    // Keep the chosen task as context without inserting text into either composer.
-    setAgent(true);
-  });
-  function setAddTask(open) {
-    addTaskForm.hidden=!open;
-    addTaskToggle.setAttribute('aria-expanded',String(open));
-    if(open)addTaskForm.querySelector('input').focus();
-  }
-  addTaskToggle.addEventListener('click',()=>setAddTask(addTaskForm.hidden));
-  addTaskForm.addEventListener('submit',event=>{
-    event.preventDefault();
-    const input=addTaskForm.querySelector('input');
-    if(!input.value.trim())return;
-    store.addTask(input.value);input.value='';setAddTask(false);addTaskToggle.focus();
-  });
-  addTaskForm.addEventListener('keydown',event=>{if(event.key==='Escape'){setAddTask(false);addTaskToggle.focus();}});
-
-  // Bare Shift is a two-tap voice action; Shift combinations keep their usual behavior.
-  let shiftOnly=false;
-  function shiftVoice(){
-    const dialog=document.querySelector('dialog[open]');
-    if(dialog){
-      if(!dialog.dataset.agentEventId)return;
-      store.setAgentEvent(dialog.dataset.agentEventId);dialog.close();
-    }
-    setAgent(true,false);
-    if(voiceCapture.active)voiceCapture.finish({submit:true,surface:'agent'});
-    else {notice.hidden=true;voiceCapture.start({surface:'agent',submit:true,base:store.state.draft});}
-  }
   document.addEventListener('keydown',event=>{
-    if(event.key==='Escape'&&!document.querySelector('dialog[open]')){voiceCapture.cancel();setAgent(false);notice.hidden=true;}
-    if(event.key==='Shift'&&!event.repeat&&!event.ctrlKey&&!event.altKey&&!event.metaKey&&!event.isComposing)shiftOnly=true;
-    else if(event.key!=='Shift')shiftOnly=false;
+    if(event.key==='Escape'&&!document.querySelector('dialog[open]')){voiceCapture.cancel();setAgent(false);notice.hidden=true;setHistory(false);}
   });
-  document.addEventListener('keyup',event=>{
-    if(event.key!=='Shift')return;
-    if(shiftOnly&&!event.ctrlKey&&!event.altKey&&!event.metaKey&&!event.isComposing)shiftVoice();
-    shiftOnly=false;
-  });
-  document.addEventListener('pointerdown',()=>{shiftOnly=false;});
-  document.addEventListener('wheel',()=>{shiftOnly=false;},{passive:true});
-  window.addEventListener('blur',()=>{shiftOnly=false;});
   voiceFinish.addEventListener('click',()=>voiceCapture.finish());
   document.querySelectorAll('[data-voice]').forEach(button=>button.addEventListener('click',()=>{
     if(voiceCapture.active){voiceCapture.finish();return;}
@@ -2499,7 +2437,7 @@ function setAgent(open, focusInput=true) {
   const active=()=>location.hash.startsWith('#toolbox');
   const format=seconds=>{seconds=Math.max(0,Math.ceil(seconds));const h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),s=seconds%60;return(h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');};
 
-  function checklist(){return heading('Checklist')+`<section class="checklist-editor"><div class="checklist-rows">${S.state.tasks.map(t=>`<div class="check-row ${t.done?'done':''}"><input type="checkbox" data-list-check="${E(t.id)}" aria-label="Complete ${E(t.title)}" ${t.done?'checked':''}><input type="text" data-list-title="${E(t.id)}" aria-label="Edit ${E(t.title)}" value="${E(t.title)}" maxlength="2000"><span class="check-due">${P.due(t.id)?E(P.dateLabel(P.due(t.id).start)):''}</span>${button(`data-list-delete="${E(t.id)}"`,'Delete '+t.title,'trash')}</div>`).join('')||'<p class="detail-empty">No tasks yet.</p>'}</div><form class="check-add" id="check-add"><input aria-label="New checklist item" placeholder="Add a to-do" maxlength="2000" required><button class="wire-button" type="submit">Add</button></form></section>`;}
+  function checklist(){return '<div class="product-heading"><h1>To Do List</h1><button class="wire-button" type="button" data-tool-new-task>New task</button></div>'+`<section class="checklist-editor"><div class="checklist-rows">${S.state.tasks.map(t=>`<div class="check-row ${t.done?'done':''}"><input type="checkbox" data-list-check="${E(t.id)}" aria-label="Complete ${E(t.title)}" ${t.done?'checked':''}><input type="text" data-list-title="${E(t.id)}" aria-label="Edit ${E(t.title)}" value="${E(t.title)}" maxlength="2000"><span class="check-due">${P.due(t.id)?E(P.dateLabel(P.due(t.id).start)):''}</span>${button(`data-list-delete="${E(t.id)}"`,'Delete '+t.title,'trash')}</div>`).join('')||'<p class="detail-empty">No tasks yet.</p>'}</div><form class="check-add" id="check-add"><input aria-label="New to-do" placeholder="Add a to-do" maxlength="2000" required><button class="wire-button" type="submit">Add</button></form></section>`;}
   function removeTask(id){S.change(s=>{const eventIds=s.calendarEvents.filter(e=>e.taskId===id).map(e=>e.id);s.tasks=s.tasks.filter(t=>t.id!==id);s.calendarEvents=s.calendarEvents.filter(e=>e.taskId!==id);s.messages.forEach(m=>{if(m.taskId===id)m.taskId=null;if(eventIds.includes(m.eventId))m.eventId=null;if(eventIds.includes(m.contextId))m.contextId=null;});if(s.activeTaskId===id)s.activeTaskId=null;if(eventIds.includes(s.agentEventId))s.agentEventId=null;},'tasks');}
 
   const appNames=['Steam','Twitch','Discord','Epic Games','YouTube','TikTok','Instagram','Reddit','X','Facebook','Slack','Microsoft Teams','WhatsApp','Netflix'];
@@ -2659,7 +2597,7 @@ function setAgent(open, focusInput=true) {
     const usageDays=Object.entries(S.state.usage.days).filter(([d])=>d>=start&&d<=end),appMs=usageDays.reduce((n,[,v])=>n+(v.ms||0),0),visits=usageDays.reduce((n,[,v])=>n+(v.visits||0),0),steps=data.reduce((n,r)=>n+(r.steps?.length||0),0),average=sessions.length?focused/sessions.length:0;
     const compare=prev?(focused===prev?'The same focus time as the previous period.':Math.abs(Math.round((focused-prev)/prev*100))+'% '+(focused>prev?'more':'less')+' focus time than the previous period.'):'No earlier period to compare yet.';
     const bands=['Morning','Afternoon','Evening','Night'],scores=[0,0,0,0];sessions.forEach(r=>{const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',hour:'numeric',hourCycle:'h23'}).format(new Date(r.startedAt||r.finishedAt)));scores[h>=6&&h<12?0:h>=12&&h<18?1:h>=18&&h<24?2:3]++;});const best=scores.indexOf(Math.max(...scores)),habit=sessions.length?bands[best]+' is your most frequent focus time.':'Your focus pattern will appear after your first session.';const suggestion=!sessions.length?'Start with one small task and a short timer.':average<10*60000?'Short sessions are part of your routine. Try another manageable 10 minutes.':days>=3?'You returned on '+days+' days. Keep a time of day that works for you.':'Try a short session at the same time tomorrow.';
-    return T.heading('Data','','Profile')+`<div class="data-filters" aria-label="Data period">${[['day','Day'],['week','Week'],['quarter','Quarter'],['semester','Semester'],['year','Year']].map(([id,label])=>`<button type="button" data-data-range="${id}" aria-pressed="${range===id}">${label}</button>`).join('')}</div><div class="data-period">${T.button('data-data-offset="1"','Previous period','back')}<h2>${start===end?start:start+' – '+end}${range==='quarter'?' · 90 days':range==='semester'?' · 180 days':''}</h2>${T.button('data-data-offset="-1"','Next period','arrow',offset===0?'disabled':'')}</div><div class="data-layout">${chart(buckets,'Focus time')}<div class="data-metrics"><div><strong>${duration(focused)}</strong><span>Focused</span></div><div><strong>${sessions.length}</strong><span>Focus sessions</span></div><div><strong>${days}</strong><span>Active focus days</span></div><div><strong>${steps}</strong><span>Subtasks completed</span></div><div><strong>${duration(appMs)}</strong><span>Time in app</span></div><div><strong>${visits}</strong><span>App visits</span></div></div></div><div class="data-insights"><section><h2>Your pattern</h2><p>${habit}</p>${sessions.length?`<p>${duration(average)} per focus session on average.</p>`:''}<p>${compare}</p></section><section><h2>Try next</h2><p>${suggestion}</p></section></div><section class="detail-section"><h2>History</h2>${data.slice().sort((a,b)=>b.finishedAt-a.finishedAt).slice(0,20).map(r=>`<div class="data-history-row"><div>${E(r.taskTitle)}<small>${dayOf(r.finishedAt)} · ${r.steps?.length||0} subtasks</small></div><span>${duration(r.focusMs)}</span></div>`).join('')||'<p class="detail-empty">No sessions in this period.</p>'}</section>`;
+    return '<div class="product-heading"><h1>Data</h1><button class="wire-button" type="button" data-export-data>Export my data</button></div>'+`<div class="data-filters" aria-label="Data period">${[['day','Day'],['week','Week'],['quarter','Quarter'],['semester','Semester'],['year','Year']].map(([id,label])=>`<button type="button" data-data-range="${id}" aria-pressed="${range===id}">${label}</button>`).join('')}</div><div class="data-period">${T.button('data-data-offset="1"','Previous period','back')}<h2>${start===end?start:start+' – '+end}${range==='quarter'?' · 90 days':range==='semester'?' · 180 days':''}</h2>${T.button('data-data-offset="-1"','Next period','arrow',offset===0?'disabled':'')}</div><div class="data-layout">${chart(buckets,'Focus time')}<div class="data-metrics"><div><strong>${duration(focused)}</strong><span>Focused</span></div><div><strong>${sessions.length}</strong><span>Focus sessions</span></div><div><strong>${days}</strong><span>Active focus days</span></div><div><strong>${steps}</strong><span>Subtasks completed</span></div><div><strong>${duration(appMs)}</strong><span>Time in app</span></div><div><strong>${visits}</strong><span>App visits</span></div></div></div><div class="data-insights"><section><h2>Your pattern</h2><p>${habit}</p>${sessions.length?`<p>${duration(average)} per focus session on average.</p>`:''}<p>${compare}</p></section><section><h2>Try next</h2><p>${suggestion}</p></section></div><section class="detail-section"><h2>History</h2>${data.slice().sort((a,b)=>b.finishedAt-a.finishedAt).slice(0,20).map(r=>`<div class="data-history-row"><div>${E(r.taskTitle)}<small>${dayOf(r.finishedAt)} · ${r.steps?.length||0} subtasks</small></div><span>${duration(r.focusMs)}</span></div>`).join('')||'<p class="detail-empty">No sessions in this period.</p>'}</section>`;
   }
   document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-data-range')){range=b.dataset.dataRange;offset=0;T.redraw();}if(b.hasAttribute('data-data-offset')){offset=Math.max(0,offset+Number(b.dataset.dataOffset));T.redraw();}if(b.hasAttribute('data-next-break'))T.startBreak();if(b.hasAttribute('data-next-continue')){const a=S.state.activeSession,record=S.state.sessions.find(r=>r.id===a?.id);if(b.dataset.nextContinue)FocusUI.start({taskId:b.dataset.nextContinue,minutes:Math.min(25,Math.max(5,Math.round((record?.focusMs||0)/60000)||10)),selected:['timer'],origin:a?.origin||'Toolbox'});else FocusUI.setup();}if(b.hasAttribute('data-next-chat')){const record=S.state.sessions.find(r=>r.id===S.state.activeSession?.id);if(record?.taskId)S.selectTask(record.taskId);setAgent(true);}});
   // Count only foreground, focused time; a suspended tab cannot add hours of idle time.
@@ -2673,10 +2611,11 @@ function setAgent(open, focusInput=true) {
 </script>
   <script data-source="pages.js">
 (() => {
-  const content=document.getElementById('page-content'),app=document.querySelector('.app'),home=document.querySelector('.workspace'),todo=document.querySelector('.todo');
-  const names=['Home','Calendar','Toolbox','Workflow','Courses','Profile','Focus','Room','Break'];
+  const content=document.getElementById('page-content'),app=document.querySelector('.app'),home=document.querySelector('.workspace');
+  const names=['Home','Courses','Toolbox','To Do List','Data','Calendar','Workflow','Profile','Focus','Room','Break'];
+  const slug=name=>name==='To Do List'?'todos':name.toLowerCase();
   let currentPage='Home',path='';
-  const renders={Calendar:()=>CalendarUI.render(),Toolbox:()=>ProductPages.toolbox(path),Workflow:()=>WorkflowUI.render(),Courses:()=>ProductPages.courses(),Profile:()=>ProductPages.profile(path),Focus:()=>FocusUI.render(),Room:()=>BodyRooms.render(path),Break:()=>ToolPages.breakPage()};
+  const renders={'To Do List':()=>ToolPages.render('checklist'),Data:()=>ProductPages.stats(),Calendar:()=>CalendarUI.render(),Toolbox:()=>ProductPages.toolbox(path),Workflow:()=>WorkflowUI.render(),Courses:()=>ProductPages.courses(),Profile:()=>ProductPages.profile(path),Focus:()=>FocusUI.render(),Room:()=>BodyRooms.render(path),Break:()=>ToolPages.breakPage()};
   function render(){
     if(currentPage==='Home'||currentPage==='Calendar')return;
     const top=content.scrollTop,viewport=content.querySelector('.canvas-viewport'),position=viewport?{left:viewport.scrollLeft,top:viewport.scrollTop}:null;
@@ -2689,19 +2628,21 @@ function setAgent(open, focusInput=true) {
     if(currentPage==='Focus')FocusUI.paint();
   }
   function navigate(name,nextPath='',updateHash=true){
+    if(name==='Toolbox'&&nextPath==='checklist'){name='To Do List';nextPath='';}
+    if(name==='Profile'&&['data','stats'].includes(nextPath)){name='Data';nextPath='';}
     if(!names.includes(name))name='Home';
     if(name==='Toolbox'&&currentPage!=='Toolbox')Articul8.change(s=>{s.tools.selected=[];s.tools.customSelection=false;},'tool-selection-reset');
     CalendarUI.unmount();ProductPages.unmount();Product.closeModal();
     currentPage=name;path=nextPath;
-    if(updateHash)history.pushState(null,'','#'+name.toLowerCase()+(path?'/'+encodeURIComponent(path):''));
-    const isHome=name==='Home';app.classList.toggle('inner-page',!isHome);home.hidden=!isHome;todo.hidden=true;app.classList.remove('todo-open');content.hidden=isHome;content.setAttribute('aria-label',name);
+    if(updateHash)history.pushState(null,'','#'+slug(name)+(path?'/'+encodeURIComponent(path):''));
+    const isHome=name==='Home';app.classList.toggle('inner-page',!isHome);home.hidden=!isHome;document.getElementById('ai-toggle').hidden=isHome;content.hidden=isHome;content.setAttribute('aria-label',name);
     document.querySelectorAll('[data-page]').forEach(b=>{if(b.dataset.page===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     if(!isHome){content.innerHTML=renders[name]();if(name==='Calendar')CalendarUI.mount(content);ToolPages.mountWheels();BodyRooms.mount();}
     if(matchMedia('(max-width:760px)').matches)Articul8.change(s=>{s.collapsed=true;},'sidebar');
     content.scrollTop=0;setAgent(false);notice.hidden=true;document.title='Concentr8 · '+name;
     window.dispatchEvent(new CustomEvent('articul8:navigate',{detail:{page:name}}));FocusUI.paint();
   }
-  function fromHash(){const parts=location.hash.slice(1).split('/');navigate(names.find(n=>n.toLowerCase()===parts[0])||'Home',decodeURIComponent(parts[1]||''),false);}
+  function fromHash(){const parts=location.hash.slice(1).split('/');navigate(names.find(n=>slug(n)===parts[0])||'Home',decodeURIComponent(parts[1]||''),false);}
   document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
   window.addEventListener('articul8:go',e=>navigate(e.detail.page,e.detail.path||''));
   window.addEventListener('popstate',fromHash);
@@ -2713,7 +2654,8 @@ function setAgent(open, focusInput=true) {
     if(currentPage==='Workflow'&&['workflow','restore'].includes(reason))render();
     if(currentPage==='Courses'&&['tasks','courses','calendar','restore'].includes(reason))render();
     if(currentPage==='Focus'&&['tasks','focus','calendar','restore'].includes(reason))render();
-    if(currentPage==='Profile'&&['focus','restore'].includes(reason))render();
+    if(['Profile','Data'].includes(currentPage)&&['focus','restore'].includes(reason))render();
+    if(currentPage==='To Do List'&&['tasks','calendar','restore'].includes(reason))render();
     if(currentPage==='Room'&&['focus','tasks','restore'].includes(reason))render();
   });
   fromHash();

@@ -57,7 +57,7 @@
   dialog.setAttribute('aria-labelledby', 'google-calendar-title');
   dialog.innerHTML = '<header><h2 id="google-calendar-title">Google Calendar</h2><button class="icon-button" type="button" data-google-close aria-label="Close Google Calendar settings">×</button></header>'
     + '<!-- AI-GENERATED: no approved hand-drawn screen exists for this connection; uses existing Concentr8 calendar controls. -->'
-    + '<p class="preview-note">AI generated: Google Calendar connection settings. Your calendar is read only here.</p>'
+    + '<p class="preview-note">Your calendar is read only here.</p>'
     + '<p class="google-calendar-status" data-google-status role="status" aria-live="polite">Checking Google Calendar setup…</p>'
     + '<section data-google-calendar-list hidden><h3>Choose calendars</h3><p class="detail-note">Choose up to three calendars to show in your study planner.</p><div class="cal-field"><span>Calendars to display</span><div data-google-calendar-options></div></div><p class="detail-note" data-google-selection-count></p></section>'
     + '<p class="cal-error" data-google-error role="alert" hidden></p>'
@@ -504,7 +504,7 @@
     button.textContent = 'Google Calendar';
     const note = document.createElement('p');
     note.className = 'preview-note quiet';
-    note.textContent = 'AI generated · Choose up to three read-only calendars to see alongside your study plans.';
+    note.textContent = 'Choose up to three read-only calendars to see alongside your study plans.';
     content.append(button, note);
   }
 
