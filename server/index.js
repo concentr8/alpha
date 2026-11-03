@@ -1074,7 +1074,7 @@ function applySettings(u, body) {
 // --- AI chat without login (docs/plans/guest-chat.md) ---
 // Anyone may try the chat for a few messages a day. Three limits, all on the server, because a counter in the browser
 // could be skipped by anyone: per guest, per IP address, and for all guests together (the brake for the Claude bill).
-const GUEST_CHAT_PER_DAY = Number(env.GUEST_CHAT_PER_DAY || 12);
+const GUEST_CHAT_PER_DAY = Number(env.GUEST_CHAT_PER_DAY || 10);
 const GUEST_CHAT_PER_IP_PER_DAY = Number(env.GUEST_CHAT_PER_IP_PER_DAY || 30);
 const GUEST_CHAT_GLOBAL_PER_DAY = Number(env.GUEST_CHAT_GLOBAL_PER_DAY || 200);
 const GUEST_ID = /^[a-f0-9]{32,64}$/; // random, made once by the browser; no phone number, no account
