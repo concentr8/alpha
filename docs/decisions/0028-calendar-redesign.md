@@ -21,10 +21,10 @@ persist those provider records as local events.
   duration input. Ambiguous or incomplete text is sent to the existing editor,
   not interpreted by AI and not saved automatically.
 - Keep local event editing, delete/undo, focus, chat proposals, and pointer
-  create/move/resize in the existing CalendarUI and Articul8 flows. `CalendarUI`
+  create/move/resize in the existing CalendarUI and Concentr8 flows. `CalendarUI`
   exposes `getRange()` and `setExternal()` for future read-only integrations.
   External events stay in CalendarUI memory, are dashed, and have no edit,
-  focus, drag or save path into Articul8.
+  focus, drag or save path into Concentr8.
 - Resolve “today” from the browser's local timezone. A week view remains seven
   fluid columns, the rail hides before the columns overflow at intermediate
   widths, and phones start in Day view.

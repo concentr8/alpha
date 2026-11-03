@@ -126,7 +126,7 @@ slot in words, then opens the existing editor with “Add to calendar”.
   one day.
 - Tasks retain a light-grey block, deadlines are dark with white text, and
   Google events are visibly read-only and dashed. External events remain in
-  CalendarUI memory and are never passed to Articul8 storage.
+  CalendarUI memory and are never passed to Concentr8 storage.
 - The current-time marker follows the browser's local timezone. The quick-add
   parser accepts explicit dates, today/tomorrow, weekdays, a time, and duration;
   invalid or ambiguous text opens the existing event editor without saving.

@@ -1,4 +1,4 @@
-# Plan: Articul8 as a Mac app with app blocking (like Raycast Focus)
+# Plan: Concentr8 as a Mac app with app blocking (like Raycast Focus)
 
 Status: Draft, waiting for a human "go" (see AGENTS.md: plan before code).
 Goal: a Mac app people download outside the Mac App Store. During a focus

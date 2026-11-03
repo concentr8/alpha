@@ -1,4 +1,4 @@
-# AGENTS.md – Articul8
+# AGENTS.md – Concentr8
 
 Read this first. Keep this file under 150 lines. Details live in docs/.
 
