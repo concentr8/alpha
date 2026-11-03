@@ -578,6 +578,8 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     <main class="workspace" aria-label="Home">
       <section class="check-in" aria-labelledby="check-in-title">
         <h1 id="check-in-title">Hello</h1>
+        <!-- AI-GENERATED: no wireframe from Jack for the Home question (CON-33). -->
+        <p class="plate-question">What's on your plate right now?</p>
         <!-- AI-GENERATED: no wireframe from Jack for the clean start screen; built from existing tokens (docs/plans/home-chat-tools.md). -->
         <section class="up-next" aria-labelledby="up-next-title">
           <h2 id="up-next-title">Up next</h2>
@@ -585,7 +587,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
         </section>
         <div class="conversation" id="home-conversation" role="log" aria-label="Conversation" aria-live="polite"></div>
         <form class="composer chat-composer" id="main-composer">
-          <textarea rows="1" aria-label="What's on your mind?" placeholder="What’s on your mind?" autocomplete="off" maxlength="2000"></textarea>
+          <textarea rows="1" aria-label="What's on your plate right now?" placeholder="Tell me everything that is on your mind" autocomplete="off" maxlength="2000"></textarea>
           <div class="composer-actions">
             <div class="voice-control"><button class="icon-button voice-button" type="button" data-voice="main" aria-label="Start voice input" aria-pressed="false" title="Voice input"><svg class="mic-symbol" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v4M8 22h8"/></svg><svg class="stop-symbol" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor"/></svg></button><span class="voice-status" aria-live="polite" hidden></span></div>
             <button class="icon-button send-button" type="submit" aria-label="Send message" disabled><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V4m-7 7 7-7 7 7"/></svg></button>
@@ -729,6 +731,13 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
 @media(max-width:960px){.page-content[aria-label="Toolbox"]>:is(.product-heading,.detail-heading)>h1{font-size:26px}}
 /* AI-GENERATED: clean start screen (docs/plans/home-chat-tools.md). Home has two columns; the full to-do list opens on demand. */
 .up-next { margin-bottom:22px; }
+.plate-question { font-size:20px; margin:0 0 18px; color:#444; }
+.page-content > .dialog-actions { justify-content:flex-start; margin-bottom:24px; }
+.sidebar .profile { display:flex; align-items:center; gap:12px; }
+.sidebar .profile .avatar { width:32px; height:32px; font-size:15px; }
+.avatar img { width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; }
+.profile-picture { margin:12px 0 8px; }
+.profile-picture .avatar { width:72px; height:72px; font-size:30px; }
 .up-next h2 { font-size:17px; font-weight:400; color:#666; margin:0 0 10px; }
 .up-next-row { display:flex; gap:10px; margin:0; padding:0 0 4px; list-style:none; overflow-x:auto; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; }
 .up-next-row > li { flex:0 0 230px; min-width:0; scroll-snap-align:start; }
@@ -785,7 +794,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     workflows:[], sessions:[], activeSession:null,
     tools:{favorites:[],selected:[],customSelection:false,blockedApps:[],sound:'brown'},
     wellness:{saved:[]}, social:{messages:{}}, usage:{days:{}},
-    profile:{name:'',email:''}, settings:{focusMinutes:25,autoAdvance:true}, canvas:{schoolUrl:'',imported:[]},
+    profile:{name:'',email:'',avatar:''}, settings:{focusMinutes:25,autoAdvance:true}, canvas:{schoolUrl:'',imported:[]},
     calendarEvents: [
       {id:'plan-problem',title:'Computer Vision Assignment 1',kind:'plan',start:day(0)+'T10:00',end:day(0)+'T11:30',taskId:'problem-set',notes:'',allDay:false},
       {id:'plan-essay',title:'Rhetoric Essay 1: Argument Analysis',kind:'plan',start:day(2)+'T12:00',end:day(2)+'T13:00',taskId:'essay-outline',notes:'',allDay:false},
@@ -818,7 +827,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(value.wellness&&Array.isArray(value.wellness.saved))clean.wellness.saved=value.wellness.saved.filter(x=>x&&typeof x.id==='string'&&typeof x.title==='string'&&typeof x.date==='string'&&Array.isArray(x.cues)&&x.cues.length&&x.cues.every(c=>Number.isFinite(c.at)&&typeof c.text==='string'));
     if(value.social?.messages&&typeof value.social.messages==='object')clean.social.messages=value.social.messages;
     if(value.usage?.days&&typeof value.usage.days==='object')clean.usage.days=value.usage.days;
-    if(value.profile)clean.profile={...clean.profile,...value.profile};
+    if(value.profile){clean.profile={...clean.profile,...value.profile};if(!/^data:image\/(jpeg|png|webp);base64,/.test(clean.profile.avatar||'')||clean.profile.avatar.length>120000)clean.profile.avatar='';}
     if(value.settings)clean.settings={...clean.settings,...value.settings};
     const session=clean.activeSession;
     if(session&&!session.workflowId&&session.status!=='review'&&session.phases.some(p=>p.kind==='meditation')){
@@ -919,6 +928,11 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
           if(!match)s.tasks.push(task);
           s.activeTaskId=task.id;a.state='done';a.taskId=task.id;a.undoable=!match;
         },'tasks');
+        const done=state.messages.find(m=>m.id===messageId).actions[index];
+        if(done.due&&!state.calendarEvents.some(e=>e.taskId===done.taskId&&e.kind==='deadline')){
+          /* The final due date the student named in the chat becomes the task's deadline (the same rule the side panel and Up next read). */
+          try{this.saveEvent({title:done.title,kind:'deadline',start:done.due+'T17:00',end:done.due+'T17:00',allDay:false,taskId:done.taskId,notes:''});}catch(_){ /* a bad date only means no deadline */ }
+        }
       } else if(verb==='undo'&&action.state==='done'&&action.undoable){
         update(s=>{
           const a=s.messages.find(m=>m.id===messageId).actions[index];
@@ -1388,13 +1402,14 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
   window.addEventListener('articul8:navigate',()=>{resetAsked=false;}); /* leaving the page cancels a pending question */
   function stats(){return Insights.profile()+resetDataSection();}
   function profile(path) {
+    const avatarHtml=profile=>profile.avatar?'<span class="avatar"><img src="'+P.esc(profile.avatar)+'" alt=""></span>':'<span class="avatar">'+P.esc((profile.name||'Y').slice(0,1).toUpperCase())+'</span>';
     if(path==='stats'||path==='data')return stats();
-    if(path==='personal')return subheading('Personal information','Profile')+(window.Concentr8.isSignedIn()?'<p class="detail-note">Signed in with Google.</p><div class="dialog-actions"><button class="wire-button" type="button" data-signout>Sign out</button></div>':'<p class="detail-note">Sign in with Google to keep your account on every device.</p><div class="dialog-actions"><button class="wire-button solid" type="button" data-signin-open>Continue with Google</button></div>')+'<form class="product-form profile-form" id="profile-form"><label>Name<input name="name" aria-label="Name" maxlength="80" value="'+P.esc(S.state.profile.name)+'"></label><label>Email<input name="email" aria-label="Email" type="email" value="'+P.esc(S.state.profile.email)+'"></label><div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
+    if(path==='personal')return subheading('Personal information','Profile')+'<!-- AI-GENERATED: no wireframe from Jack for the profile picture; built from .avatar, .wire-button and .detail-note. --><div class="profile-identity profile-picture">'+avatarHtml(S.state.profile)+'<label class="wire-button">Choose picture<input type="file" accept="image/png,image/jpeg,image/webp" data-avatar-file hidden></label>'+(S.state.profile.avatar?'<button class="wire-button" type="button" data-avatar-remove>Remove</button>':'')+'</div><p class="detail-note" data-avatar-note role="status"></p>'+(window.Concentr8.isSignedIn()?'<p class="detail-note">Signed in with Google.</p><div class="dialog-actions"><button class="wire-button" type="button" data-signout>Sign out</button></div>':'<p class="detail-note">Sign in with Google to keep your account on every device.</p><div class="dialog-actions"><button class="wire-button solid" type="button" data-signin-open>Continue with Google</button></div>')+'<form class="product-form profile-form" id="profile-form"><label>Name<input name="name" aria-label="Name" maxlength="80" value="'+P.esc(S.state.profile.name)+'"></label><label>Email<input name="email" aria-label="Email" type="email" value="'+P.esc(S.state.profile.email)+'"></label><div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
     if(path==='call')return window.Concentr8.callPage(subheading('Phone call','Profile'));
     if(path==='account')return subheading('Account & subscription','Profile')+(window.Concentr8.isSignedIn()?'<div class="profile-detail"><h2>Signed in with Google</h2><p>Your Google account is connected to Concentr8.</p><div class="dialog-actions"><button class="wire-button" type="button" data-signout>Sign out</button></div></div>':'<div class="profile-detail"><h2>Sign in</h2><p>Continue with Google to use Concentr8 on this device. Billing is not connected.</p><div class="dialog-actions"><button class="wire-button solid" type="button" data-signin-open>Continue with Google</button></div></div>');
     if(path==='settings')return subheading('Settings','Profile')+'<form class="product-form profile-form" id="settings-form"><label>Default focus minutes<input name="minutes" aria-label="Default focus minutes" type="number" min="1" max="240" value="'+S.state.settings.focusMinutes+'"></label><label class="check-line"><input name="advance" type="checkbox" '+(S.state.settings.autoAdvance?'checked':'')+'>Advance workflow automatically</label><div class="dialog-actions"><button class="wire-button solid" type="submit">Save</button></div></form>';
     if(path==='privacy')return subheading('Privacy policy','Profile')+'<div class="profile-detail"><h2>Prototype data</h2><p>Tasks, messages and focus history stay in this browser’s local storage.</p><p>When you chat with the agent, your last messages and the titles of your open tasks are sent to the Concentr8 server and to Claude (Anthropic) to write an answer. The server keeps no chat history. Without an account you get 12 free messages a day; a random code made in this browser, not linked to you, counts them. If you set up the phone call, the server also stores your phone number, call time, time zone and open task titles until you delete your account.</p><p>Voice input uses your browser’s speech service and may send audio to its provider.</p><p>No Canvas or school account is connected. A production privacy policy is not yet available.</p><button class="wire-button" type="button" data-export-data>Export my data</button></div>';
-    return heading('Profile')+'<div class="profile-menu"><div class="profile-identity"><span class="avatar">'+P.esc((S.state.profile.name||'Y').slice(0,1).toUpperCase())+'</span><h2>'+P.esc(S.state.profile.name||'Your profile')+'</h2></div>'+(window.Concentr8.isSignedIn()?'':'<div class="dialog-actions"><button class="wire-button solid" type="button" data-signin-open>Continue with Google</button></div>')+[['personal','Personal information'],['account','Sign in & subscription'],['call','Phone call'],['settings','Settings'],['privacy','Privacy policy'],['data','Data']].map(([path,label])=>'<button type="button" data-profile="'+path+'"><span>'+label+'</span>'+P.icon(P.paths.arrow,22)+'</button>').join('')+'</div>';
+    return heading('Profile')+'<div class="profile-menu"><div class="profile-identity">'+avatarHtml(S.state.profile)+'<h2>'+P.esc(S.state.profile.name||'Your profile')+'</h2></div>'+(window.Concentr8.isSignedIn()?'':'<div class="dialog-actions"><button class="wire-button solid" type="button" data-signin-open>Continue with Google</button></div>')+[['personal','Personal information'],['account','Sign in & subscription'],['call','Phone call'],['settings','Settings'],['privacy','Privacy policy'],['data','Data']].map(([path,label])=>'<button type="button" data-profile="'+path+'"><span>'+label+'</span>'+P.icon(P.paths.arrow,22)+'</button>').join('')+'</div>';
   }
   document.addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b)return;
@@ -1446,7 +1461,7 @@ textarea:focus-visible { outline:2px solid var(--ink); outline-offset:5px; }
     if(f.id==='toolbox-task-form'){e.preventDefault();const text=f.querySelector('input').value.trim();if(!text)return;S.send(text);S.change(s=>{s.tools.customSelection=false;},'context');P.ensureTask(text);}
     if(f.id==='tool-step-form'){e.preventDefault();S.addStep(P.currentTask().id,f.querySelector('input').value);}
     if(f.id==='block-form'){e.preventDefault();const value=f.querySelector('input').value.trim();if(value)S.change(s=>{if(!s.tools.blockedApps.includes(value))s.tools.blockedApps.push(value);},'tools');}
-    if(f.id==='profile-form'){e.preventDefault();const data={name:f.elements.name.value.trim(),email:f.elements.email.value.trim()};S.change(s=>s.profile=data,'profile');announce('Saved.');}
+    if(f.id==='profile-form'){e.preventDefault();const data={...S.state.profile,name:f.elements.name.value.trim(),email:f.elements.email.value.trim()};S.change(s=>s.profile=data,'profile');announce('Saved.');}
     if(f.id==='settings-form'){e.preventDefault();const data={focusMinutes:Number(f.elements.minutes.value),autoAdvance:f.elements.advance.checked};S.change(s=>s.settings=data,'settings');announce('Saved.');}
   });
   setInterval(()=>{if(!practice)return;const value=Math.min(60000,practice.elapsed+(practice.running?Date.now()-practice.started:0));const timer=document.querySelector('[data-practice-time]'),instruction=document.querySelector('[data-practice-instruction]');if(timer)timer.textContent=FocusUI.time(60000-value);if(instruction)instruction.textContent=value>=60000?'Complete':practice.kind==='breathing'?(Math.floor(value/1000)%10<4?'Breathe in':'Breathe out'):'Breathe naturally';document.querySelector('[data-practice-orb]')?.classList.toggle('inhale',practice.running&&Math.floor(value/1000)%10<4);if(value>=60000){practice.elapsed=60000;practice.running=false;const b=document.querySelector('[data-practice-start]');if(b)b.textContent='Again';}},250);
@@ -2250,7 +2265,7 @@ function setAgent(open, focusInput=true) {
         return `<div class="chat-tool"><span class="chat-tool-icon">${Product.icon(Product.paths[tool.icon]||'',18)}</span><span class="chat-tool-name">${escapeHtml(tool.name)}</span><button type="button" class="chat-action solid" data-chat-tool="${escapeHtml(action.tool)}">Open</button></div>`;
       }
       if(action.state==='done'&&action.type==='suggest_calendar')return `<p class="chat-note">Added to calendar: ${title}</p>`;
-      const minutesText=action.minutes?` (${Number(action.minutes)} min)`:'';
+      const minutesText=(action.minutes?` (${Number(action.minutes)} min)`:'')+(action.due?` · due ${escapeHtml(action.due)}`:'');
       if(action.state==='done')return `<p class="chat-note">Added to to-do: ${title}${minutesText}${action.undoable?` · <button type="button" class="chat-undo" data-chat-action="undo" data-message="${id}" data-index="${index}">Undo</button>`:''}</p>`;
       if(action.state==='undone')return `<p class="chat-note">Removed from to-do: ${title}</p>`;
       if(action.state!=='pending')return '';
@@ -2275,14 +2290,21 @@ function setAgent(open, focusInput=true) {
   }
   function renderTasks() {
     const focusedId=document.activeElement?.dataset.taskCheck;
-    taskList.innerHTML=store.state.tasks.map(task=>`<li class="task"><input type="checkbox" data-task-check="${escapeHtml(task.id)}" aria-label="Complete ${escapeHtml(task.title)}" ${task.done?'checked':''}><button class="task-title" type="button" data-discuss-task="${escapeHtml(task.id)}" aria-label="Discuss ${escapeHtml(task.title)}">${escapeHtml(task.title)}${task.estimatedMinutes?` · ${Number(task.estimatedMinutes)} min`:''}</button></li>`).join('');
+    const byDue=[...store.state.tasks].sort((a,b)=>(deadlineOf(a)||'9').localeCompare(deadlineOf(b)||'9'));
+    taskList.innerHTML=byDue.map(task=>`<li class="task"><input type="checkbox" data-task-check="${escapeHtml(task.id)}" aria-label="Complete ${escapeHtml(task.title)}" ${task.done?'checked':''}><button class="task-title" type="button" data-discuss-task="${escapeHtml(task.id)}" aria-label="Discuss ${escapeHtml(task.title)}">${escapeHtml(task.title)}${task.estimatedMinutes?` · ${Number(task.estimatedMinutes)} min`:''}${deadlineOf(task)?` · ${dueLabel(deadlineOf(task))}`:''}</button></li>`).join('');
     if(focusedId)Array.from(taskList.querySelectorAll('input')).find(input=>input.dataset.taskCheck===focusedId)?.focus();
   }
   /* AI-GENERATED: greeting, "Up next" and the on-demand to-do list of the clean start screen (docs/plans/home-chat-tools.md). */
   const greetingTitle=document.getElementById('check-in-title');
   const upNextList=document.getElementById('up-next-list');
   const allTodos=document.getElementById('all-todos');
+  const profileButton=document.querySelector('.sidebar .profile');
+  function renderProfileButton() {
+    const p=store.state.profile,mark=p.avatar?'<span class="avatar"><img src="'+escapeHtml(p.avatar)+'" alt=""></span>':'<span class="avatar">'+escapeHtml((p.name||'Y').slice(0,1).toUpperCase())+'</span>';
+    profileButton.innerHTML=mark+'<span>Profile</span>';
+  }
   function renderGreeting() {
+    renderProfileButton();
     const hour=new Date().getHours();
     const word=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
     const name=store.state.profile.name.trim();
@@ -2339,6 +2361,23 @@ function setAgent(open, focusInput=true) {
     else if(reason==='tasks'){renderTasks();renderUpNext();renderMessages();}
     else renderAll();
   });
+
+  /* Profile picture: shrunk to 128 px in the browser and kept with the other profile data; it never leaves this device. */
+  document.addEventListener('change',event=>{
+    const input=event.target.closest?.('[data-avatar-file]');if(!input||!input.files[0])return;
+    const file=input.files[0],note=document.querySelector('[data-avatar-note]'),fail=text=>{if(note)note.textContent=text;};
+    if(file.size>8000000){fail('Pick a picture under 8 MB.');return;}
+    const url=URL.createObjectURL(file),img=new Image();
+    img.onerror=()=>{URL.revokeObjectURL(url);fail('That file could not be read as a picture.');};
+    img.onload=()=>{
+      const size=128,side=Math.min(img.width,img.height),canvas=document.createElement('canvas');canvas.width=canvas.height=size;
+      canvas.getContext('2d').drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,size,size);URL.revokeObjectURL(url);
+      Articul8.change(s=>{s.profile.avatar=canvas.toDataURL('image/jpeg',.85);},'profile');
+      window.dispatchEvent(new CustomEvent('articul8:rerender'));
+    };
+    img.src=url;
+  });
+  document.addEventListener('click',event=>{if(event.target.closest('[data-avatar-remove]')){Articul8.change(s=>{s.profile.avatar='';},'profile');window.dispatchEvent(new CustomEvent('articul8:rerender'));}});
   window.addEventListener('articul8:agent-open',()=>{renderDraft();const log=conversations[1];log.scrollTop=log.scrollHeight;});
   document.getElementById('collapse-sidebar').addEventListener('click',()=>{store.setCollapsed(true);document.getElementById('open-sidebar').focus();});
   document.getElementById('open-sidebar').addEventListener('click',()=>{store.setCollapsed(false);document.getElementById('collapse-sidebar').focus();});

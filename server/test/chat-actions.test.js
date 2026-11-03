@@ -128,15 +128,23 @@ test('a wrong time estimate is dropped, the task stays', async () => {
   }
 });
 
-test('the prompt makes the chat ask first, estimate time first and keep the timer for later', async () => {
+test('the prompt makes the chat take a brain dump, ask until each to-do is complete, estimate time first and keep the timer for later', async () => {
   await ask([text('What do you want to get done?')]);
   const system = lastClaudeRequest.system;
-  assert.match(system, /First understand what the student wants to get done/);
-  assert.match(system, /1 to 2 short questions/);
-  assert.match(system, /do not suggest a timer or any other tool before you understand/);
+  assert.match(system, /starts from a blank page and gets out everything/);
+  assert.match(system, /one short question per reply until each to-do is complete/);
+  assert.match(system, /Do not suggest a timer or any other tool before you understand/);
   assert.match(system, /how long each one takes/);
   assert.match(system, /for the timer only after the student agreed to a plan or asked for it/);
   const addTodo = lastClaudeRequest.tools.find((t) => t.name === 'add_todo');
   assert.ok(addTodo.input_schema.properties.minutes, 'add_todo has a minutes field');
   assert.deepEqual(addTodo.input_schema.required, ['title', 'minutes']);
+});
+
+test('a to-do can carry a due date; a wrong date is dropped and the task stays', async () => {
+  const { body } = await ask([text('Noted.'), call('add_todo', { title: 'Essay', minutes: 90, due: '2026-11-20' }), call('suggest_todo', { title: 'Lab', due: '2026-02-31' })]);
+  assert.deepEqual(body.actions, [
+    { type: 'add_todo', title: 'Essay', minutes: 90, due: '2026-11-20' },
+    { type: 'suggest_todo', title: 'Lab' },
+  ]);
 });

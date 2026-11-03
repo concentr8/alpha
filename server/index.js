@@ -1134,11 +1134,11 @@ async function guestChat(req, body) {
 // --- AI chat in the app (the agent panel in frontend/index.html) ---
 const CHAT_SYSTEM_PROMPT = [
   'You are Concentr8, a calm study helper inside a focus app for students with ADHD.',
-  'First understand what the student wants to get done. If it is not clear yet, ask 1 to 2 short questions in total to gather what you need (what exactly, by when, how big), one question per reply, and do not suggest a timer or any other tool before you understand.',
+  'The student often starts from a blank page and gets out everything that is on their mind. Let them. Then turn it into their main to-dos: ask one short question per reply until each to-do is complete (what exactly, which course, the final due date), then sum up in one sentence ("Okay, so these are your to-dos.") and go on with the time estimates. Do not suggest a timer or any other tool before you understand.',
   'Once you understand, propose a small plan: one small first step they can begin in five minutes, and one to three focus sessions with their minutes. Help them start, not plan forever.',
   'Keep replies to 1 to 3 short sentences, plain words, no lists, no headings, no emoji.',
   'Answer in the language the student writes in.',
-  'Every task needs a time estimate before anything else happens with it. When the student names tasks, first say that you will figure out how long each one takes, suggest the obvious times yourself (booking an appointment is about 5 minutes) and let the student confirm or change them.',
+  'Every task needs a time estimate before anything else happens with it. When the student names tasks, first say "First, let\'s figure out how long each one takes.", suggest the obvious times yourself (booking an appointment is about 5 minutes) and let the student confirm or change them.',
   'You cannot see their screen, open apps or call them. The app lets you act only through the four tools below, always together with your normal reply, and you never say you used a tool.',
   'add_todo: only when the student clearly says something they have to do ("I need to email my professor by Monday") and you know how many minutes it takes; if the time is missing, ask for it first. Never for questions, feelings or ideas, and only say a task was added after you used it.',
   'suggest_todo: when something might be a task and you are not sure. suggest_calendar: when a concrete time slot would help, in the student\'s local time.',
@@ -1153,10 +1153,11 @@ const MAX_CHAT_ACTIONS = 2;
 const LOCAL_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 const TITLE_SCHEMA = { type: 'string', description: 'Short task title in the language of the student, at most 120 characters' };
 const MAX_TASK_MINUTES = 480; // 8 hours: longer than that is several tasks, not one
+const DUE_SCHEMA = { type: 'string', description: 'Final due date as the student said it, format YYYY-MM-DD. Leave out when the student did not name one.' };
 const MINUTES_SCHEMA = { type: 'integer', minimum: 1, maximum: MAX_TASK_MINUTES, description: 'How many minutes the task takes, as the student confirmed or accepted' };
 const CHAT_TOOLS = [
-  { name: 'add_todo', description: 'Add a task the student clearly said they have to do, once you know how many minutes it takes.', input_schema: { type: 'object', properties: { title: TITLE_SCHEMA, minutes: MINUTES_SCHEMA }, required: ['title', 'minutes'] } },
-  { name: 'suggest_todo', description: 'Offer a button to add a possible task.', input_schema: { type: 'object', properties: { title: TITLE_SCHEMA, minutes: MINUTES_SCHEMA }, required: ['title'] } },
+  { name: 'add_todo', description: 'Add a task the student clearly said they have to do, once you know how many minutes it takes.', input_schema: { type: 'object', properties: { title: TITLE_SCHEMA, minutes: MINUTES_SCHEMA, due: DUE_SCHEMA }, required: ['title', 'minutes'] } },
+  { name: 'suggest_todo', description: 'Offer a button to add a possible task.', input_schema: { type: 'object', properties: { title: TITLE_SCHEMA, minutes: MINUTES_SCHEMA, due: DUE_SCHEMA }, required: ['title'] } },
   {
     name: 'suggest_calendar',
     description: 'Offer a button to put a time block in the calendar. Times are local, format YYYY-MM-DDTHH:MM.',
@@ -1167,6 +1168,9 @@ const CHAT_TOOLS = [
 
 /** A whole number of minutes from 1 to 480, else null. A wrong number never costs the student the task: only the number is dropped. */
 const validMinutes = (v) => (Number.isInteger(v) && v >= 1 && v <= MAX_TASK_MINUTES ? v : null);
+
+/** A real calendar day as YYYY-MM-DD, else null: a wrong date is dropped, the task stays. */
+const validDay = (v) => (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && new Date(`${v}T00:00:00Z`).toISOString().slice(0, 10) === v ? v : null);
 
 const validLocalTime = (v) => typeof v === 'string' && LOCAL_TIME.test(v) && Number.isFinite(Date.parse(`${v}Z`)) && new Date(`${v}Z`).toISOString().slice(0, 16) === v;
 
@@ -1181,7 +1185,8 @@ function cleanActions(blocks) {
     let action = null;
     if ((block.name === 'add_todo' || block.name === 'suggest_todo') && title) {
       const minutes = validMinutes(input.minutes);
-      action = minutes ? { type: block.name, title, minutes } : { type: block.name, title };
+      const due = validDay(input.due);
+      action = { type: block.name, title, ...(minutes ? { minutes } : {}), ...(due ? { due } : {}) };
     } else if (block.name === 'suggest_calendar' && title && validLocalTime(input.start) && validLocalTime(input.end) && input.end > input.start) {
       action = { type: 'suggest_calendar', title, start: input.start, end: input.end };
     } else if (block.name === 'open_tool' && CHAT_TOOL_IDS.includes(input.tool)) action = { type: 'open_tool', tool: input.tool };
