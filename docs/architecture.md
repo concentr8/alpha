@@ -80,6 +80,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/calendar-wireframes.md | Text wireframes for Jack before implementation | New |
 | docs/plans/calendar-find-time.md | Approved calendar-only availability plan | New |
 | docs/plans/google-calendar.md | Approved read-only OAuth, frontend contract and future ICS fallback | New |
+| docs/plans/google-signin.md | Plan: sign in with Google only, calendar required | New, waiting for a human go |
 | server/google-calendar.js | Per-student read-only OAuth, encrypted refresh credentials, calendar selection and event pagination | New |
 | server/test/google-calendar.test.js | Mocked OAuth, cookie/state/PKCE, isolation, selection, range, timezone and disconnect tests | New |
 | frontend/concentr8-google-calendar.js | Runtime Settings dialog and in-memory read-only calendar adapter; calls the same Concentr8 server | New |
