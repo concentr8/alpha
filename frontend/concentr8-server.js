@@ -137,13 +137,15 @@
     return { ok: false, error: 'The sign-in took too long. Try again.' };
   }
 
-  // The Google account tells the server which email it is; the profile shows it instead of asking for it again.
+  // The Google account tells the server the email (and name); the profile shows them instead of asking again.
   async function syncAccount() {
     if (!settings.token || !window.Articul8) return;
     const r = await request('/api/me', 'GET');
     if (r.status === 401) { signOut(); return; }
-    if (!r.ok || !r.data.email || window.Articul8.state.profile.email === r.data.email) return;
-    window.Articul8.change((s) => { s.profile.email = r.data.email; }, 'profile');
+    const profile = window.Articul8.state.profile;
+    const newName = r.ok && r.data.name && !profile.name ? r.data.name : ''; // a name the student typed is never overwritten
+    if (!r.ok || !r.data.email || (profile.email === r.data.email && !newName)) return;
+    window.Articul8.change((s) => { s.profile.email = r.data.email; if (newName) s.profile.name = newName; }, 'profile');
     window.dispatchEvent(new CustomEvent('articul8:rerender'));
   }
   window.addEventListener('load', syncAccount);

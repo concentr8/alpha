@@ -93,6 +93,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | server/test/google-signin.test.js | Mocked Google: whole flow, openid email only, bad tokens, wrong cookie or state, expiry, closed sign-ups, limits, no leaks | New |
 | docs/decisions/0032-sign-in-with-google.md | ADR: Google sign-in, phone only for calls, calendar stays a separate opt-in | New |
 | docs/decisions/0033-calendar-required-after-sign-in.md | ADR: after signing in the calendar step is required; phone and Canvas come later, optional | New |
+| docs/decisions/0034-google-name-with-profile-scope.md | ADR: sign-in also asks for the Google name (`profile` scope); the app fills the name only while it is empty | New |
 | frontend/concentr8-signin.js | Sign-in page ("Continue with Google") and the calendar step that cannot be closed (ADR 0032, 0033). AI generated | New |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |

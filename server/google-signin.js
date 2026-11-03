@@ -6,7 +6,7 @@
 
 const crypto = require('node:crypto');
 
-const SCOPE = 'openid email';
+const SCOPE = 'openid email profile'; // profile gives the name only (ADR 0034); calendar stays a separate opt-in
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const FIVE_MINUTES = 300000;
 const POLL = /^[a-f0-9]{32,64}$/; // random, made once by the app for one sign-in attempt
@@ -29,7 +29,7 @@ function settings(env) {
 /**
  * The id_token comes straight from Google's token endpoint over TLS (not from the browser), so reading it without
  * checking the signature is allowed by the OpenID Connect rules. We still check who it is for, that it is fresh,
- * and that Google verified the email. Returns { sub, email } or throws.
+ * and that Google verified the email. Returns { sub, email, name } or throws (name is '' when Google sends none).
  */
 function readIdToken(idToken, clientId, nowMs) {
   let claims;
@@ -39,7 +39,8 @@ function readIdToken(idToken, clientId, nowMs) {
   if (!issuerOk || claims.aud !== clientId || !(claims.exp * 1000 > nowMs) || !claims.sub || !claims.email || !verified) {
     throw error(400, 'Google sign-in failed.');
   }
-  return { sub: String(claims.sub), email: String(claims.email).toLowerCase().slice(0, 254) };
+  const name = typeof claims.name === 'string' ? claims.name.replace(/\s+/g, ' ').trim().slice(0, 80) : '';
+  return { sub: String(claims.sub), email: String(claims.email).toLowerCase().slice(0, 254), name };
 }
 
 function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignupAllowed, countSignup,
@@ -78,7 +79,7 @@ function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignup
   }
 
   /** The student of this Google account, made on the first sign-in. A new token replaces the old one, like /api/register. */
-  function accountFor({ sub, email }) {
+  function accountFor({ sub, email, name }) {
     let user = Object.values(users).find((u) => u.googleSub === sub);
     if (!user) {
       if (!newSignupAllowed()) throw error(403, 'Sign-ups are closed on this server.');
@@ -86,6 +87,7 @@ function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignup
       user = newUser(crypto.randomBytes(8).toString('hex'), { googleSub: sub });
       users[user.id] = user;
     }
+    user.googleName = name || null;
     user.email = email; // an email can change at Google, the sub cannot: the account follows the sub
     const token = crypto.randomBytes(24).toString('hex');
     user.tokenHash = sha256(token);

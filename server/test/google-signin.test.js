@@ -22,7 +22,7 @@ let saved, signupsOpen, signupsToday, signupLimit, nextClaims, exchanged, google
 function reset() {
   for (const id of Object.keys(users)) delete users[id];
   saved = 0; signupsOpen = true; signupsToday = 0; signupLimit = 200; exchanged = []; googleDown = false;
-  nextClaims = { sub: 'google-sub-1', email: 'Student@Example.edu', email_verified: true };
+  nextClaims = { sub: 'google-sub-1', email: 'Student@Example.edu', email_verified: true, name: 'Test Student' };
 }
 const idToken = (claims) => {
   const part = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
@@ -94,6 +94,7 @@ test('the whole flow makes an account and gives the app its token exactly once',
   const user = users[first.body.userId];
   assert.equal(user.googleSub, 'google-sub-1');
   assert.equal(user.email, 'student@example.edu');
+  assert.equal(user.googleName, 'Test Student');
   assert.equal(user.tokenHash, sha256(first.body.token));
   assert.equal(user.phoneNumber, null, 'no phone number is needed');
   assert.equal(user.consentAt, null, 'consent for calls comes with the first phone number, not here');
@@ -103,9 +104,9 @@ test('the whole flow makes an account and gives the app its token exactly once',
   assert.equal(second.body.token, undefined);
 });
 
-test('sign-in asks for openid email only: calendar access stays a separate opt-in', async () => {
+test('sign-in asks for openid, email and profile only: calendar access stays a separate opt-in', async () => {
   const { google } = await browserSignIn(poll());
-  assert.equal(google.searchParams.get('scope'), 'openid email');
+  assert.equal(google.searchParams.get('scope'), 'openid email profile');
   assert.doesNotMatch(google.href, /calendar/);
   assert.doesNotMatch(exchanged.map((e) => e.body).join(' '), /calendar/);
   assert.equal(google.searchParams.get('access_type'), null, 'no refresh token is requested');
@@ -248,7 +249,8 @@ test('no response shows the email, the token of Google or the secret', async () 
 
 test('readIdToken reads who the token is for and refuses anything odd', () => {
   const ok = readIdToken(idToken({ sub: 'abc', email: 'A@B.COM', email_verified: true }), CLIENT, clock);
-  assert.deepEqual(ok, { sub: 'abc', email: 'a@b.com' });
+  assert.deepEqual(ok, { sub: 'abc', email: 'a@b.com', name: '' });
+  assert.equal(readIdToken(idToken({ sub: 'abc', email: 'a@b.com', email_verified: true, name: '  Ada   Lovelace ' }), CLIENT, clock).name, 'Ada Lovelace');
   assert.throws(() => readIdToken('not-a-token', CLIENT, clock), /Google sign-in failed/);
   assert.throws(() => readIdToken('', CLIENT, clock), /Google sign-in failed/);
 });
