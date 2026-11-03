@@ -31,6 +31,7 @@ After that the chat asks them to sign in under Profile, Phone call.
 ## Decisions (Jonas, 2026-10-30)
 1. 12 messages per day per visitor, without login (not a total).
 2. Limits per IP (30 per day) and for all guests together (200 per day): fine as defaults.
+3. Changed 2026-11-03: 10 messages per day instead of 12 (Jonas). A saved login the server no longer knows no longer ends in an error: the chat forgets it and answers as a guest.
 
 ## Risks
 - Someone clears `localStorage` for a new guest id: stopped by the per-IP and the global limit, not by the per-id limit.

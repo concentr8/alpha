@@ -78,13 +78,21 @@
     try {
       const messages = app.state.messages.slice(-MESSAGES_SENT).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', text: m.text }));
       const tasks = app.state.tasks.filter((t) => !t.done).map((t) => t.title);
-      const guest = !settings.token;
-      const r = guest
-        ? await request('/api/chat/guest', 'POST', { guestId: guestId(), messages, tasks, today: localDate() })
-        : await request('/api/chat', 'POST', { messages, tasks, today: localDate() });
+      const send = (asGuest) => (asGuest
+        ? request('/api/chat/guest', 'POST', { guestId: guestId(), messages, tasks, today: localDate() })
+        : request('/api/chat', 'POST', { messages, tasks, today: localDate() }));
+      let guest = !settings.token;
+      let r = await send(guest);
+      if (!guest && r.status === 401) {
+        // The server no longer knows the saved login (for example its data was reset). Answering with an error would make the
+        // chat useless, so we forget the dead login and answer as a guest. Phone number digits and other settings stay.
+        delete settings.token;
+        save(settings);
+        guest = true;
+        r = await send(true);
+      }
       if (r.ok && r.data.reply) addAssistantMessage(r.data.reply + (guest ? freeMessagesHint(r.data.remaining) : ''), Array.isArray(r.data.actions) ? r.data.actions : []);
       else if (guest && r.status === 429) addAssistantMessage(r.error); // the server text already says how to continue
-      else if (r.status === 401) addAssistantMessage('The server does not know you any more. Open Profile, Phone call and save again.');
       else addAssistantMessage(`I could not answer right now. ${r.error}`);
     } finally { asking = false; }
   }
