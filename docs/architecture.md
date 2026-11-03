@@ -73,6 +73,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | server/test/guest-chat.test.js | Tests for the AI chat without login (`POST /api/chat/guest`): limits per guest, per address and overall | New |
 | docs/plans/voice-on-azure.md | Plan: voice on the Azure server | New |
 | docs/plans/chat-followups.md | Plan: follow-ups of the chat actions (due date, Back from chat cards, French "tu", translations) | New, waiting for a human go |
+| docs/plans/chat-interview-and-google-login.md | Plan: chat asks first, time estimates, Google sign-in (CON-53 backend items) | New, waiting for a human go |
 | docs/decisions/0023-voice-on-the-node-server.md | ADR: voice moves from Heroku to the Node server | New |
 | .env.example | Names of required secrets | Works |
 | docs/plans/calendar-redesign.md | Approved calendar-only redesign plan | New |
