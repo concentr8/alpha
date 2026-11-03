@@ -77,13 +77,13 @@
   // The hints at the top of the Block App page.
   function panel() {
     if (!desktop) {
-      return '<div class="preview-note">AI generated · Blocking works only in the Concentr8 app for Mac. In the browser your list is saved, but nothing is closed. Download the app on concentr8.github.io.</div>';
+      return '<div class="preview-note">Blocking works in the Concentr8 desktop app. In the browser your list is saved, but nothing is closed. Download the app on concentr8.github.io.</div>';
     }
     if (!['darwin', 'win32', 'linux'].includes(desktop.platform)) {
-      return '<div class="preview-note">AI generated · Blocking is not available on this system. Your list is saved.</div>';
+      return '<div class="preview-note">Blocking is not available on this system. Your list is saved.</div>';
     }
     const signedIn = !!connection();
-    return `<div class="preview-note">AI generated · Blocking is on in every focus session as soon as your list has an app. <span data-block-live>${esc(liveText())}</span>
+    return `<div class="preview-note">Blocking is on in every focus session as soon as your list has an app. <span data-block-live>${esc(liveText())}</span>
       <details><summary>How it works</summary>
       ${OS_HINT[desktop.platform] || ''}Concentr8 looks at your screen every few seconds. If you open something on your list, you get a notification and 15 seconds to switch back. After that the tab is closed (your browser goes back to your last work page) or the app is hidden. Breaks are never blocked.<br>
       ${desktop.platform === 'darwin' ? 'The first time, macOS asks if Concentr8 may control your browser and System Events. Click Allow. Firefox also needs Accessibility (System Settings, Privacy &amp; Security).' : ''}</details>

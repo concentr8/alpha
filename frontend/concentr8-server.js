@@ -53,12 +53,32 @@
   // --- AI chat ---
   // Actions come from the server already checked. The app starts them as "pending" and the student confirms (a button or Enter);
   // only add_todo runs at once, always with an Undo line.
-  function addAssistantMessage(text, actions = []) {
+  // Jack: every answer goes to the chat that asked, even when the student switched to another chat meanwhile.
+  function addAssistantMessage(chatId, text, actions = []) {
     const app = window.Articul8;
+    // A reset or another tab may have removed the chat while the request ran.
+    if (!app.state.chats.some(c => c.id === chatId)) return;
     const id = app.uid();
     const list = actions.map((a) => ({ ...a, state: a.type === 'open_tool' ? 'shown' : 'pending' }));
-    app.change((s) => { s.messages.push({ id, text, role: 'assistant', taskId: null, eventId: null, contextId: null, proposal: null, actions: list }); }, 'assistant');
-    list.forEach((a, i) => { if (a.type === 'add_todo') app.runAction(id, i, 'accept'); });
+    app.change((s) => {
+      const chat = s.chats.find(c => c.id === chatId);
+      chat.messages.push({ id, text, role: 'assistant', taskId: null, eventId: null, contextId: null, proposal: null, actions: list });
+      chat.updatedAt = Date.now();
+      // Preserve automatic adds and their Undo state without switching the visible chat.
+      list.filter(a => a.type === 'add_todo').forEach(a => {
+        const match = s.tasks.find(t => t.title === a.title);
+        const task = match || { id: app.uid(), title: a.title, done: false, course: '', steps: [] };
+        if (a.minutes && !task.estimatedMinutes) task.estimatedMinutes = a.minutes; // the time the student confirmed in the chat (CON-35)
+        if (!match) s.tasks.push(task);
+        Object.assign(a, { state: 'done', taskId: task.id, undoable: !match });
+        chat.activeTaskId = task.id;
+        if (s.activeChatId === chatId) s.activeTaskId = task.id;
+      });
+    }, list.some(a => a.type === 'add_todo') ? 'tasks' : 'assistant');
+    // The final due date the student named in the chat becomes the task's deadline (CON-35), unless the task has one.
+    list.filter(a => a.type === 'add_todo' && a.due && !app.state.calendarEvents.some(e => e.taskId === a.taskId && e.kind === 'deadline')).forEach(a => {
+      try { app.saveEvent({ title: a.title, kind: 'deadline', start: a.due + 'T17:00', end: a.due + 'T17:00', allDay: false, taskId: a.taskId, notes: '' }); } catch (_) { /* a bad date only means no deadline */ }
+    });
   }
 
   const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
@@ -70,13 +90,26 @@
     return ` (${left}. Continue with Google under Profile, Account for more.)`;
   }
 
-  let asking = false;
+  // Jack: each chat waits for its own answer; the others stay usable.
+  const pendingChats = new Set();
+  const isAsking = (chatId = window.Articul8?.state.activeChatId) => pendingChats.has(chatId);
+  const notifyPending = () => window.dispatchEvent(new CustomEvent('concentr8:chat-pending'));
+  // Jack's Quick Start: a focus chat gets this planning instruction on the student's last message.
+  const focusInstruction = '\n\nQuick Start focus planning: first ask what I need to accomplish and how much time I have. Ask 1–2 concise questions to narrow the task to one achievable outcome. Then propose small steps and a realistic duration. Wait for my agreement before suggesting the timer. I can use the Start focus session button to review the task and minutes.';
   async function ask() {
     const app = window.Articul8;
-    if (!app || asking) return;
-    asking = true;
+    if (!app || isAsking()) return;
+    const chatId = app.state.activeChatId;
+    const chat = app.state.chats.find(c => c.id === chatId);
+    if (!chat || !chat.messages.length) return;
+    pendingChats.add(chatId);
+    notifyPending();
     try {
-      const messages = app.state.messages.slice(-MESSAGES_SENT).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', text: m.text }));
+      const messages = chat.messages.slice(-MESSAGES_SENT).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', text: m.text }));
+      if (chat.mode === 'focus') {
+        const lastUser = messages.findLast(m => m.role === 'user');
+        if (lastUser) lastUser.text = lastUser.text.slice(0, 1400) + focusInstruction;
+      }
       const tasks = app.state.tasks.filter((t) => !t.done).map((t) => t.title);
       const send = (asGuest) => (asGuest
         ? request('/api/chat/guest', 'POST', { guestId: guestId(), messages, tasks, today: localDate() })
@@ -91,10 +124,10 @@
         guest = true;
         r = await send(true);
       }
-      if (r.ok && r.data.reply) addAssistantMessage(r.data.reply + (guest ? freeMessagesHint(r.data.remaining) : ''), Array.isArray(r.data.actions) ? r.data.actions : []);
-      else if (guest && r.status === 429) addAssistantMessage(r.error); // the server text already says how to continue
-      else addAssistantMessage(`I could not answer right now. ${r.error}`);
-    } finally { asking = false; }
+      if (r.ok && r.data.reply) addAssistantMessage(chatId, r.data.reply + (guest ? freeMessagesHint(r.data.remaining) : ''), Array.isArray(r.data.actions) ? r.data.actions : []);
+      else if (guest && r.status === 429) addAssistantMessage(chatId, r.error); // the server text already says how to continue
+      else addAssistantMessage(chatId, `I could not answer right now. ${r.error}`);
+    } finally { pendingChats.delete(chatId); notifyPending(); }
   }
 
   // --- Sign in with Google (ADR 0032) ---
@@ -194,7 +227,6 @@
     const saved = Boolean(settings.token);
     return heading
       + '<!-- AI-GENERATED: no wireframe from Jack for this page; built from .product-form, .wire-button and .preview-note. -->'
-      + '<p class="preview-note">AI generated: Jack has not drawn this page yet. It will be redrawn.</p>'
       + '<form class="product-form profile-form" id="call-form" novalidate>'
       + `<label>Phone number (US)<input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="${saved && settings.phoneEnd ? `Saved: number ending in ${esc(settings.phoneEnd)}` : '+1 415 555 1234'}"></label>`
       + `<label>Time of the call<input name="time" type="time" value="${esc(settings.callTime || '18:00')}"></label>`
@@ -276,5 +308,5 @@
   });
 
   // The page is drawn by index.html after callPage() returns, so the check runs right after it.
-  window.Concentr8 = { api: API, ask, signIn, signOut, isDesktop, openGoogleWindow, openInBrowser, blockedWindowText: BLOCKED_WINDOW_TEXT, isSignedIn: () => Boolean(settings.token), connection: () => (settings.token ? { url: API, token: settings.token } : null), callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
+  window.Concentr8 = { api: API, ask, isAsking, signIn, signOut, isDesktop, openGoogleWindow, openInBrowser, blockedWindowText: BLOCKED_WINDOW_TEXT, isSignedIn: () => Boolean(settings.token), connection: () => (settings.token ? { url: API, token: settings.token } : null), callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
 })();

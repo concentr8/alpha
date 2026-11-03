@@ -15,7 +15,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 ## File map
 | File | Purpose | Status |
 |---|---|---|
-| frontend/index.html | Whole UI in one file. Stores local data in the browser (localStorage); Calendar exposes a separate in-memory read-only extension point. | Small approved page edits (ADR 0022, 0028). Includes Jack's 2026-10-21 version, ElevenLabs (ADR 0010, 0013), phone layout (ADR 0014), calendar redesign (ADR 0028) |
+| frontend/index.html | Whole UI in one file: Jack's redesign of 2026-11-03 (ADR 0036). Stores local data, chats included, in the browser (localStorage); Calendar exposes a separate in-memory read-only extension point. | Replaced by Jack's version |
 | docs/evidence/mobile-layout/ | Before/after screenshots at phone width (proof for ADR 0014) | New |
 | docs/evidence/calendar/ | 1440/390 before/after screenshots; README explains synthetic fixtures, per-PR images and browser checks | New |
 | frontend/music/ | Four music loops for the Music page (ADR 0015) | New |
@@ -64,7 +64,8 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | .github/workflows/app-beta.yml | Builds Mac, Windows, Linux apps on every merge and publishes a beta (Pre-release) | New |
 | .github/workflows/promote-stable.yml | Copies a tested beta into a stable release on the website repo | New |
 | scripts/count-strings.js | Counts the English texts in the app (step 0 of docs/plans/languages.md); reads only, changes nothing | New |
-| frontend/concentr8-server.js | Connects the web app to the server: AI chat and phone call setup (ADR 0022) | New |
+| frontend/concentr8-server.js | Connects the web app to the server: AI chat (one answer per chat, Quick Start planning), Google sign-in and phone call setup (ADR 0022, 0032, 0036) | New |
+| frontend/chat-history.js | Jack's chat history: stored chats, a new chat reuses an empty one, short chat titles. Pure, no network or storage (ADR 0036) | New |
 | docs/plans/call-and-chat.md | Plan: phone call setup and AI chat in the app | New |
 | docs/decisions/0027-chat-actions-and-tools-in-chat.md | ADR: chat actions from the model, tools inside the chat, no stored chat | New |
 | docs/decisions/0022-frontend-talks-to-the-concentr8-server.md | ADR: what changed in the frozen frontend and why | New |
@@ -95,11 +96,13 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/decisions/0032-sign-in-with-google.md | ADR: Google sign-in, phone only for calls, calendar stays a separate opt-in | New |
 | docs/decisions/0033-calendar-required-after-sign-in.md | ADR: after signing in the calendar step is required; phone and Canvas come later, optional | New |
 | docs/decisions/0034-google-name-with-profile-scope.md | ADR: sign-in also asks for the Google name (`profile` scope); the app fills the name only while it is empty | New |
+| docs/decisions/0036-jack-redesign-takes-over-the-frontend.md | ADR: Jack's redesign becomes the frontend; what came from him and what was kept | New |
 | docs/decisions/0035-google-sign-in-in-default-browser.md | ADR: desktop sign-in opens in the default browser; a blocked window shows "Open in browser" | New |
 | frontend/concentr8-signin.js | Sign-in page ("Continue with Google") and the calendar step that cannot be closed (ADR 0032, 0033); continues in the browser when no window can open (ADR 0035). AI generated | New |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
+| server/test/chat-history.test.js | Node tests for chat-history.js: restore and clean saved chats, switching, titles | New |
 | server/test/calendar-tools.test.js | Node built-in tests for calendar date boundaries and quick-add valid, invalid and ambiguous input | New |
 | docs/decisions/0028-calendar-redesign.md | Calendar-only design, parsing, timezone and read-only external-event boundaries | New |
 
