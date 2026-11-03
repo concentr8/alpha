@@ -1428,7 +1428,7 @@ async function route(req, res) {
       return send(res, 200, { tasks: u.tasks });
     }
     if (p === '/api/me' && m === 'GET') {
-      return send(res, 200, { id: u.id, phoneNumber: phoneOf(u), callTime: u.callTime, callSlots: publicSlots(u), timezone: u.timezone, paused: u.paused });
+      return send(res, 200, { id: u.id, email: u.email || null, phoneNumber: phoneOf(u), callTime: u.callTime, callSlots: publicSlots(u), timezone: u.timezone, paused: u.paused });
     }
     if (p === '/api/me/impact' && m === 'GET') {
       return send(res, 200, { ...impactOf([u]), summary: await impactSummary(u) });

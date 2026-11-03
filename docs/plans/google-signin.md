@@ -82,3 +82,6 @@ Home without sign-in keeps the 12 free chat messages (guest chat plan).
 
 ## Update 2026-11-03: sign-in must be visible
 Jonas: signing in with Google on the web version is very important, and "Personal information" alone made no sense. The Profile page and Profile, Personal information now show "Continue with Google" (or "Sign out" when signed in); "Account & subscription" is renamed "Sign in & subscription". Still to decide with Jack: a sign-in entry in the sidebar.
+
+## Update 2026-11-03: email from Google fills the profile
+The server already stores the verified Google email. `GET /api/me` now returns it as `email` (null for phone-only accounts). After signing in, and on page load while signed in, the app copies it into the profile; Personal information shows it read-only ("Email from your Google account"). The name is not filled yet: Google only gives it with the `profile` scope, which ADR 0032 does not ask for. Decision for Jonas: add `profile` (basic, no Google verification needed) so name and picture can come from Google too.

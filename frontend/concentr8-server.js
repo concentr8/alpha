@@ -126,6 +126,7 @@
         settings = { ...settings, token: r.data.token };
         save(settings);
         window.dispatchEvent(new CustomEvent('concentr8:auth'));
+        await syncAccount();
         window.dispatchEvent(new CustomEvent('articul8:rerender'));
         return { ok: true };
       }
@@ -135,6 +136,17 @@
     closeWindow();
     return { ok: false, error: 'The sign-in took too long. Try again.' };
   }
+
+  // The Google account tells the server which email it is; the profile shows it instead of asking for it again.
+  async function syncAccount() {
+    if (!settings.token || !window.Articul8) return;
+    const r = await request('/api/me', 'GET');
+    if (r.status === 401) { signOut(); return; }
+    if (!r.ok || !r.data.email || window.Articul8.state.profile.email === r.data.email) return;
+    window.Articul8.change((s) => { s.profile.email = r.data.email; }, 'profile');
+    window.dispatchEvent(new CustomEvent('articul8:rerender'));
+  }
+  window.addEventListener('load', syncAccount);
 
   function signOut() {
     delete settings.token;
