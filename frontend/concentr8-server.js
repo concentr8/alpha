@@ -1,4 +1,4 @@
-// Purpose: connects Jack's web app to the Concentr8 server: the AI chat in the agent panel and the phone call setup.
+// Purpose: connects Jack's web app to the Concentr8 server: the AI chat in the agent panel, Sign in with Google and the phone call setup.
 // Called by: frontend/index.html (loaded before the main script). It calls window.Concentr8.ask() after the student
 //            sends a chat message and window.Concentr8.callPage() when the page Profile > Phone call is drawn.
 // Calls: the Concentr8 server (server/index.js): /api/register, /api/settings, /api/tasks, /api/call-now, /api/chat,
@@ -67,7 +67,7 @@
   function freeMessagesHint(remaining) {
     if (!(remaining >= 0 && remaining <= 2)) return '';
     const left = remaining === 0 ? 'No free messages left today' : `${remaining} free message${remaining === 1 ? '' : 's'} left today`;
-    return ` (${left}. Sign in under Profile, Phone call for more.)`;
+    return ` (${left}. Continue with Google under Profile, Account for more.)`;
   }
 
   let asking = false;
@@ -95,6 +95,52 @@
       else if (guest && r.status === 429) addAssistantMessage(r.error); // the server text already says how to continue
       else addAssistantMessage(`I could not answer right now. ${r.error}`);
     } finally { asking = false; }
+  }
+
+  // --- Sign in with Google (ADR 0032) ---
+  // The app makes a random poll code, the server turns it into a Google address, the student signs in in a second window,
+  // and the app collects the new token with the same poll code. Google never sees the code; the token never travels in a URL.
+  const randomHex = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function signIn() {
+    if (settings.token) return { ok: true };
+    const poll = randomHex();
+    const popup = window.open('about:blank', 'concentr8-google-signin', 'popup,width=560,height=720');
+    if (!popup) return { ok: false, error: 'Allow the sign-in window to open, then try again.' };
+    try { popup.opener = null; } catch (_) { /* we only need to see when it closes */ }
+    const closeWindow = () => { if (!popup.closed) popup.close(); };
+    const start = await request('/auth/google/start', 'POST', { poll });
+    if (!start.ok) { closeWindow(); return { ok: false, error: start.status === 503 ? 'Google sign-in is not set up yet.' : start.error }; }
+    let target;
+    try { target = new URL(start.data.authorizationUrl); } catch (_) { target = null; }
+    if (!target || target.origin !== new URL(API).origin || target.pathname !== '/auth/google/login') { closeWindow(); return { ok: false, error: 'The server returned an invalid sign-in link.' }; }
+    popup.location.href = target.href;
+    const until = Date.now() + 5 * 60 * 1000;
+    let closedAt = 0;
+    while (Date.now() < until) {
+      await wait(1500);
+      const r = await request('/auth/google/token', 'POST', { poll });
+      if (r.status === 200 && r.data.token) {
+        closeWindow();
+        settings = { ...settings, token: r.data.token };
+        save(settings);
+        window.dispatchEvent(new CustomEvent('concentr8:auth'));
+        window.dispatchEvent(new CustomEvent('articul8:rerender'));
+        return { ok: true };
+      }
+      if (r.status !== 202 && r.status !== 0) { closeWindow(); return { ok: false, error: r.error }; }
+      if (popup.closed) { closedAt = closedAt || Date.now(); if (Date.now() - closedAt > 4000) return { ok: false, error: 'The sign-in was not finished.' }; }
+    }
+    closeWindow();
+    return { ok: false, error: 'The sign-in took too long. Try again.' };
+  }
+
+  function signOut() {
+    delete settings.token;
+    save(settings);
+    window.dispatchEvent(new CustomEvent('concentr8:auth'));
+    window.dispatchEvent(new CustomEvent('articul8:rerender'));
   }
 
   // --- Phone call setup (Profile > Phone call) ---
@@ -187,5 +233,5 @@
   });
 
   // The page is drawn by index.html after callPage() returns, so the check runs right after it.
-  window.Concentr8 = { api: API, ask, connection: () => (settings.token ? { url: API, token: settings.token } : null), callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
+  window.Concentr8 = { api: API, ask, signIn, signOut, isSignedIn: () => Boolean(settings.token), connection: () => (settings.token ? { url: API, token: settings.token } : null), callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
 })();

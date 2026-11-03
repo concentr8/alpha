@@ -70,5 +70,12 @@ Home without sign-in keeps the 12 free chat messages (guest chat plan).
 6. Human: Google consent screen, verification, deploy.
 7. Switch off `/api/register` once all of the above works.
 
+## Build: sign-in page and calendar step (go given 2026-11-03)
+- `frontend/concentr8-server.js`: `Concentr8.signIn()` (poll flow: `POST /auth/google/start`, open the Google window, poll `POST /auth/google/token`, save the token), `signOut()`, `isSignedIn()`. Chat hint says "Continue with Google".
+- New `frontend/concentr8-signin.js` (AI generated, built from `cal-dialog`, `.wire-button`, `.preview-note`): one sign-in dialog with the Google button; after signing in, a calendar step that cannot be closed (ADR 0033): "Connect Google Calendar" (`POST /google/login`, window, check `GET /google/calendars`) and "Sign out". Without the step the app shows only this dialog.
+- `frontend/index.html`: one `<script>` line and a sign-in / sign-out entry on Profile, Account.
+- `server/index.js`: free-message limit text says "Continue with Google".
+- Not in this PR: server-side refusal of data routes without calendar, switching off `/api/register`.
+
 ## Verification
 `cd server && npm test`. Live consent cannot be tested without the real Google configuration and a real account.

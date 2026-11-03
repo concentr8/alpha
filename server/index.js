@@ -1080,7 +1080,7 @@ const GUEST_CHAT_GLOBAL_PER_DAY = Number(env.GUEST_CHAT_GLOBAL_PER_DAY || 200);
 const GUEST_ID = /^[a-f0-9]{32,64}$/; // random, made once by the browser; no phone number, no account
 const guestIpCounts = new Map(); // address -> { date, count }. Memory only: the address is never written to disk.
 let guestGlobal = { date: null, count: 0 };
-const SIGN_IN_HINT = 'Sign in under Profile, Phone call to keep chatting.';
+const SIGN_IN_HINT = 'Continue with Google (Profile, Account) to keep chatting.';
 
 /**
  * The caller's address. A guest can send any X-Forwarded-For text, but every proxy adds the address it saw at the END,
