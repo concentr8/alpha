@@ -39,9 +39,14 @@ directly. Do not add new greys or new accent colors.
 ## Layout
 - `.app` is a 3-column grid: sidebar 224px, content (flexible), agent panel 336px.
   Minimum width 760px, so there is no phone layout yet.
-- Pages: Home, Calendar, Toolbox, Workflow, Courses, Profile (sidebar buttons
-  with `data-page`), plus Focus, Room and Break. A hash router shows them
-  (`#calendar`, `#toolbox/music` etc.).
+- Pages (Jack, 2026-11-03, ADR 0036): Home, Courses, Toolbox, To Do List, Data,
+  Calendar in the sidebar (buttons with `data-page`), plus Workflow, Profile, Focus,
+  Room and Break. A hash router shows them (`#calendar`, `#todos`, `#data`,
+  `#toolbox/music` etc.).
+- Home (Jack): a chat switcher top left (`.chat-switcher`, history panel
+  `.chat-history`), the greeting, `.home-question` "What's on your plate right now?",
+  `.quick-start-options` (Quick Start) and, in a focus chat, `.focus-chat-actions`
+  (Start focus session). The AI button is hidden on Home.
 - Toolbox detail pages: Timer, Body Doubling, Music, Block App, Breathing
   Exercise, Meditation (and Saved sessions), Checklist.
 - Content pages use `.page-content` and start with `.product-heading` (title,
@@ -71,7 +76,11 @@ directly. Do not add new greys or new accent colors.
 | `.stat-row` | Three numbers in a row | big 38px numbers |
 | `.template-grid` | Cards in 3 columns (2 when narrow) | gap 22px |
 | `.avatar` | Round initials | 40px, `#eee` |
-| `.up-next-row` / `.up-next-card` | "Up next" row on Home (AI generated, ADR 0026) | cards 230px wide, 1px `#eaeaea`, radius 8px, hover `#f7f7f5`, swipeable (scroll snap) |
+| `.chat-switcher` / `.chat-history-row` | Chat title button and its history list on Home (Jack) | pill 40px high, `#f4f4f2`; rows 44px, current row `#f4f4f2` |
+| `.quick-start-options` / `.focus-chat-actions` | Small button with a grey hint next to it (Jack) | 40px button, `#dedede` border; hint 14px `#777` |
+| `.chat-pending` | "Concentr8 is thinking…" under the chat (Jack) | 16px, `#777` |
+| `.cal-toolbar` / `.cal-toolbar-actions` | Calendar's one toolbar row (Jack) | 40px controls, range 20px |
+| `.profile-picture`, `.avatar img` | Profile picture (AI generated, not drawn by Jack) | 72px on Personal information, 32px in the sidebar |
 | `.detail-heading` | Header of a tool page: `.text-back`, `h1`, `.detail-actions` on the right | 28px title, actions push right |
 | `.detail-section`, `.detail-note`, `.detail-empty` | Block with 21px/500 title, grey note, empty text | notes `#737373`, 16px |
 | `.detail-search` | Search field with icon and button | 1px `#ccc`, radius 6px |

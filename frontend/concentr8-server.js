@@ -68,12 +68,17 @@
       list.filter(a => a.type === 'add_todo').forEach(a => {
         const match = s.tasks.find(t => t.title === a.title);
         const task = match || { id: app.uid(), title: a.title, done: false, course: '', steps: [] };
+        if (a.minutes && !task.estimatedMinutes) task.estimatedMinutes = a.minutes; // the time the student confirmed in the chat (CON-35)
         if (!match) s.tasks.push(task);
         Object.assign(a, { state: 'done', taskId: task.id, undoable: !match });
         chat.activeTaskId = task.id;
         if (s.activeChatId === chatId) s.activeTaskId = task.id;
       });
     }, list.some(a => a.type === 'add_todo') ? 'tasks' : 'assistant');
+    // The final due date the student named in the chat becomes the task's deadline (CON-35), unless the task has one.
+    list.filter(a => a.type === 'add_todo' && a.due && !app.state.calendarEvents.some(e => e.taskId === a.taskId && e.kind === 'deadline')).forEach(a => {
+      try { app.saveEvent({ title: a.title, kind: 'deadline', start: a.due + 'T17:00', end: a.due + 'T17:00', allDay: false, taskId: a.taskId, notes: '' }); } catch (_) { /* a bad date only means no deadline */ }
+    });
   }
 
   const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
