@@ -39,10 +39,20 @@ Signing in also gives Concentr8 read-only access to their Google Calendar. Witho
 ## Data
 New fields per student: `googleSub`, `email` (shown in Profile, never logged), `googleCalendar` as today. Existing students are untouched.
 
-## Frontend (needs a human agreement, `frontend/index.html` is frozen)
-A sign-in screen with one "Continue with Google" button and one short sentence about the calendar.
-No wireframe from Jack yet, so it is built from existing classes and marked "AI generated".
-Home without sign-in keeps the 12 free chat messages (guest chat plan).
+## Central sign-in page (Jonas, 2026-11-03)
+One place to sign in, used by everything: a page with one "Continue with Google" button and one sentence about the calendar.
+It opens from Profile ("Sign in") and from every spot that today says "sign in first" (Google Calendar, calling, the chat limit).
+The phone number section is no longer a way to sign in; it only sets up the morning calls after you are signed in.
+No wireframe from Jack yet, so it is built from existing classes and marked "AI generated". `frontend/index.html` is frozen, so this needs a human agreement.
+
+## AI chat without signing in (Jonas, 2026-11-03)
+Visitors can chat without an account, and the website must show that the app really helps, so the chat must not nag.
+- **10 free messages per day** per visitor (today 12). No code needed to try it: set `GUEST_CHAT_PER_DAY=10` in Azure.
+  The default in `server/index.js` (12) changes to 10 in the same PR as the sign-in work, so the setting is not forgotten.
+- **No nagging.** Today every answer ends with "Sign in under Profile, Phone call for more" (`frontend/concentr8-server.js`).
+  Proposal: show a hint only when 3 or fewer messages are left, and when the limit is reached. The text says "Continue with Google", never "phone number".
+  The same change replaces `SIGN_IN_HINT` in `server/index.js`.
+- Signed-in students keep `CHAT_PER_DAY` (100). The per-IP and global limits stay as they are (ADR guest-chat).
 
 ## Google Cloud, human steps (cannot be done in code)
 - Consent screen: **External**, then **In production**. In "Testing" only listed test users can sign in and refresh tokens expire after 7 days.
@@ -56,13 +66,14 @@ Home without sign-in keeps the 12 free chat messages (guest chat plan).
 1. **Existing phone-only students:** keep them working and offer "Connect Google" in Settings, or require Google for everyone at once?
 2. **`/api/register`:** switch it off right away (step 7) or keep it for the owner and tests only?
 3. **Other devices:** a new sign-in issues a new token and logs out the old Mac, as today. Keep that?
-4. **Non-Google people** (no Google account, school mail without Google) cannot join. Accept that?
+4. **Hint when messages run low:** only at 3 or fewer left (proposal above), or never before the limit?
+5. **Non-Google people** (no Google account, school mail without Google) cannot join. Accept that?
 
 ## Steps (each a small PR, after the go)
 1. ADR 0031: Google account is the identity, supersedes the "no separate account system" line of ADR 0030.
 2. Server: sign-in routes, scope check, claim flow, tests with mocked Google (state, cookie, PKCE, nonce, replay, expiry, missing calendar scope, second sign-in, per-student isolation).
 3. Phone number optional in the calling code, tests.
-4. Frontend: sign-in screen (AI generated), 1440px and 390px screenshots before/after.
+4. Frontend: central sign-in page (AI generated), chat hints without "phone number", 1440px and 390px screenshots before/after.
 5. Docs: `docs/architecture.md`, `server/README.md`, `.env.example` (no new names expected).
 6. Human: Google consent screen, verification, deploy.
 7. Switch off `/api/register` once all of the above works.
