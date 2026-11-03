@@ -71,7 +71,7 @@ test('the per-guest limit says how to continue, and a refused message costs no C
   const before = claudeCalls.length;
   const r = await chat(id, { ip: '203.0.113.2' });
   assert.equal(r.status, 429);
-  assert.match((await r.json()).error, /3 free messages for today.*Profile, Phone call/);
+  assert.match((await r.json()).error, /3 free messages for today.*Continue with Google/);
   assert.equal(claudeCalls.length, before);
 });
 
