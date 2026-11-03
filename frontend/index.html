@@ -2383,8 +2383,8 @@ function setAgent(open, focusInput=true) {
     img.src=url;
   });
   document.addEventListener('click',event=>{if(event.target.closest('[data-avatar-remove]')){Articul8.change(s=>{s.profile.avatar='';},'profile');window.dispatchEvent(new CustomEvent('articul8:rerender'));}});
-  /* Quick start (CON-38): the shortest way into a focus session, a checklist and a 10 minute timer for the task in focus. */
-  document.addEventListener('click',event=>{if(event.target.closest('[data-quick-start]'))FocusUI.setup({selected:['checklist','timer'],minutes:10,origin:'Home'});});
+  /* Quick start (CON-38): one click starts a session, the checklist first, then a 10 minute timer, for the task in focus (or a new task "Quick focus"). */
+  document.addEventListener('click',event=>{if(event.target.closest('[data-quick-start]'))FocusUI.start({taskId:Product.ensureTask('Quick focus'),selected:['checklist','timer'],minutes:10,origin:'Home'});});
   window.addEventListener('articul8:agent-open',()=>{renderDraft();const log=conversations[1];log.scrollTop=log.scrollHeight;});
   document.getElementById('collapse-sidebar').addEventListener('click',()=>{store.setCollapsed(true);document.getElementById('open-sidebar').focus();});
   document.getElementById('open-sidebar').addEventListener('click',()=>{store.setCollapsed(false);document.getElementById('collapse-sidebar').focus();});
