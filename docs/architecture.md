@@ -83,6 +83,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | server/test/google-calendar.test.js | Mocked OAuth, cookie/state/PKCE, isolation, selection, range, timezone and disconnect tests | New |
 | frontend/concentr8-google-calendar.js | Runtime Settings dialog and in-memory read-only calendar adapter; calls the same Concentr8 server | New |
 | docs/decisions/0030-google-calendar-readonly.md | OAuth identity, credential storage and read-only data boundaries | New |
+| docs/decisions/0031-chat-asks-first-and-estimates-time.md | ADR: the chat asks 1 to 2 questions first, every task gets a time estimate (`minutes`) | New |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
