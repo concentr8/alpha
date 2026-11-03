@@ -9,7 +9,7 @@ server/build.json
 *.env
 !.env.example
 
-# Python (Articul8 backend)
+# Python (Concentr8 backend)
 __pycache__/
 *.pyc
 .venv/

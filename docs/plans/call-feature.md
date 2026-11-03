@@ -4,7 +4,7 @@ Status: Phases 0 and 1 approved by Jonas on 2026-10-23 and built. Real calls
 (phase 2 onwards) are not built yet.
 
 ## Goal
-A user says "I want to study at these times". At those times Articul8 calls
+A user says "I want to study at these times". At those times Concentr8 calls
 them and helps them start with one small step.
 
 ## Target flow
@@ -56,5 +56,5 @@ Frontend (later) -> POST /calls/schedules -> store schedule + consent
 
 ## Done when
 A saved schedule makes a real call at the right local time, the call names
-Articul8 and says it is an AI, the user can stop it, and tests cover consent,
+Concentr8 and says it is an AI, the user can stop it, and tests cover consent,
 time zone and stop.

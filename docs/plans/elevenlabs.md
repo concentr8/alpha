@@ -9,8 +9,8 @@ plan: Creator). No code yet. Each frontend step still needs Jack's OK and an ADR
 Text to Speech, Speech to Text, Music, Sound effects, ElevenAgents (voice
 agents), Voice changer, Dubbing and more. We only plan the first five.
 
-## Where it fits in Articul8
-| Articul8 part | Today (read from frontend/index.html) | With ElevenLabs | Size of change | Status |
+## Where it fits in Concentr8
+| Concentr8 part | Today (read from frontend/index.html) | With ElevenLabs | Size of change | Status |
 |---|---|---|---|---|
 | Reminder calls | Not in the frontend at all | ElevenAgents + Twilio number, backend only | Backend (Phase 2 to 3 of call-feature.md) | Endpoint and fields verified |
 | Music page | Four mixes, `url: null`, nothing plays | Loops made once with Eleven Music, files put into the track lists | Smallest: data only | See music.md |
