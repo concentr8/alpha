@@ -83,6 +83,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/google-signin.md | Plan: sign in with Google only, calendar required | New, waiting for a human go |
 | docs/plans/estimate-time-first.md | Plan: chat to-dos keep their confirmed time estimate and show it in the to-do list and calendar (CON-35) | New |
 | docs/plans/brain-dump-and-profile-picture.md | Plan: Home brain dump, due dates from the chat, profile picture (CON-32, 33, 34, 36) | New |
+| docs/plans/quickstart-button.md | Plan: Quick start button on Home, one click into a 10 minute focus session (CON-38) | New |
 | server/google-calendar.js | Per-student read-only OAuth, encrypted refresh credentials, calendar selection and event pagination | New |
 | server/test/google-calendar.test.js | Mocked OAuth, cookie/state/PKCE, isolation, selection, range, timezone and disconnect tests | New |
 | frontend/concentr8-google-calendar.js | Runtime Settings dialog and in-memory read-only calendar adapter; calls the same Concentr8 server | New |
