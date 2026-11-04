@@ -109,6 +109,18 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | frontend/test/chat-scroll.test.js | Regression tests for layout-aware scrolling, resize, hidden views and cleanup using fake frames and observers; included in server npm test | Restored |
 | server/test/calendar-tools.test.js | Node built-in tests for calendar date boundaries and quick-add valid, invalid and ambiguous input | New |
 | docs/decisions/0028-calendar-redesign.md | Calendar-only design, parsing, timezone and read-only external-event boundaries | New |
+| frontend/demo/demo-data.js | DEMO branch only: mock student, fake Canvas API and Google Calendar, focus history, the state of each video scene. Pure | New (ADR 0038) |
+| frontend/demo/demo-chat.js | DEMO branch only: scripted AI chat in the shape of `/api/chat`, and spoken times from a call. Pure | New (ADR 0038) |
+| frontend/demo/demo-api.js | DEMO branch only: wraps `fetch`; answers Canvas, Google and chat, sends only the call routes to the real server | New (ADR 0038) |
+| frontend/demo/demo-mode.js | DEMO branch only: seeds the scene before the app loads, installs the fake backend, `window.Concentr8Demo` | New (ADR 0038) |
+| frontend/demo/demo-ui.js | DEMO branch only: Connect Canvas, "I'm stuck · call me", call results in the app, Profile > Demo setup. AI generated | New (ADR 0038) |
+| frontend/demo/test/demo.test.js | DEMO branch only: tests for the mock data, scripted chat and fake backend (run by `npm test` in app/) | New |
+| app/desktop/demo-menu.js | DEMO branch only: the Demo menu (scenes, reset, Demo setup, 16:9 window sizes) | New |
+| app/desktop/demo-smoke.js | DEMO branch only: smoke test of the built app in CI (`CONCENTR8_SMOKE=1`) | New |
+| app/test/demo.test.js | DEMO branch only: tests for the Demo menu, Chrome permission, 10-second warning, separate app id | New |
+| .github/workflows/app-demo.yml | DEMO branch only: tests, builds the Mac app, publishes the pre-release `v1.1.0-beta.26-demo` | New |
+| docs/demo-build.md | DEMO branch only: what is fake and real, scenes, real call setup, tests | New |
+| docs/decisions/0038-demo-build-on-its-own-branch.md | ADR: the product-video demo is a fork of beta.26 that is never merged | New |
 
 ## How a call happens (target flow)
 1. User agrees to calls and picks days and a time. The API stores the schedule

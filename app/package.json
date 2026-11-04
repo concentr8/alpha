@@ -1,13 +1,13 @@
 {
-  "name": "concentr8",
-  "productName": "Concentr8",
-  "version": "1.1.0",
+  "name": "concentr8-demo",
+  "productName": "Concentr8 Demo",
+  "version": "1.1.0-beta.26-demo",
   "private": true,
-  "description": "Concentr8 desktop app: Jack's web app in a window.",
+  "description": "Concentr8 demo build for the product video: beta.26 with mock data, fake Canvas and Google Calendar, real blocking and real calls. Branch demo/video-2026-11-04, never merged.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "node --test --test-force-exit test/desktop.test.js",
+    "test": "node --test --test-force-exit test/desktop.test.js test/demo.test.js ../frontend/demo/test/demo.test.js",
     "dist": "electron-builder --mac --publish never",
     "dist:win": "electron-builder --win --publish never",
     "dist:linux": "electron-builder --linux --publish never"
@@ -18,15 +18,36 @@
     "electron-builder": "^26.0.0"
   },
   "build": {
-    "appId": "app.concentr8.mac",
-    "productName": "Concentr8",
-    "directories": { "output": "release" },
-    "files": ["main.js", "preload.js", "desktop/**", "package.json"],
-    "extraResources": [{ "from": "../frontend", "to": "frontend" }],
-    "artifactName": "Concentr8-${arch}.${ext}",
+    "appId": "app.concentr8.demo",
+    "productName": "Concentr8 Demo",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "desktop/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../frontend",
+        "to": "frontend",
+        "filter": ["**/*", "!test/**", "!demo/test/**"]
+      }
+    ],
+    "artifactName": "Concentr8-Demo-${arch}.${ext}",
     "mac": {
       "category": "public.app-category.productivity",
-      "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
       "identity": null,
       "extendInfo": {
         "NSMicrophoneUsageDescription": "Concentr8 uses the microphone for voice input in the chat and the body-double room.",
@@ -34,7 +55,28 @@
       },
       "icon": "build/icon.png"
     },
-    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }], "icon": "build/icon.png" },
-    "linux": { "target": [{ "target": "AppImage", "arch": ["x64"] }], "category": "Utility", "icon": "build/icon.png" }
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Utility",
+      "icon": "build/icon.png"
+    }
   }
 }

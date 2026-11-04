@@ -8,7 +8,8 @@ const { rulesFromNames } = require('./apps');
 const { judgeActivity } = require('./relevance');
 
 const TICK_MS = 3000;
-const GRACE_SECONDS = 15; // time to switch back before the distraction is closed
+// DEMO: 10 instead of 15 seconds, so the blocking scene of the video has less waiting (frontend text says the same).
+const GRACE_SECONDS = 10; // time to switch back before the distraction is closed
 // After a block, the same distraction is closed again at once for this long, without a second warning.
 const REPEAT_WINDOW_MS = 2 * 60_000;
 

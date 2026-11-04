@@ -6,12 +6,12 @@ const { createBlocker } = require('./blocker');
 const { createCachedJudge, createServerAsker } = require('./relevance');
 const { createPlatform } = require('./platform');
 
-const CHANNELS = { start: 'concentr8:start', stop: 'concentr8:stop', pause: 'concentr8:pause', status: 'concentr8:status', test: 'concentr8:test', changed: 'concentr8:changed' };
+const CHANNELS = { start: 'concentr8:start', stop: 'concentr8:stop', pause: 'concentr8:pause', status: 'concentr8:status', test: 'concentr8:test', changed: 'concentr8:changed', demoFocus: 'concentr8:demo-focus', demoChrome: 'concentr8:demo-chrome' };
 
 // Only an https address of the Concentr8 server is accepted, so the token cannot be sent anywhere else by a bad page.
 const safeServer = (server) => (server && /^https:\/\/[^/\s]+$/.test(server.url || '') && typeof server.token === 'string' ? server : null);
 
-function setupBridge({ ipcMain, Notification, getWindow }) {
+function setupBridge({ ipcMain, Notification, getWindow, app }) {
   let server = null;
   const notify = (title, body) => { if (Notification.isSupported()) new Notification({ title, body }).show(); };
   const platform = createPlatform();
@@ -36,7 +36,28 @@ function setupBridge({ ipcMain, Notification, getWindow }) {
     return { activity: seen ? seen.app : null };
   });
   ipcMain.handle(CHANNELS.status, () => blocker.status());
+  // DEMO: after a phone call the plan appears in the app; the window comes to the front so the video shows it.
+  ipcMain.handle(CHANNELS.demoFocus, () => {
+    const win = getWindow();
+    if (!win || win.isDestroyed()) return false;
+    if (win.isMinimized()) win.restore();
+    win.show();
+    win.focus();
+    if (app && process.platform === 'darwin') app.focus({ steal: true });
+    return true;
+  });
+  // DEMO: reads the address of Chrome's front tab once, so macOS asks "control Google Chrome?" before recording,
+  // not in the middle of the blocking scene. Answers 'allowed', 'denied' or 'unsupported' (not a Mac).
+  ipcMain.handle(CHANNELS.demoChrome, () => askChromeOnce(platform.runScript));
   return blocker;
 }
 
-module.exports = { setupBridge, CHANNELS, safeServer };
+async function askChromeOnce(runScript, os = process.platform) {
+  if (os !== 'darwin' || !runScript) return 'unsupported';
+  try {
+    await runScript(['tell application "Google Chrome"', 'if (count of windows) = 0 then make new window', 'return URL of active tab of front window', 'end tell'], 30000);
+    return 'allowed';
+  } catch (_) { return 'denied'; }
+}
+
+module.exports = { setupBridge, CHANNELS, safeServer, askChromeOnce };

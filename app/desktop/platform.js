@@ -45,6 +45,7 @@ function createMacPlatform(runScript = osascript) {
   let lastProcessName = '';
   return {
     supported: true,
+    runScript, // DEMO: used once by bridge.js (askChromeOnce) to ask for the Chrome permission before recording
 
     async activity() {
       let processName;

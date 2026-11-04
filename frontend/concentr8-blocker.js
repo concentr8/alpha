@@ -85,7 +85,7 @@
     const signedIn = !!connection();
     return `<div class="preview-note">Apps on your list are blocked during focus sessions. <span data-block-live>${esc(liveText())}</span>
       <details><summary>How it works</summary>
-      ${OS_HINT[desktop.platform] || ''}Concentr8 looks at your screen every few seconds. If you open something on your list, you get a notification and 15 seconds to switch back. After that the tab is closed (your browser goes back to your last work page) or the app is hidden. Breaks are never blocked.<br>
+      ${OS_HINT[desktop.platform] || ''}Concentr8 looks at your screen every few seconds. If you open something on your list, you get a notification and 10 seconds to switch back. After that the tab is closed (your browser goes back to your last work page) or the app is hidden. Breaks are never blocked.<br>
       ${desktop.platform === 'darwin' ? 'The first time, macOS asks if Concentr8 may control your browser and System Events. Click Allow. Firefox also needs Accessibility (System Settings, Privacy &amp; Security).' : ''}</details>
       <label><input type="checkbox" data-ai-check ${aiCheck && signedIn ? 'checked' : ''} ${signedIn ? '' : 'disabled'}> Let AI check that my screen fits my task ${signedIn ? '' : '(first set up Profile, Phone call)'}</label>
       <details><summary>What the AI check sends</summary>The app name, page title and web address of pages that your list does not cover go to the Concentr8 server and are judged by Claude. Nothing is stored.</details>

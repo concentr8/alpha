@@ -163,6 +163,16 @@
   // (then the caller shows a button that opens url). The Google link works once, so it is opened at most once.
   async function signIn({ onBrowser } = {}) {
     if (settings.token) return { ok: true };
+    // DEMO: the demo build (frontend/demo/) signs in as the demo student after a short pause, without a Google window.
+    if (window.Concentr8Demo) {
+      await window.Concentr8Demo.fakeGoogleSignIn();
+      settings = { ...settings, token: window.Concentr8Demo.DEMO_TOKEN };
+      save(settings);
+      window.dispatchEvent(new CustomEvent('concentr8:auth'));
+      await syncAccount();
+      window.dispatchEvent(new CustomEvent('articul8:rerender'));
+      return { ok: true };
+    }
     const attempt = ++signInAttempt;
     const poll = randomHex();
     const popup = openGoogleWindow('concentr8-google-signin');

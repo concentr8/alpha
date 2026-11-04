@@ -11,6 +11,10 @@ contextBridge.exposeInMainWorld('concentr8Desktop', {
   pause: (value) => ipcRenderer.invoke('concentr8:pause', value),
   test: () => ipcRenderer.invoke('concentr8:test'),
   status: () => ipcRenderer.invoke('concentr8:status'),
+  // DEMO: brings the window to the front when a phone call result arrives (frontend/demo/demo-ui.js).
+  demoFocus: () => ipcRenderer.invoke('concentr8:demo-focus'),
+  // DEMO: asks macOS once for "control Google Chrome" (Profile > Demo setup), so no question pops up while recording.
+  demoChrome: () => ipcRenderer.invoke('concentr8:demo-chrome'),
   onChange: (callback) => {
     const listener = (_event, status) => callback(status);
     ipcRenderer.on('concentr8:changed', listener);

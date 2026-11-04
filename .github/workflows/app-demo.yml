@@ -1,0 +1,105 @@
+# Purpose: builds, tests and publishes the DEMO app for the product video as its own pre-release, v1.1.0-beta.26-demo.
+# Runs on: every push to a demo/ branch that changes app/, frontend/ or this file, and "Run workflow" under Actions.
+# Never runs on main. Future betas do not build on it: the branch is never merged, and app-beta.yml only counts tags
+# that end in a number (its sed needs "-beta.<digits>" at the end), so the next normal beta is still v1.1.0-beta.27.
+# The demo release is never marked "latest", and the website (concentr8.github.io) only links its own releases.
+# Docs: docs/demo-build.md.
+name: App demo
+on:
+  push:
+    branches: ['demo/**']
+    paths: ['app/**', 'frontend/**', 'server/**', '.github/workflows/app-demo.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: app-demo-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  TAG: v1.1.0-beta.26-demo
+  VERSION: 1.1.0-beta.26-demo
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Unit tests (desktop, demo data, scripted chat, fake backend)
+        working-directory: app
+        run: npm test
+      - name: Call server tests (the demo uses the real server for calls)
+        working-directory: server
+        run: npm test
+      - name: Smoke test in Electron (Linux, virtual screen)
+        working-directory: app
+        shell: bash
+        run: |
+          npm install --no-audit --no-fund
+          command -v xvfb-run || (sudo apt-get update && sudo apt-get install -y xvfb)
+          CONCENTR8_SMOKE=1 CONCENTR8_SMOKE_FILE="$PWD/smoke.log" timeout 150 xvfb-run -a npx electron . --no-sandbox || true
+          cat smoke.log
+          grep -q "DEMO SMOKE OK" smoke.log
+  mac:
+    needs: test
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build the Mac app (Apple chip and Intel)
+        working-directory: app
+        run: |
+          npm install --no-audit --no-fund
+          npm run dist -- --config.extraMetadata.version="$VERSION"
+      - name: Smoke test the built app (the same files that go into the .dmg)
+        working-directory: app
+        shell: bash
+        run: |
+          APP="release/mac-arm64/Concentr8 Demo.app"
+          ls "$APP/Contents/Resources/frontend/demo"
+          # perl alarm: a time limit without coreutils (macOS has no "timeout").
+          CONCENTR8_SMOKE=1 CONCENTR8_SMOKE_FILE="$PWD/smoke.log" perl -e 'alarm 150; exec @ARGV' "$APP/Contents/MacOS/Concentr8 Demo" || true
+          cat smoke.log
+          grep -q "DEMO SMOKE OK" smoke.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Concentr8-Demo-mac
+          path: app/release/*.dmg
+          if-no-files-found: error
+  publish:
+    needs: mac
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Concentr8-Demo-mac
+          path: release
+      - name: Publish the demo pre-release (replaces the older demo build)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -l release
+          {
+            echo "**Demo build for the product video. Not a beta for testers.** Built from the branch \`${GITHUB_REF_NAME}\` (commit ${GITHUB_SHA::7}), on top of v1.1.0-beta.26."
+            echo
+            echo "**Which file?** Mac with Apple chip (M1 or newer): \`Concentr8-Demo-arm64.dmg\`. Mac with Intel chip: \`Concentr8-Demo-x64.dmg\`."
+            echo
+            echo "- Mock data: student Maya Chen, 4 UC Berkeley courses, 8 assignments, a full week of classes, two weeks of focus history."
+            echo "- Fake bCourses (Canvas API) and fake Google Calendar. The AI chat is scripted, so every take looks the same."
+            echo "- Real: blocking of YouTube, Instagram, TikTok, Reddit and Netflix (10 seconds to switch back), and real phone calls through the Concentr8 server."
+            echo "- Menu bar: **Demo** jumps to the start of each scene, resets the data and opens Demo setup."
+            echo "- Installs as \"Concentr8 Demo\", next to the normal Concentr8 app, with its own data."
+            echo
+            echo "Future betas do not build on this release. How it works: docs/demo-build.md on the branch."
+          } > notes.md
+          # One demo release at a time: the old one and its tag go, so the tag always points at the build in it.
+          gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag || true
+          gh release create "$TAG" release/*.dmg --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --latest=false --title "Concentr8 $VERSION (product video)" --notes-file notes.md
