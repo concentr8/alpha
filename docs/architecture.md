@@ -105,6 +105,8 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
 | server/test/chat-history.test.js | Node tests for chat-history.js: restore and clean saved chats, switching, titles | New |
 | server/test/chat-scroll.test.js | Node tests for chat-scroll.js with a fake log and fake animation frames | New |
+| frontend/test/chat-history.test.js | VM regression tests for saved chats, drafts, in-flight replies, reset and Quick Start; mocked storage and fetch; included in server npm test | Restored |
+| frontend/test/chat-scroll.test.js | Regression tests for layout-aware scrolling, resize, hidden views and cleanup using fake frames and observers; included in server npm test | Restored |
 | server/test/calendar-tools.test.js | Node built-in tests for calendar date boundaries and quick-add valid, invalid and ambiguous input | New |
 | docs/decisions/0028-calendar-redesign.md | Calendar-only design, parsing, timezone and read-only external-event boundaries | New |
 
