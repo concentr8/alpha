@@ -62,8 +62,13 @@ jobs:
         run: |
           APP="release/mac-arm64/Concentr8 Demo.app"
           ls "$APP/Contents/Resources/frontend/demo"
+          codesign -dv "$APP" 2>&1 | head -4 || true
           # perl alarm: a time limit without coreutils (macOS has no "timeout").
-          CONCENTR8_SMOKE=1 CONCENTR8_SMOKE_FILE="$PWD/smoke.log" perl -e 'alarm 150; exec @ARGV' "$APP/Contents/MacOS/Concentr8 Demo" || true
+          set +e
+          CONCENTR8_SMOKE=1 CONCENTR8_SMOKE_FILE="$PWD/smoke.log" ELECTRON_ENABLE_LOGGING=1 perl -e 'alarm 150; exec @ARGV' "$APP/Contents/MacOS/Concentr8 Demo"
+          echo "app exit code: $?"
+          set -e
+          touch smoke.log
           cat smoke.log
           grep -q "DEMO SMOKE OK" smoke.log
       - uses: actions/upload-artifact@v4

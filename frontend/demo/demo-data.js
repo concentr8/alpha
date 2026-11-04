@@ -12,7 +12,7 @@
 })(typeof window === 'object' ? window : globalThis, function () {
   'use strict';
 
-  const VERSION = 4; // bump when the seed changes, so an installed demo app reseeds by itself
+  const VERSION = 5; // bump when the seed changes, so an installed demo app reseeds by itself
   const DAY = 86400000;
 
   const persona = { name: 'Maya Chen', firstName: 'Maya', email: 'maya.demo@berkeley.edu', school: 'UC Berkeley', canvasUrl: 'https://bcourses.berkeley.edu' };
@@ -229,7 +229,7 @@
   // The plan block the chat makes in scene 2, placed around "now" for scenes 3 to 5.
   function focusBlock(now) {
     const start = atDay(now, 0, `${pad(now.getHours())}:${now.getMinutes() < 30 ? '00' : '30'}`);
-    const end = new Date(start.getTime() + 90 * 60000);
+    const end = new Date(start.getTime() + 50 * 60000); // 50 min: the timer reads 49:59, not 1:29:59
     return { id: FOCUS_BLOCK_ID, title: 'Project 3: Reinforcement Learning', kind: 'plan', start: wall(start), end: wall(end), allDay: false, taskId: FOCUS_TASK, notes: 'Goal: Q1 value iteration passes the autograder.' };
   }
 
