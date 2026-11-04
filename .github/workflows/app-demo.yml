@@ -60,16 +60,24 @@ jobs:
         working-directory: app
         shell: bash
         run: |
-          APP="release/mac-arm64/Concentr8 Demo.app"
+          APP="$PWD/release/mac-arm64/Concentr8 Demo.app"
           ls "$APP/Contents/Resources/frontend/demo"
-          codesign -dv "$APP" 2>&1 | head -4 || true
+          env | grep -i electron || echo "no ELECTRON_* variables"
+          # Started the way Finder starts it (LaunchServices), with the test switched on. -W waits until it quits.
           # perl alarm: a time limit without coreutils (macOS has no "timeout").
           set +e
-          CONCENTR8_SMOKE=1 CONCENTR8_SMOKE_FILE="$PWD/smoke.log" ELECTRON_ENABLE_LOGGING=1 perl -e 'alarm 150; exec @ARGV' "$APP/Contents/MacOS/Concentr8 Demo"
-          echo "app exit code: $?"
-          set -e
+          perl -e 'alarm 150; exec @ARGV' open -W -n --env CONCENTR8_SMOKE=1 --env CONCENTR8_SMOKE_FILE="$PWD/smoke.log" "$APP"
+          echo "open exit code: $?"
           touch smoke.log
           cat smoke.log
+          if ! grep -q "DEMO SMOKE OK" smoke.log; then
+            echo "--- second try: the binary directly"
+            CONCENTR8_SMOKE=1 CONCENTR8_SMOKE_FILE="$PWD/smoke.log" perl -e 'alarm 150; exec @ARGV' "$APP/Contents/MacOS/Concentr8 Demo" --enable-logging 2>&1 | tail -40
+            echo "--- third try: from the repo (npx electron .)"
+            CONCENTR8_SMOKE=1 CONCENTR8_SMOKE_FILE="$PWD/smoke-repo.log" perl -e 'alarm 150; exec @ARGV' npx electron . 2>&1 | tail -20
+            cat smoke-repo.log smoke.log 2>/dev/null
+          fi
+          set -e
           grep -q "DEMO SMOKE OK" smoke.log
       - uses: actions/upload-artifact@v4
         with:
