@@ -87,7 +87,7 @@
   function freeMessagesHint(remaining) {
     if (!(remaining >= 0 && remaining <= 2)) return '';
     const left = remaining === 0 ? 'No free messages left today' : `${remaining} free message${remaining === 1 ? '' : 's'} left today`;
-    return ` (${left}. Continue with Google under Profile, Account for more.)`;
+    return ` (${left}. Continue with Google under Profile, Sign in & subscription for more.)`;
   }
 
   // Jack: each chat waits for its own answer; the others stay usable.
@@ -230,14 +230,14 @@
       + '<form class="product-form profile-form" id="call-form" novalidate>'
       + `<label>Phone number (US)<input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="${saved && settings.phoneEnd ? `Saved: number ending in ${esc(settings.phoneEnd)}` : '+1 415 555 1234'}"></label>`
       + `<label>Time of the call<input name="time" type="time" value="${esc(settings.callTime || '18:00')}"></label>`
-      + `<p class="detail-note">Your time zone: ${esc(timezone())}. We call you once a day at this time and ask which task you will start and when.</p>`
+      + `<p class="detail-note">A daily call to plan your next task. Time zone: ${esc(timezone())}.</p>`
       + '<label class="check-line"><input name="consent" type="checkbox"' + (settings.consent ? ' checked' : '') + '>I agree that Concentr8 calls this number at this time.</label>'
       + '<label data-recovery hidden>Invite or recovery code<input name="recovery" type="password" autocomplete="off"></label>'
       + '<div class="dialog-actions">'
       + (saved ? '<button class="wire-button" type="button" data-call-delete>Delete my account</button>' : '')
       + '<button class="wire-button" type="button" data-call-now' + (saved ? '' : ' disabled') + '>Call me now</button>'
       + '<button class="wire-button solid" type="submit">Save</button></div>'
-      + `<p class="detail-note" id="call-status" role="status" aria-live="polite">${saved ? 'Your call is set up.' : 'Save first, then you can test the call.'}</p>`
+      + `<p class="detail-note" id="call-status" role="status" aria-live="polite">${saved ? 'Call scheduled.' : 'Save to enable a test call.'}</p>`
       + '</form>';
   }
 
