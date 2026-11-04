@@ -9,32 +9,30 @@ If something is missing, copy the closest existing class, say so in the pull
 request, and add it here. Any visual change needs a human "go" (ADR 0001).
 
 ## Look in one sentence
-A plain grey-and-white wireframe: Arial, thin light-grey borders, one dark
-button style, warm off-white for hover and selected states, and one muted sage
-green used only for progress (timer ring, meditation slider,
-charts). Almost no shadows (only two barely visible ones).
+A warm paper look (Jack, 2026-11-04): cream page, sand sidebar, dark brown text,
+one terracotta button colour, Bricolage Grotesque for titles and Lexend for text
+(both embedded in the file, SIL Open Font License, licence texts in the
+`bundled-licenses` block). Thin warm borders, almost no shadows.
 
-## Tokens (exact values in the CSS)
-| Use | Value |
-|---|---|
-| Text, dark buttons (`--ink`) | `#292929` |
-| Dividers (`--line`) | `#dedede` |
-| Card borders and row dividers on the newer pages | `#eaeaea`, 1px (older pages: `#bdbdbd`, `#c8c8c8`) |
-| Hover on cards and rows on the newer pages | `#f7f7f5` |
-| Selected card or tab on the newer pages | `#f4f4f2` |
-| Accent for progress (timer ring, meditation slider, charts) | `#566b60`, `#a6b5af` |
-| Sidebar background (`--sidebar`) | `#f8f8f8` |
-| Page background | `#fff` |
-| Control border | `#bdbdbd`, 1.5px (inputs in forms: `#bbb`, 1px) |
-| Selected / hover backgrounds | newer pages `#f4f4f2`, `#f7f7f5`; older pages and sidebar `#eaeaea`, `#f0f0f0`, `#f5f5f5` |
-| Muted text | `#555`, `#666`, `#777` |
-| Font | Arial, Helvetica, sans-serif, 18px, line-height 1.4 |
-| Page title `h1` (all pages, also tool detail pages) | 28px, weight 400 |
-| Section title in detail pages | 21px, weight 500 |
-| Corners | cards 8px, buttons and inputs 6-7px, round avatars `50%`, player bars 8-12px |
-| Focus ring | 2px solid `#292929`, offset 5px (`:focus-visible`) |
-Only `--ink`, `--line`, `--sidebar` are CSS variables; other colors are written
-directly. Do not add new greys or new accent colors.
+## Tokens (CSS variables in `:root`, written once in the file)
+| Use | Variable | Value |
+|---|---|---|
+| Page background | `--paper` | `#fffbf2` |
+| Cards, dialogs | `--surface` / `--surface-muted` | `#fffdf8` / `#f1e3d7` |
+| Sidebar | `--sidebar` | `#efddc8` |
+| Text / secondary text | `--ink` / `--body-ink` | `#2a1d14` / `#4a3020` |
+| Muted text | `--muted` | `#786657` |
+| Dividers / control borders | `--line` / `--control` | `#e2d6c9` / `#a08b7a` |
+| Selected / hover | `--selected` / `--hover` | `#f2cab6` / `#f7e4d6` |
+| Main button (and progress) | `--action` (`--action-hover`, `--action-border`, `--action-ink`) | `#b4532f` (`#9f4728`, `#924124`, `#fffbf2`) |
+| Progress, soft | `--progress`, `--progress-soft` | `#b4532f`, `#c88d6d` |
+| Error | `--danger`, `--danger-surface` | `#9b2948`, `#f8e7ec` |
+| Focus ring | `--focus` | `#8a5b38`, 2px, offset 5px |
+| Shadows, backdrop | `--shadow-color`, `--shadow-faint`, `--backdrop` | brown at 10%, 4%, 20% |
+| Fonts | `--font-display` / `--font-body` | Bricolage Grotesque / Lexend |
+| Corners | `--radius-control` / `--radius-panel` | 8px / 12px |
+Use the variables, not new hex values. Pixel sizes of titles and rows below were
+measured before the warm look and may be a little off; the CSS is the truth.
 
 ## Layout
 - `.app` is a 3-column grid: sidebar 224px, content (flexible), agent panel 336px.

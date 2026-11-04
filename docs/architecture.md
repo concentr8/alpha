@@ -66,6 +66,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | scripts/count-strings.js | Counts the English texts in the app (step 0 of docs/plans/languages.md); reads only, changes nothing | New |
 | frontend/concentr8-server.js | Connects the web app to the server: AI chat (one answer per chat, Quick Start planning), Google sign-in and phone call setup (ADR 0022, 0032, 0036) | New |
 | frontend/chat-history.js | Jack's chat history: stored chats, a new chat reuses an empty one, short chat titles. Pure, no network or storage (ADR 0036) | New |
+| frontend/chat-scroll.js | Jack's chat scrolling: a conversation follows new messages only while the student is at the bottom (ADR 0037) | New |
 | docs/plans/call-and-chat.md | Plan: phone call setup and AI chat in the app | New |
 | docs/decisions/0027-chat-actions-and-tools-in-chat.md | ADR: chat actions from the model, tools inside the chat, no stored chat | New |
 | docs/decisions/0022-frontend-talks-to-the-concentr8-server.md | ADR: what changed in the frozen frontend and why | New |
@@ -103,6 +104,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
 | server/test/chat-history.test.js | Node tests for chat-history.js: restore and clean saved chats, switching, titles | New |
+| server/test/chat-scroll.test.js | Node tests for chat-scroll.js with a fake log and fake animation frames | New |
 | server/test/calendar-tools.test.js | Node built-in tests for calendar date boundaries and quick-add valid, invalid and ambiguous input | New |
 | docs/decisions/0028-calendar-redesign.md | Calendar-only design, parsing, timezone and read-only external-event boundaries | New |
 
@@ -129,3 +131,4 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 Settings > Branches > rule for `main`: require a pull request with 1 approval,
 require the `tests` check to pass, block force pushes. Branch protection may
 not be available for private repos on a free plan.
+| docs/decisions/0037-jack-warm-design-2026-11-04.md | ADR: Jack's warm design of 2026-11-04 merged the way ADR 0036 describes | New |
