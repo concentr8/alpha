@@ -1,6 +1,6 @@
 # 0033. The calendar is required, right after signing in
 
-Status: Accepted (Jonas, 2026-11-03). Changes one rule of ADR 0032 ("calendar stays a separate opt-in").
+Status: Superseded by ADR 0039 (2026-11-05). Was accepted (Jonas, 2026-11-03). Changes one rule of ADR 0032 ("calendar stays a separate opt-in").
 Purpose: tells the team what a signed-in student must do before the app opens.
 
 Every student connects their Google Calendar. The order stays two steps, so signing in itself stays small:
