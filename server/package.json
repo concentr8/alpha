@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node --test test/server.test.js test/cartesia.test.js test/voice.test.js test/guest-chat.test.js test/chat-actions.test.js test/calendar-tools.test.js test/calendar-availability.test.js test/google-calendar.test.js test/google-signin.test.js test/chat-history.test.js test/chat-scroll.test.js ../frontend/test/chat-history.test.js ../frontend/test/chat-scroll.test.js ../frontend/test/signin.test.js"
+    "test": "node --test test/server.test.js test/cartesia.test.js test/voice.test.js test/guest-chat.test.js test/chat-actions.test.js test/calendar-tools.test.js test/calendar-availability.test.js test/google-calendar.test.js test/google-signin.test.js test/chat-history.test.js test/chat-scroll.test.js ../frontend/test/chat-history.test.js ../frontend/test/chat-scroll.test.js ../frontend/test/signin.test.js ../frontend/test/task-placement.test.js"
   },
   "engines": {
     "node": ">=18"

@@ -224,16 +224,7 @@
       responses.forEach((result) => (Array.isArray(result.events) ? result.events : []).forEach((event) => {
         if (event?.id != null && event?.calendarId != null) unique.set(`${event.calendarId}:${event.id}`, event);
       }));
-      events = [...unique.values()].map((event) => ({
-        ...event,
-        calendarId: String(event.calendarId),
-        id: `${String(event.calendarId).length}:${event.calendarId}${event.id}`,
-        kind: 'google',
-        readOnly: true,
-        start: wallTime(event.start, event.allDay),
-        end: wallTime(event.end, event.allDay),
-        allDay: !!event.allDay,
-      }));
+      events = [...unique.values()].map(calendarEvent);
       const timestamps = responses.map((result) => result.updatedAt).filter(Boolean).sort();
       updatedAt = timestamps[timestamps.length - 1] || new Date().toISOString();
       lastRefresh = Date.now();
@@ -243,6 +234,36 @@
       updateCalendarStatus(events.length ? 'stale' : 'error', error.message || 'Google Calendar could not be loaded. Try again.');
     }
   }
+
+  function calendarEvent(event) {
+    return {
+      ...event,
+      calendarId: String(event.calendarId),
+      id: `${String(event.calendarId).length}:${event.calendarId}${event.id}`,
+      kind: 'google',
+      readOnly: true,
+      start: wallTime(event.start, event.allDay),
+      end: wallTime(event.end, event.allDay),
+      allDay: !!event.allDay,
+    };
+  }
+
+  // The student's Google events of the coming week, for task-placement.js (ADR 0041). Why its own request: the events above
+  // only load while the Calendar page is open. [] when no calendar is connected, null when we cannot tell right now.
+  async function busyEvents() {
+    if (!authToken()) return null;
+    try {
+      const setup = await request(STATUS_PATH);
+      if (!setup.configured) return [];
+      const data = await request(CALENDARS_PATH);
+      if (!data.connected || !data.selectedIds?.length) return [];
+      const today = localDate(new Date());
+      const query = new URLSearchParams({ from: dayInstant(today), to: dayInstant(addDays(today, 7)), timezone: browserTimezone() });
+      const result = await request(`/google/events?${query.toString()}`);
+      return Array.isArray(result.events) ? result.events.map(calendarEvent) : null;
+    } catch (_) { return null; }
+  }
+  window.Concentr8GoogleCalendar = { busyEvents };
 
   function wallTime(value, allDay) {
     const text = String(value || '');
