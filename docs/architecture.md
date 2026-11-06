@@ -78,6 +78,10 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/chat-followups.md | Plan: follow-ups of the chat actions (due date, Back from chat cards, French "tu", translations) | New, waiting for a human go |
 | docs/plans/chat-interview-and-google-login.md | Plan: chat asks first, time estimates, Google sign-in (CON-53 backend items) | New, waiting for a human go |
 | docs/plans/sign-in-on-first-open.md | Plan: the Google sign-in page opens when a signed-out student starts the app | New |
+| docs/plans/todos-on-calendar.md | Plan: new to-dos are placed on the calendar by themselves, with or without Google Calendar | New |
+| docs/decisions/0041-todos-placed-on-the-calendar.md | ADR: new to-dos get a block by themselves, and the rules that protect the week | New |
+| frontend/task-placement.js | Gives a new to-do a block in the first free slot, with or without Google Calendar (ADR 0041) | New |
+| frontend/test/task-placement.test.js | Tests for placing to-dos: slots, deadlines, waiting for Google, deleted and finished blocks | New |
 | docs/decisions/0038-sign-in-required-on-start.md | ADR: students sign in with Google before the app opens; no guest mode | New |
 | docs/decisions/0040-google-first-on-start.md | ADR: a signed-out student goes straight to Google; the Concentr8 page is only the fallback | New |
 | docs/decisions/0039-calendar-optional-in-settings.md | ADR: the calendar is optional and connected in Settings, so sign-in is Google's standard page | New |
