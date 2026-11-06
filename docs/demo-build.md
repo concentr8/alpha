@@ -18,6 +18,11 @@ The recording script (what to click, what to say, the titles for iMovie) is the 
 Everything is relative to the moment of recording: "due tomorrow" is always tomorrow, the focus block of scene 3 is
 always "now", and a class at that time is left out of the calendar.
 
+## Cal demo (2026-11-06)
+In scene 2 the chat answers "I have three assignment due, where should I start" with where to start (the earliest deadline)
+and the three to-dos broken into their small steps, then asks how much time the student has. The steps come from the
+to-dos in the app, so chat and checklist agree. The generic "so much due" brain dump answer is unchanged.
+
 ## Scenes (Demo menu in the desktop app, or Ctrl+Alt+1…5 in a browser)
 
 | # | Title in the video | Starts on | State |

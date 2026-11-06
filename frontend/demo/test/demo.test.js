@@ -99,6 +99,16 @@ test('chat: the brain dump lists what is due first and asks for time', () => {
   assert.deepEqual(out.actions, []);
 });
 
+test('chat: "three assignments due, where should I start" names where to start and breaks each to-do into steps', () => {
+  const out = DemoChat.answer(say([['user', 'I have three assignment due, where should I start']]), chatCtx());
+  assert.match(out.reply, /^Start with Lab 9: Feature Engineering: it is due first/);
+  assert.match(out.reply, /Open the lab notebook → Finish part 1 → Finish part 2 → Submit to Gradescope/);
+  assert.equal(out.reply.split('\n').filter((l) => l.startsWith('•')).length, 3);
+  assert.match(out.reply, /How much time do you have today\?/);
+  assert.equal(out.actions[0].tool, 'checklist');
+  assert.ok(out.selectTaskId);
+});
+
 test('chat: "about two hours" becomes two calendar suggestions in free slots', () => {
   const first = DemoChat.answer(say([['user', 'so much due']]), chatCtx());
   const out = DemoChat.answer(say([['user', 'so much due'], ['assistant', first.reply], ['user', 'About two hours']]), chatCtx());

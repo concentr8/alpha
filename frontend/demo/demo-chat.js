@@ -47,6 +47,7 @@
     return tasks.find((t) => t.title.length > 4 && lower.includes(t.title.toLowerCase())) || null;
   }
 
+  const t0 = (t) => (t.estimatedMinutes ? ` and only ${t.estimatedMinutes} minutes` : '');
   const lastAssistant = (messages) => [...messages].reverse().find((m) => m.role === 'assistant')?.text || '';
   const time12 = (wall) => { const [h, m] = wall.slice(11, 16).split(':').map(Number); const ampm = h >= 12 ? 'PM' : 'AM'; return `${((h + 11) % 12) + 1}${m ? ':' + String(m).padStart(2, '0') : ''} ${ampm}`; };
   const isToday = (wall, today) => wall.slice(0, 10) === today;
@@ -88,6 +89,19 @@
       const title = todo[1].replace(/\b(to my (to-?do|list))\b/i, '').trim().replace(/^./, (c) => c.toUpperCase());
       const minutes = minutesIn(text) || 15;
       return { reply: `Added "${title}" to your to-dos (${minutes} min). Want me to find a time for it?`, actions: [{ type: 'add_todo', title, minutes }] };
+    }
+
+    // "I have three assignments due, where should I start": say where to start, then break each one into small steps.
+    // The steps are the ones the to-do already has in the app, so the chat and the checklist always agree (Cal demo, 2026-11-06).
+    if (/(\b3\b|three)\s+(\w+\s+){0,2}(assignments?|homework|deadlines?|due)/.test(lower) && soonest.length >= 3) {
+      const [first, ...rest] = soonest;
+      const steps = (t) => (t.steps || []).slice(0, 4).map((x) => x.text).join(' → ');
+      const lines = soonest.map((t) => `• ${t.title}, due ${ctx.dueLabel(t.due)}: ${steps(t)}`).join('\n');
+      return {
+        reply: `Start with ${first.title}: it is due first${t0(first)}. Then ${rest.map((t) => t.title).join(' and ')}.\nOkay, so these are your to-dos, each in small steps:\n${lines}\nHow much time do you have today?`,
+        actions: [{ type: 'open_tool', tool: 'checklist' }],
+        selectTaskId: first.id,
+      };
     }
 
     // Step 2 of the plan: the student says how much time they have.
