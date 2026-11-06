@@ -1,4 +1,4 @@
-// Purpose: gets a signed-out student to Google before the app opens (ADR 0038, 0040). On the web the whole tab goes to Google;
+// Purpose: gets a signed-out student to Google before the app opens (ADR 0038, 0040), except in demo mode (ADR 0042). On the web the whole tab goes to Google;
 //          the desktop app opens Google in the browser. The "Continue with Google" page here is only the way back when that failed.
 // Called by: frontend/index.html (script tag, loaded after concentr8-server.js). Runs by itself on start and after signing out.
 // Calls: window.Concentr8 (goToGoogle, finishGoogleTrip, signIn, isSignedIn, Google windows). When a window is blocked, Google
@@ -24,6 +24,9 @@
   let browserUrl = ''; // the Google address behind "Open in browser"; it works only once, so it is cleared after the click
   let closing = false; // true only while this file closes the page itself; any other close is undone (see the close listener)
 
+  // Why: a demo link (?demo) is the one way in without Google (ADR 0042).
+  const isDemo = () => Boolean(window.Concentr8Demo && window.Concentr8Demo.isDemo());
+
   const SIGNIN_WAIT = 'Finish signing in in your browser. Concentr8 continues by itself.';
 
   const status = (value) => { $('status').textContent = value; $('status').hidden = !value; };
@@ -47,6 +50,7 @@
 
   // The page is open exactly while nobody is signed in.
   function check() {
+    if (isDemo()) return;
     const signedIn = window.Concentr8.isSignedIn();
     if (signedIn && dialog.open) hide();
     if (!signedIn && !dialog.open) { hideBrowserButton(); status(''); dialog.showModal(); }
@@ -59,7 +63,7 @@
   function showPage(message) { showApp(true); check(); status(message); }
 
   async function start() {
-    if (window.Concentr8.isSignedIn()) return;
+    if (window.Concentr8.isSignedIn() || isDemo()) return;
     if (window.Concentr8.isDesktop()) { check(); act(); return; }
     showApp(false);
     const trip = await window.Concentr8.finishGoogleTrip();

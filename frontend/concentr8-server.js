@@ -67,7 +67,7 @@
       // Preserve automatic adds and their Undo state without switching the visible chat.
       list.filter(a => a.type === 'add_todo').forEach(a => {
         const match = s.tasks.find(t => t.title === a.title);
-        const task = match || { id: app.uid(), title: a.title, done: false, course: '', steps: [] };
+        const task = match || { id: app.uid(), title: a.title, done: false, course: a.course || '', steps: (a.steps || []).map((text) => ({ id: app.uid(), text, done: false })) }; // steps and course only come from the demo (ADR 0042)
         if (a.minutes && !task.estimatedMinutes) task.estimatedMinutes = a.minutes; // the time the student confirmed in the chat (CON-35)
         if (!match) s.tasks.push(task);
         Object.assign(a, { state: 'done', taskId: task.id, undoable: !match });
@@ -111,6 +111,9 @@
         if (lastUser) lastUser.text = lastUser.text.slice(0, 1400) + focusInstruction;
       }
       const tasks = app.state.tasks.filter((t) => !t.done).map((t) => t.title);
+      // Demo mode (ADR 0042): the fixed answer needs no server, so the demo works anywhere.
+      const scripted = window.Concentr8Demo && window.Concentr8Demo.reply(messages, localDate());
+      if (scripted) { await wait(900); addAssistantMessage(chatId, scripted.reply, scripted.actions); return; }
       const send = (asGuest) => (asGuest
         ? request('/api/chat/guest', 'POST', { guestId: guestId(), messages, tasks, today: localDate() })
         : request('/api/chat', 'POST', { messages, tasks, today: localDate() }));
