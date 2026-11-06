@@ -77,6 +77,10 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/voice-on-azure.md | Plan: voice on the Azure server | New |
 | docs/plans/chat-followups.md | Plan: follow-ups of the chat actions (due date, Back from chat cards, French "tu", translations) | New, waiting for a human go |
 | docs/plans/chat-interview-and-google-login.md | Plan: chat asks first, time estimates, Google sign-in (CON-53 backend items) | New, waiting for a human go |
+| docs/plans/sign-in-on-first-open.md | Plan: the Google sign-in page opens when a signed-out student starts the app | New |
+| docs/decisions/0038-sign-in-required-on-start.md | ADR: students sign in with Google before the app opens; no guest mode | New |
+| docs/decisions/0039-calendar-optional-in-settings.md | ADR: the calendar is optional and connected in Settings, so sign-in is Google's standard page | New |
+| frontend/test/signin.test.js | Tests for the sign-in page on start: opens signed out, cannot be closed, stays away when signed in | New |
 | docs/decisions/0023-voice-on-the-node-server.md | ADR: voice moves from Heroku to the Node server | New |
 | .env.example | Names of required secrets | Works |
 | docs/plans/calendar-redesign.md | Approved calendar-only redesign plan | New |
@@ -99,7 +103,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/decisions/0034-google-name-with-profile-scope.md | ADR: sign-in also asks for the Google name (`profile` scope); the app fills the name only while it is empty | New |
 | docs/decisions/0036-jack-redesign-takes-over-the-frontend.md | ADR: Jack's redesign becomes the frontend; what came from him and what was kept | New |
 | docs/decisions/0035-google-sign-in-in-default-browser.md | ADR: desktop sign-in opens in the default browser; a blocked window shows "Open in browser" | New |
-| frontend/concentr8-signin.js | Sign-in page ("Continue with Google") and the calendar step that cannot be closed (ADR 0032, 0033); continues in the browser when no window can open (ADR 0035). AI generated | New |
+| frontend/concentr8-signin.js | Sign-in page ("Continue with Google") that opens on start and cannot be closed (ADR 0032, 0038); continues in the browser when no window can open (ADR 0035). AI generated | New |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |
