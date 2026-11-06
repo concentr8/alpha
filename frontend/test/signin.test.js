@@ -1,4 +1,4 @@
-/* Purpose: regression coverage for the sign-in page on start (ADR 0038), with no calendar step after it (ADR 0039).
+/* Purpose: regression coverage for going to Google on start (ADR 0038, 0040), with no calendar step after it (ADR 0039).
    Run with node --test frontend/test/signin.test.js. Uses VM, a tiny fake page and a fake window.Concentr8;
    never opens Google and never calls the hosted backend. */
 const { test } = require('node:test');
@@ -26,8 +26,11 @@ function fakeDialog() {
   };
 }
 
-function boot({ signedIn = false } = {}) {
+// trip: what finishGoogleTrip answers. google: what goToGoogle answers. Both count their calls in `calls`.
+function boot({ signedIn = false, desktop = false, trip = { returned: false }, google = { ok: true } } = {}) {
   const dialog = fakeDialog();
+  const body = { style: {}, append() {} };
+  const calls = { goToGoogle: 0, signIn: 0 };
   const listeners = new Map();
   const window = {
     addEventListener(name, listener) { if (!listeners.has(name)) listeners.set(name, []); listeners.get(name).push(listener); },
@@ -37,56 +40,86 @@ function boot({ signedIn = false } = {}) {
   const setToken = (value) => { token = value; window.dispatchEvent({ type: 'concentr8:auth' }); };
   window.Concentr8 = {
     isSignedIn: () => Boolean(token),
-    finishSignIn: () => setToken('test-token'),
+    isDesktop: () => desktop,
+    goToGoogle: async () => { calls.goToGoogle += 1; return google; },
+    finishGoogleTrip: async () => { if (trip.ok) setToken('test-token'); return trip; },
+    signIn: async () => { calls.signIn += 1; return new Promise(() => {}); }, // stays in the browser for the whole test
     signOut: () => setToken('')
   };
-  const context = vm.createContext({ window,
-    document: { createElement: () => dialog, body: { append() {} }, addEventListener() {} } });
+  const context = vm.createContext({ window, document: { createElement: () => dialog, body, addEventListener() {} } });
   vm.runInContext(signinScript, context);
-  return { dialog, window };
+  return { dialog, window, body, calls };
 }
+const settle = () => new Promise((resolve) => setImmediate(resolve));
 
-test('signed out on start: the Google sign-in page opens', () => {
-  const { dialog } = boot();
+test('signed out on start: the tab goes to Google, with no Concentr8 page and no flash of the app', async () => {
+  const { dialog, body, calls } = boot();
+  await settle();
+  assert.equal(calls.goToGoogle, 1);
+  assert.equal(dialog.open, false);
+  assert.equal(body.style.visibility, 'hidden');
+});
+
+test('signed in: nothing happens, and no calendar step follows (ADR 0039)', async () => {
+  const { dialog, body, calls } = boot({ signedIn: true });
+  await settle();
+  assert.equal(calls.goToGoogle, 0);
+  assert.equal(dialog.open, false);
+  assert.notEqual(body.style.visibility, 'hidden');
+});
+
+test('back from Google, signed in: the app opens', async () => {
+  const { dialog, body, calls } = boot({ trip: { returned: true, ok: true } });
+  await settle();
+  assert.equal(calls.goToGoogle, 0);
+  assert.equal(dialog.open, false);
+  assert.equal(body.style.visibility, '');
+});
+
+test('back from Google without signing in: the Concentr8 page, never a loop back to Google', async () => {
+  const { dialog, body, calls } = boot({ trip: { returned: true, ok: false } });
+  await settle();
+  assert.equal(calls.goToGoogle, 0);
+  assert.equal(dialog.open, true);
+  assert.equal(body.style.visibility, '');
+  assert.match(dialog.querySelector('[data-signin-status]').textContent, /not finished/);
+});
+
+test('server not reachable: the Concentr8 page shows the reason', async () => {
+  const { dialog, body } = boot({ google: { ok: false, error: 'The Concentr8 server is not reachable.' } });
+  await settle();
+  assert.equal(dialog.open, true);
+  assert.equal(body.style.visibility, '');
+  assert.match(dialog.querySelector('[data-signin-status]').textContent, /not reachable/);
+});
+
+test('desktop app: Google opens in the browser by itself, the page says to finish there', async () => {
+  const { dialog, calls } = boot({ desktop: true });
+  await settle();
+  assert.equal(calls.signIn, 1);
+  assert.equal(calls.goToGoogle, 0);
   assert.equal(dialog.open, true);
 });
 
-test('the sign-in page has no close button and Escape does not close it', () => {
-  const { dialog } = boot();
+test('signing out goes to Google again', async () => {
+  const { window, calls } = boot({ signedIn: true });
+  await settle();
+  window.Concentr8.signOut();
+  await settle();
+  assert.equal(calls.goToGoogle, 1);
+});
+
+test('the Concentr8 page has no close button, and Escape cannot skip it', async () => {
+  const { dialog } = boot({ trip: { returned: true, ok: false } });
+  await settle();
   assert.doesNotMatch(dialog.innerHTML, /data-signin-close/);
   let prevented = false;
   dialog.fire('cancel', { preventDefault() { prevented = true; } });
   assert.equal(prevented, true);
-});
-
-test('a close the app did not ask for (Escape before any click in Chrome) opens the page again', () => {
-  const { dialog } = boot();
-  dialog.close();
+  dialog.close(); // Chrome: Escape before any click closes it anyway
   assert.equal(dialog.open, true);
-});
-
-test('the sign-in text no longer offers free guest messages', () => {
-  const { dialog } = boot();
-  assert.doesNotMatch(dialog.innerHTML, /free messages/);
-});
-
-test('signed in: the page stays away, and no calendar step follows (ADR 0039)', () => {
-  const { dialog } = boot({ signedIn: true });
-  assert.equal(dialog.open, false);
-});
-
-test('finishing sign-in closes the page and the app opens', () => {
-  const { dialog, window } = boot();
-  window.Concentr8.finishSignIn();
-  assert.equal(dialog.open, false);
 });
 
 test('sign-in never starts the calendar connection', () => {
   assert.doesNotMatch(signinScript, /google\/calendars|google\/login/);
-});
-
-test('signing out brings back the sign-in page', () => {
-  const { dialog, window } = boot({ signedIn: true });
-  window.Concentr8.signOut();
-  assert.equal(dialog.open, true);
 });

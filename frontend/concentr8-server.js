@@ -199,6 +199,40 @@
     return { ok: false, error: 'The sign-in took too long. Try again.' };
   }
 
+  // --- Google first on the web: the whole tab goes to Google and comes back (ADR 0040) ---
+  // Why the whole tab: a browser blocks a small window that no click asked for. The poll code waits in sessionStorage,
+  // which survives the trip in this tab; the token still comes from the server, never through an address.
+  const GOOGLE_TRIP_KEY = 'concentr8-google-trip';
+
+  async function goToGoogle() {
+    const poll = randomHex();
+    try { sessionStorage.setItem(GOOGLE_TRIP_KEY, poll); } catch (_) { return { ok: false, error: '' }; } // without it the trip could not end
+    const start = await request('/auth/google/start', 'POST', { poll, returnTo: location.origin + location.pathname });
+    let target = null;
+    try { target = new URL(start.data.authorizationUrl); } catch (_) { /* handled below */ }
+    if (!start.ok || !target || target.origin !== new URL(API).origin || target.pathname !== '/auth/google/login') {
+      try { sessionStorage.removeItem(GOOGLE_TRIP_KEY); } catch (_) { /* nothing to clean */ }
+      return { ok: false, error: start.ok ? 'The server returned an invalid sign-in link.' : start.error };
+    }
+    location.assign(target.href);
+    return { ok: true };
+  }
+
+  // Called on start. returned=false: this tab did not just come back from Google.
+  async function finishGoogleTrip() {
+    let poll = null;
+    try { poll = sessionStorage.getItem(GOOGLE_TRIP_KEY); sessionStorage.removeItem(GOOGLE_TRIP_KEY); } catch (_) { /* no trip then */ }
+    if (!poll) return { returned: false };
+    const r = await request('/auth/google/token', 'POST', { poll });
+    if (r.status !== 200 || !r.data.token) return { returned: true, ok: false };
+    settings = { ...settings, token: r.data.token };
+    save(settings);
+    window.dispatchEvent(new CustomEvent('concentr8:auth'));
+    await syncAccount();
+    window.dispatchEvent(new CustomEvent('articul8:rerender'));
+    return { returned: true, ok: true };
+  }
+
   // The Google account tells the server the email (and name); the profile shows them instead of asking again.
   async function syncAccount() {
     if (!settings.token || !window.Articul8) return;
@@ -308,5 +342,5 @@
   });
 
   // The page is drawn by index.html after callPage() returns, so the check runs right after it.
-  window.Concentr8 = { api: API, ask, isAsking, signIn, signOut, isDesktop, openGoogleWindow, openInBrowser, blockedWindowText: BLOCKED_WINDOW_TEXT, isSignedIn: () => Boolean(settings.token), connection: () => (settings.token ? { url: API, token: settings.token } : null), callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
+  window.Concentr8 = { api: API, ask, isAsking, signIn, goToGoogle, finishGoogleTrip, signOut, isDesktop, openGoogleWindow, openInBrowser, blockedWindowText: BLOCKED_WINDOW_TEXT, isSignedIn: () => Boolean(settings.token), connection: () => (settings.token ? { url: API, token: settings.token } : null), callPage: (heading) => { setTimeout(showCodeFieldIfNeeded, 0); return callPage(heading); } };
 })();
