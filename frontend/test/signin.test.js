@@ -27,7 +27,7 @@ function fakeDialog() {
 }
 
 // trip: what finishGoogleTrip answers. google: what goToGoogle answers. Both count their calls in `calls`.
-function boot({ signedIn = false, desktop = false, trip = { returned: false }, google = { ok: true } } = {}) {
+function boot({ signedIn = false, desktop = false, demo = false, trip = { returned: false }, google = { ok: true } } = {}) {
   const dialog = fakeDialog();
   const body = { style: {}, append() {} };
   const calls = { goToGoogle: 0, signIn: 0 };
@@ -46,6 +46,7 @@ function boot({ signedIn = false, desktop = false, trip = { returned: false }, g
     signIn: async () => { calls.signIn += 1; return new Promise(() => {}); }, // stays in the browser for the whole test
     signOut: () => setToken('')
   };
+  if (demo) window.Concentr8Demo = { isDemo: () => true }; // ADR 0042
   const context = vm.createContext({ window, document: { createElement: () => dialog, body, addEventListener() {} } });
   vm.runInContext(signinScript, context);
   return { dialog, window, body, calls };
@@ -122,4 +123,12 @@ test('the Concentr8 page has no close button, and Escape cannot skip it', async 
 
 test('sign-in never starts the calendar connection', () => {
   assert.doesNotMatch(signinScript, /google\/calendars|google\/login/);
+});
+
+test('demo mode (ADR 0042): no Google, no Concentr8 page, the app is visible', async () => {
+  const { dialog, body, calls } = boot({ demo: true });
+  await settle();
+  assert.equal(calls.goToGoogle, 0);
+  assert.equal(dialog.open, false);
+  assert.notEqual(body.style.visibility, 'hidden');
 });

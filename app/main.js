@@ -20,7 +20,8 @@ function openWindow() {
     minWidth: 760, // the frontend has a minimum width of 760px (docs/design.md)
     webPreferences: { contextIsolation: true, sandbox: true, preload: path.join(__dirname, 'preload.js') },
   });
-  win.loadFile(frontendFile());
+  // Why: `Concentr8 --demo` opens the demo without Google sign-in (ADR 0042); the page reads ?demo.
+  win.loadFile(frontendFile(), process.argv.includes('--demo') ? { query: { demo: '1' } } : undefined);
 
   // Why: links to other sites open in the normal browser, so the app window never leaves the app. This includes the Google
   // sign-in (ADR 0035). Empty windows ("about:blank") are refused quietly, so the page knows it must use the browser.

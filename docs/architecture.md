@@ -82,6 +82,8 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/decisions/0041-todos-placed-on-the-calendar.md | ADR: new to-dos get a block by themselves, and the rules that protect the week | New |
 | docs/plans/demo-without-google.md | Plan: a `?demo` link opens the app without a Google account | New, waiting for a human go |
 | docs/decisions/0042-demo-link-without-google.md | ADR: the one exception to the Google sign-in, for demos | New, proposed |
+| frontend/concentr8-demo.js | Demo mode: `?demo` skips Google sign-in; fixed chat answer with three to-dos and their steps (ADR 0042). AI generated | New |
+| frontend/test/demo.test.js | Tests for demo mode: switch on/off, the fixed answer, due dates | New |
 | frontend/task-placement.js | Gives a new to-do a block in the first free slot, with or without Google Calendar (ADR 0041) | New |
 | frontend/test/task-placement.test.js | Tests for placing to-dos: slots, deadlines, waiting for Google, deleted and finished blocks | New |
 | docs/decisions/0038-sign-in-required-on-start.md | ADR: students sign in with Google before the app opens; no guest mode | New |

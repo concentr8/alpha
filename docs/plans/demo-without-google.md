@@ -1,6 +1,6 @@
 # Plan: a demo link that works without a Google account
 
-Status: PROPOSED. Needs a "go" from Camila (she accepted ADR 0038) before any code is written.
+Status: BUILT on Jonas's go (2026-11-06) for the Cal demo. Camila still to confirm, because it narrows her ADR 0038.
 Purpose: read by the team before building; lets people try the app at Cal without signing in.
 
 ## Goal
@@ -18,14 +18,19 @@ Someone who opens the demo link sees the app straight away, with no Google page.
 3. Without the link nothing changes: the sign-in is still required.
 4. Data stays in this browser like today. Parts that need an account (Google Calendar, the call) keep their
    "Sign in to ..." message.
-5. Files: `frontend/concentr8-signin.js` only, plus a test in `frontend/test/signin.test.js`.
-   `frontend/index.html` (frozen) does not change.
+5. The desktop app has no address bar: start it with `--demo` (`app/main.js` then loads the page with `?demo`).
+6. In demo mode the chat answers "I have three assignments due, where should I start" with a fixed answer, no server and no
+   Claude key needed: three to-dos (Computer Vision, Microeconomics, Rhetoric essay) with minutes, due dates and four small
+   steps each. Any other message goes to the normal chat. It cannot fail on stage.
+7. Files: new `frontend/concentr8-demo.js` (+ `frontend/test/demo.test.js`), small changes in `concentr8-signin.js`,
+   `concentr8-server.js` (the fixed answer, steps and course on a to-do from the chat) and `app/main.js`.
+   `frontend/index.html` (frozen) gets one script tag, `concentr8-demo.js`, as this plan says.
 
 ## Decisions needed
 - **A. `?demo` link (recommended).** Hidden from normal students, no UI change.
 - **B. "Try the demo" button on the sign-in page.** Visible to everyone; needs a button, so a redraw by Jack.
-- TO CHECK before building: does the AI chat work in demo mode? The guest chat route still exists on the server
-  (`POST /api/chat/guest`, 10 messages per day) but the app no longer reaches it (ADR 0038).
+- Chat in demo mode: the fixed answer above needs no server. Other messages use the guest chat (10 per day), which has
+  not been reachable since ADR 0038 and is NOT tested here.
 
 ## Tests
 - `frontend/test/`: with `?demo` the Google page does not open and the tab is not sent to Google; without it, as before;
