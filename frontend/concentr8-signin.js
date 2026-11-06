@@ -1,7 +1,8 @@
-// Purpose: the central sign-in page ("Continue with Google", ADR 0032). A student must sign in before the app opens (ADR 0038).
-// Called by: frontend/index.html (script tag, loaded after concentr8-server.js). Opens by itself on start and after signing out.
-// Calls: window.Concentr8 (signIn, isSignedIn, Google windows). In the desktop app, or when a window is blocked, Google opens in
-//        the browser (ADR 0035). Google Calendar is not part of sign-in: students connect it in Settings (ADR 0039).
+// Purpose: gets a signed-out student to Google before the app opens (ADR 0038, 0040). On the web the whole tab goes to Google;
+//          the desktop app opens Google in the browser. The "Continue with Google" page here is only the way back when that failed.
+// Called by: frontend/index.html (script tag, loaded after concentr8-server.js). Runs by itself on start and after signing out.
+// Calls: window.Concentr8 (goToGoogle, finishGoogleTrip, signIn, isSignedIn, Google windows). When a window is blocked, Google
+//        opens in the browser (ADR 0035). Google Calendar is not part of sign-in: students connect it in Settings (ADR 0039).
 // AI-GENERATED: Jack has no wireframe for this page; it is built from .cal-dialog, .wire-button and .preview-note (docs/design.md).
 (() => {
   const dialog = document.createElement('dialog');
@@ -51,6 +52,22 @@
     if (!signedIn && !dialog.open) { hideBrowserButton(); status(''); dialog.showModal(); }
   }
 
+  // Why hidden: the student should see Google first, not a flash of the app. The server may need a few seconds to wake up.
+  const showApp = (visible) => { document.body.style.visibility = visible ? '' : 'hidden'; };
+
+  // The way back when going to Google directly did not work: the page below with its button, never a loop back to Google.
+  function showPage(message) { showApp(true); check(); status(message); }
+
+  async function start() {
+    if (window.Concentr8.isSignedIn()) return;
+    if (window.Concentr8.isDesktop()) { check(); act(); return; }
+    showApp(false);
+    const trip = await window.Concentr8.finishGoogleTrip();
+    if (trip.returned) { if (trip.ok) showApp(true); else showPage('Sign-in was not finished. Try again.'); return; }
+    const r = await window.Concentr8.goToGoogle();
+    if (!r.ok) showPage(r.error);
+  }
+
   async function act() {
     if (busy) return;
     busy = true; $('action').disabled = true;
@@ -74,10 +91,12 @@
     if (e.target.closest('[data-signin-action]')) act();
     else if (e.target.closest('[data-signin-browser]')) openBrowser();
   });
-  window.addEventListener('concentr8:auth', check);
+  window.addEventListener('concentr8:auth', () => { if (window.Concentr8.isSignedIn()) check(); else start(); });
+  // Why: Back from Google can restore this page exactly as it was, hidden. A reload runs start() again.
+  window.addEventListener('pageshow', (e) => { if (e.persisted) window.location.reload(); });
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-signout]')) window.Concentr8.signOut();
   });
 
-  check();
+  start();
 })();

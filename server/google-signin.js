@@ -10,6 +10,7 @@ const SCOPE = 'openid email profile'; // profile gives the name only (ADR 0034);
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const FIVE_MINUTES = 300000;
 const POLL = /^[a-f0-9]{32,64}$/; // random, made once by the app for one sign-in attempt
+const RETURN_ORIGIN = 'https://concentr8.github.io'; // the web app; the only site Google sends a student back to (ADR 0040)
 const error = (status, message) => Object.assign(new Error(message), { status });
 const random = () => crypto.randomBytes(32).toString('base64url');
 
@@ -23,6 +24,16 @@ function settings(env) {
         redirect.pathname !== '/auth/google/callback' || redirect.search || redirect.hash ||
         redirect.username || redirect.password) return null;
     return { client: env.GOOGLE_CLIENT_ID, secret: env.GOOGLE_CLIENT_SECRET, redirect: redirect.href, secure: redirect.protocol === 'https:' };
+  } catch (_) { return null; }
+}
+
+/** The app's address to come back to, or null. Why so strict: anything else would let a link send students to another site. */
+function returnAddress(value) {
+  try {
+    const url = new URL(value);
+    const local = url.protocol === 'http:' && url.hostname === 'localhost'; // the web app on a developer's machine
+    if ((url.origin !== RETURN_ORIGIN && !local) || url.username || url.password) return null;
+    return url.origin + url.pathname;
   } catch (_) { return null; }
 }
 
@@ -45,8 +56,8 @@ function readIdToken(idToken, clientId, nowMs) {
 
 function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignupAllowed, countSignup,
   fetchImpl = (...args) => fetch(...args), now = () => Date.now() }) {
-  const tickets = new Map(); // ticket -> { pollHash, expires }: the app asked to sign in, the browser has not started yet
-  const states = new Map(); // state -> { pollHash, browser, verifier, expires }: the browser is at Google
+  const tickets = new Map(); // ticket -> { pollHash, returnTo, expires }: the app asked to sign in, the browser has not started yet
+  const states = new Map(); // state -> { pollHash, returnTo, browser, verifier, expires }: the browser is at Google
   const results = new Map(); // pollHash -> { userId, token, expires }: signed in, waiting for the app to pick it up (once)
 
   function prune() {
@@ -58,7 +69,9 @@ function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignup
     res.setHeader('Referrer-Policy', 'no-referrer');
     return send(res, status, body);
   }
-  function callbackPage(res, status, success) {
+  // With returnTo the whole tab went to Google, so it goes back to the app, success or not; the app asks for the token as usual.
+  function callbackPage(res, status, success, returnTo) {
+    if (returnTo) { res.setHeader('Location', returnTo); reply(res, 302, { ok: success }); return; }
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
@@ -98,6 +111,7 @@ function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignup
   async function handle(req, res, url) {
     const p = url.pathname.replace(/\/+$/, ''), method = req.method;
     if (!p.startsWith('/auth/google/')) return false;
+    let returnTo = null; // kept outside the try: a failed callback goes back to the app too
     try {
       const config = settings(env);
       if (p === '/auth/google/status' && method === 'GET') { reply(res, 200, { configured: Boolean(config) }); return true; }
@@ -110,7 +124,7 @@ function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignup
         try { body = JSON.parse(await readText(req) || '{}'); } catch (_) { throw error(400, 'Expected { poll }.'); }
         if (!POLL.test(String(body.poll || ''))) throw error(400, 'Missing or wrong poll code.');
         const ticket = random();
-        tickets.set(ticket, { pollHash: sha256(body.poll), expires: now() + FIVE_MINUTES });
+        tickets.set(ticket, { pollHash: sha256(body.poll), returnTo: returnAddress(body.returnTo), expires: now() + FIVE_MINUTES });
         const launch = new URL('/auth/google/login', config.redirect);
         launch.searchParams.set('ticket', ticket);
         reply(res, 200, { authorizationUrl: launch.href }); return true;
@@ -122,7 +136,7 @@ function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignup
         if (!entry || entry.expires <= now()) throw error(400, 'Start signing in from Concentr8 again.');
         tickets.delete(ticket);
         const state = random(), browser = random(), verifier = random();
-        states.set(state, { pollHash: entry.pollHash, browser, verifier, expires: now() + FIVE_MINUTES });
+        states.set(state, { pollHash: entry.pollHash, returnTo: entry.returnTo, browser, verifier, expires: now() + FIVE_MINUTES });
         res.setHeader('Set-Cookie', `c8_signin_${state.slice(0, 12)}=${browser}; Path=/auth/google; HttpOnly; SameSite=Lax; Max-Age=300${config.secure ? '; Secure' : ''}`);
         const auth = new URL('https://accounts.google.com/o/oauth2/v2/auth');
         auth.search = new URLSearchParams({ client_id: config.client, redirect_uri: config.redirect, response_type: 'code',
@@ -136,16 +150,17 @@ function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignup
         const state = url.searchParams.get('state'), entry = states.get(state);
         if (!entry || entry.expires <= now()) { callbackPage(res, 400, false); return true; }
         states.delete(state);
+        returnTo = entry.returnTo;
         const cookieName = `c8_signin_${state.slice(0, 12)}`;
         const cookie = String(req.headers.cookie || '').split(';').map((s) => s.trim()).find((s) => s.startsWith(`${cookieName}=`));
         res.setHeader('Set-Cookie', `${cookieName}=; Path=/auth/google; HttpOnly; SameSite=Lax; Max-Age=0${config.secure ? '; Secure' : ''}`);
         if (!cookie || cookie.slice(cookieName.length + 1) !== entry.browser || url.searchParams.has('error') || !url.searchParams.get('code')) {
-          callbackPage(res, 400, false); return true;
+          callbackPage(res, 400, false, returnTo); return true;
         }
         const identity = readIdToken(await exchangeCode(config, url.searchParams.get('code'), entry.verifier), config.client, now());
         const { user, token } = accountFor(identity);
         results.set(entry.pollHash, { userId: user.id, token, expires: now() + FIVE_MINUTES });
-        callbackPage(res, 200, true); return true;
+        callbackPage(res, 200, true, returnTo); return true;
       }
       // 4. The app asks with its poll code until the browser part is done. The token is handed over exactly once.
       if (p === '/auth/google/token' && method === 'POST') {
@@ -160,7 +175,7 @@ function createGoogleSignin({ env, users, save, newUser, sha256, send, newSignup
       }
       reply(res, 404, { error: 'Sign-in route not found.' }); return true;
     } catch (err) {
-      if (url.pathname === '/auth/google/callback') callbackPage(res, err.status || 502, false);
+      if (url.pathname === '/auth/google/callback') callbackPage(res, err.status || 502, false, returnTo);
       else reply(res, err.status || 502, { error: err.status ? err.message : 'Google sign-in is unavailable. Try again.' });
       return true;
     }

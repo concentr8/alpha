@@ -61,14 +61,14 @@ const post = (path, body) => fetch(`${base}${path}`, { method: 'POST', headers: 
 const pathOf = (href) => { const u = new URL(href); return u.pathname + u.search; };
 
 /** The whole browser part: ticket -> Google address -> back to the callback with the cookie of the same browser. */
-async function browserSignIn(pollCode, { cookie = true, state: stateOverride } = {}) {
-  const started = await (await post('/auth/google/start', { poll: pollCode })).json();
+async function browserSignIn(pollCode, { cookie = true, state: stateOverride, returnTo } = {}) {
+  const started = await (await post('/auth/google/start', { poll: pollCode, returnTo })).json();
   const login = await fetch(`${base}${pathOf(started.authorizationUrl)}`, { redirect: 'manual' });
   const google = new URL(login.headers.get('location'));
   const setCookie = login.headers.get('set-cookie');
   const state = stateOverride || google.searchParams.get('state');
   const headers = cookie && setCookie ? { Cookie: setCookie.split(';')[0] } : {};
-  const callback = await fetch(`${base}/auth/google/callback?state=${state}&code=<CODE>`, { headers });
+  const callback = await fetch(`${base}/auth/google/callback?state=${state}&code=<CODE>`, { headers, redirect: 'manual' });
   return { started, login, google, callback, html: await callback.text() };
 }
 const pickUp = async (pollCode) => { const r = await post('/auth/google/token', { poll: pollCode }); return { status: r.status, body: await r.json() }; };
@@ -102,6 +102,31 @@ test('the whole flow makes an account and gives the app its token exactly once',
   const second = await pickUp(code);
   assert.equal(second.status, 202, 'the token is handed over once');
   assert.equal(second.body.token, undefined);
+});
+
+test('a tab that went to Google goes back to the web app, and the app collects its token (ADR 0040)', async () => {
+  const code = poll();
+  const { callback } = await browserSignIn(code, { returnTo: 'https://concentr8.github.io/alpha/?x=1' });
+  assert.equal(callback.status, 302);
+  assert.equal(callback.headers.get('location'), 'https://concentr8.github.io/alpha/', 'no query, and never a token in the address');
+  assert.equal((await pickUp(code)).status, 200);
+});
+
+test('a failed sign-in also goes back to the web app, without a token', async () => {
+  const code = poll();
+  const { callback } = await browserSignIn(code, { cookie: false, returnTo: 'https://concentr8.github.io/alpha/' });
+  assert.equal(callback.status, 302);
+  assert.equal(callback.headers.get('location'), 'https://concentr8.github.io/alpha/');
+  assert.equal((await pickUp(code)).status, 202);
+});
+
+test('Google never sends a student back to another site', async () => {
+  for (const returnTo of ['https://evil.example/alpha/', 'https://concentr8.github.io.evil.example/', 'https://user@concentr8.github.io/', 'javascript:alert(1)']) {
+    const { callback, html } = await browserSignIn(poll(), { returnTo });
+    assert.equal(callback.status, 200, returnTo);
+    assert.equal(callback.headers.get('location'), null, returnTo);
+    assert.match(html, /You are signed in/);
+  }
 });
 
 test('sign-in asks for openid, email and profile only: calendar access stays a separate opt-in', async () => {
