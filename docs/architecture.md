@@ -52,6 +52,11 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | ios/project.yml | XcodeGen definition of the iPhone app and its three Screen Time extensions; `xcodegen generate` writes the Xcode project (not committed) | New |
 | ios/Shared/DesignTokens.swift | Colours and corner sizes from docs/design.md as Swift constants | New |
 | ios/Shared/AppGroup.swift | App Group name and storage keys shared by the app and the extensions | New |
+| ios/Shared/FocusSessionClock.swift | Plain focus session logic: start, stop, remaining time (no UI) | New |
+| ios/Shared/AnswerStore.swift | The three "Are you focused?" answers and their storage with a time in the App Group | New |
+| ios/Shared/SelectionStore.swift | Remembers the apps the student chose to block, for the Monitor extension | New |
+| ios/Concentr8Tests/FocusSessionClockTests.swift | Tests for session timing with fixed dates | New, not run yet (no Xcode on the run machine) |
+| ios/Concentr8Tests/AnswerStoreTests.swift | Tests for storing answers in a throw-away storage | New, not run yet (no Xcode on the run machine) |
 | docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
 | app/main.js | Desktop app: opens `frontend/index.html` in a window; web links (and the Google sign-in) go to the default browser | New |
 | app/desktop/links.js | Decides which addresses may go to the default browser: only http and https (ADR 0035) | New |
