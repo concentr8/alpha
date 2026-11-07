@@ -51,3 +51,42 @@ compile them and test the plain logic around them.
 
 ## Run log
 (The run adds a short entry per step here: what was done, what failed, what is left.)
+
+Run of 2026-11-07, branch `feat/ios-phase-1` (already checked out, not on `main`). Nothing was pushed.
+
+1. Project and tokens (commit "project definition, design tokens and App Group names"): `ios/project.yml`,
+   `ios/Shared/DesignTokens.swift`, `ios/Shared/AppGroup.swift`, `.gitignore` (`ios/.build/`, generated `.xcodeproj`).
+   `xcodegen generate` succeeds after all files existed (checked once, at the end of step 5).
+2. Session model and answers (commit "session logic, answer storage and their tests"): `FocusSessionClock`,
+   `AnswerStore`, `SelectionStore` and two test files. Not compiled or run, see "Blocked" below.
+3. Home screen (commit "home screen with app picker..."): `HomeView`, `SessionController`, `SampleTasks`, app
+   `Info.plist` and entitlements. Marked `AI-GENERATED:` and shows the "AI generated" label.
+4. Shield and extensions (commit "Screen Time extensions with the Are you focused shield"): Monitor, ShieldConfig,
+   ShieldAction, their `Info.plist` and entitlements (step 5 of the spec is done in steps 3 and 4).
+5. `docs/architecture.md` got its rows in the same commit as each file.
+
+Second run (2026-11-07, Xcode now installed), checks from "Done when":
+- `xcodegen generate`: NOT re-run. The command was denied by the permission mode, so the existing
+  `ios/Concentr8.xcodeproj` was used as it was. TODO: a human runs `cd ios && xcodegen generate` once to confirm.
+- Build for `generic/platform=iOS Simulator`: first try failed with one error, `cannot find 'Date' in scope` in
+  `ShieldActionExtension.swift` (missing `import Foundation`). Fixed on the first try (commit "ShieldAction extension
+  builds"). Then `BUILD SUCCEEDED`; `Concentr8Monitor`, `Concentr8ShieldAction` and `Concentr8ShieldConfig` are all
+  embedded as `.appex` in the app.
+- Unit tests on iPhone 17 (iOS 27.2 simulator): 10 tests, 0 failures (5 `AnswerStoreTests`, 5 `FocusSessionClockTests`).
+- The "Blocked" notes below are from the first run and are outdated for build and tests.
+
+Blocked in the first run (outdated, see above):
+- This Mac has only the Command Line Tools, no Xcode (`xcodebuild` says it requires Xcode; `xcrun simctl` is not
+  found). So `xcodebuild ... build` and the unit tests did not run, and no Swift file was compiled. The Swift code is
+  written from memory of Apple's APIs and may contain compile errors. Not a build error I could retry three times,
+  and I did not install or switch anything (`xcode-select` needs sudo, not allowed).
+  TODO: on a Mac with Xcode run `cd ios && xcodegen generate`, then the build and test commands above, and fix errors.
+- Simulator names from `xcrun simctl list devices available` could not be listed for the same reason.
+
+Open points for a human:
+- TODO: Apple's shield screen has only two buttons. The third answer "Not focused" is in `FocusAnswer` and the tests,
+  but has no button. Ask Jack how the student gives it.
+- TODO: DeviceActivity schedules need at least 15 minutes; the default session is 25 minutes, shorter ones would fail.
+- TODO: ADR 0043 is still "Proposed".
+- Fonts are the system font (TODO in `DesignTokens.swift`). No app icon yet.
+- Checked in: nothing in `frontend/`, `server/`, `backend/` or `app/` was touched. No secrets, no phone numbers.

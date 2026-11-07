@@ -25,3 +25,7 @@ backend/.cache/
 # Desktop app build output and packages
 app/release/
 app/node_modules/
+
+# iPhone app: generated Xcode project and local build output (ADR 0043)
+ios/.build/
+ios/Concentr8.xcodeproj/

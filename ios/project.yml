@@ -1,0 +1,93 @@
+# Purpose: XcodeGen definition of the Concentr8 iPhone app and its three Screen Time extensions (ADR 0043).
+# Called by: `cd ios && xcodegen generate`, which writes ios/Concentr8.xcodeproj (not committed).
+# Calls: the source folders next to this file (Concentr8, Concentr8Monitor, Concentr8ShieldConfig,
+#        Concentr8ShieldAction, Concentr8Tests, Shared).
+# TODO: signing (team, provisioning, the Family Controls entitlement for every bundle ID) is done by a human in Xcode.
+name: Concentr8
+
+options:
+  bundleIdPrefix: app.concentr8
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  Concentr8:
+    type: application
+    platform: iOS
+    sources:
+      - Concentr8
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.concentr8.ios
+        INFOPLIST_FILE: Concentr8/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Concentr8/Concentr8.entitlements
+    dependencies:
+      - target: Concentr8Monitor
+      - target: Concentr8ShieldConfig
+      - target: Concentr8ShieldAction
+
+  Concentr8Monitor:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Concentr8Monitor
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.concentr8.ios.monitor
+        INFOPLIST_FILE: Concentr8Monitor/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Concentr8Monitor/Concentr8Monitor.entitlements
+
+  Concentr8ShieldConfig:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Concentr8ShieldConfig
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.concentr8.ios.shieldconfig
+        INFOPLIST_FILE: Concentr8ShieldConfig/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Concentr8ShieldConfig/Concentr8ShieldConfig.entitlements
+
+  Concentr8ShieldAction:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Concentr8ShieldAction
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.concentr8.ios.shieldaction
+        INFOPLIST_FILE: Concentr8ShieldAction/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Concentr8ShieldAction/Concentr8ShieldAction.entitlements
+
+  Concentr8Tests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Concentr8Tests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.concentr8.ios.tests
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: Concentr8
+
+schemes:
+  Concentr8:
+    build:
+      targets:
+        Concentr8: all
+    test:
+      targets:
+        - Concentr8Tests
