@@ -63,6 +63,15 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | ios/Concentr8/SampleTasks.swift | Sample data for the next-tasks list until the server contract is known | New |
 | ios/Concentr8/Info.plist | App settings (name, version, launch screen) | New |
 | ios/Concentr8/Concentr8.entitlements | Family Controls and App Group for the app | New, signing by a human |
+| ios/Concentr8Monitor/DeviceActivityMonitorExtension.swift | Monitor extension: shields the chosen apps while a session runs, lifts the shield at the end | New, needs a real iPhone to try |
+| ios/Concentr8Monitor/Info.plist | Settings of the Monitor extension | New |
+| ios/Concentr8Monitor/Concentr8Monitor.entitlements | Family Controls and App Group for the Monitor extension | New, signing by a human |
+| ios/Concentr8ShieldConfig/ShieldConfigurationExtension.swift | Shield screen "Are you focused?" (AI generated); only two buttons fit | New, needs a real iPhone to try |
+| ios/Concentr8ShieldConfig/Info.plist | Settings of the ShieldConfig extension | New |
+| ios/Concentr8ShieldConfig/Concentr8ShieldConfig.entitlements | Family Controls and App Group for the ShieldConfig extension | New, signing by a human |
+| ios/Concentr8ShieldAction/ShieldActionExtension.swift | Stores the shield answer with a time in the App Group | New, needs a real iPhone to try |
+| ios/Concentr8ShieldAction/Info.plist | Settings of the ShieldAction extension | New |
+| ios/Concentr8ShieldAction/Concentr8ShieldAction.entitlements | Family Controls and App Group for the ShieldAction extension | New, signing by a human |
 | docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
 | app/main.js | Desktop app: opens `frontend/index.html` in a window; web links (and the Google sign-in) go to the default browser | New |
 | app/desktop/links.js | Decides which addresses may go to the default browser: only http and https (ADR 0035) | New |
