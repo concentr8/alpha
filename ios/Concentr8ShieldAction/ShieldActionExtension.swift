@@ -5,6 +5,7 @@
 // Answers stay on the phone in phase 1. Nothing is sent to a server.
 // TODO: the button texts must stay in step with ShieldConfigurationExtension; "Not focused" has no button yet.
 
+import Foundation
 import ManagedSettings
 
 final class ShieldActionExtension: ShieldActionDelegate {
