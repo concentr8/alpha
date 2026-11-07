@@ -70,6 +70,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | ios/Concentr8Monitor/Concentr8Monitor.entitlements | Family Controls and App Group for the Monitor extension | New, signing by a human |
 | ios/Concentr8ShieldConfig/ShieldConfigurationExtension.swift | Shield screen "Are you focused?" (AI generated, marker only in the code, ADR 0044); only two buttons fit | Tried on an iPhone 12 Pro; readable colours and icon added |
 | ios/Concentr8ShieldConfig/Assets.xcassets/ | Images of the ShieldConfig extension: `ShieldIcon` (the round bear from the desktop icon) shown on the shield screen | New |
+| docs/evidence/ios-shield/ | Before/after screenshots of the iPhone shield screen for review (PR #60) | New |
 | ios/Concentr8ShieldConfig/Info.plist | Settings of the ShieldConfig extension | New |
 | ios/Concentr8ShieldConfig/Concentr8ShieldConfig.entitlements | Family Controls and App Group for the ShieldConfig extension | New, signing by a human |
 | ios/Concentr8ShieldAction/ShieldActionExtension.swift | Stores the shield answer with a time in the App Group | New, needs a real iPhone to try |
