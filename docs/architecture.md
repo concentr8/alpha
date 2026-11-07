@@ -46,6 +46,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | server/ | Concentr8 call server (Node, no dependencies), imported unchanged from intentguard-v2 | New, tests run in CI |
 | .github/workflows/deploy-server.yml | Tests server/, deploys it to the Azure web app `concentr8-api`, then checks `/api/health` | New |
 | docs/plans/download-site.md | Plan: download site, app builds, stable releases | New |
+| docs/plans/ios-app.md | Plan: Concentr8 iPhone app with app blocking, focus check, tasks and chat | New, waiting for a human go |
 | docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
 | app/main.js | Desktop app: opens `frontend/index.html` in a window; web links (and the Google sign-in) go to the default browser | New |
 | app/desktop/links.js | Decides which addresses may go to the default browser: only http and https (ADR 0035) | New |
