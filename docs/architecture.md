@@ -57,6 +57,12 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | ios/Shared/SelectionStore.swift | Remembers the apps the student chose to block, for the Monitor extension | New |
 | ios/Concentr8Tests/FocusSessionClockTests.swift | Tests for session timing with fixed dates | New, not run yet (no Xcode on the run machine) |
 | ios/Concentr8Tests/AnswerStoreTests.swift | Tests for storing answers in a throw-away storage | New, not run yet (no Xcode on the run machine) |
+| ios/Concentr8/Concentr8App.swift | Entry point of the iPhone app | New |
+| ios/Concentr8/HomeView.swift | Home screen: choose apps to block, start and stop a focus session, next tasks (AI generated) | New |
+| ios/Concentr8/SessionController.swift | Screen Time permission, chosen apps, starts and stops the DeviceActivity schedule | New, needs a real iPhone to try |
+| ios/Concentr8/SampleTasks.swift | Sample data for the next-tasks list until the server contract is known | New |
+| ios/Concentr8/Info.plist | App settings (name, version, launch screen) | New |
+| ios/Concentr8/Concentr8.entitlements | Family Controls and App Group for the app | New, signing by a human |
 | docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
 | app/main.js | Desktop app: opens `frontend/index.html` in a window; web links (and the Google sign-in) go to the default browser | New |
 | app/desktop/links.js | Decides which addresses may go to the default browser: only http and https (ADR 0035) | New |
