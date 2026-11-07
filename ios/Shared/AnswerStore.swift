@@ -6,6 +6,7 @@
 
 import Foundation
 
+// Labels are short: the shield button broke "Working on my task" onto two lines (iPhone 12 Pro, iOS 27.2).
 enum FocusAnswer: String, Codable, CaseIterable {
     case workingOnTask
     case onBreak
@@ -13,7 +14,7 @@ enum FocusAnswer: String, Codable, CaseIterable {
 
     var label: String {
         switch self {
-        case .workingOnTask: return "Working on my task"
+        case .workingOnTask: return "On my task"
         case .onBreak: return "On a break"
         case .notFocused: return "Not focused"
         }

@@ -29,6 +29,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.concentr8.ios
         INFOPLIST_FILE: Concentr8/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: Concentr8/Concentr8.entitlements
     dependencies:
       - target: Concentr8Monitor

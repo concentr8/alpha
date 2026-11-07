@@ -49,6 +49,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/ios-app.md | Plan: Concentr8 iPhone app with app blocking, focus check, tasks and chat | New, go given |
 | docs/plans/ios-app-phase-1.md | Spec for the first unattended run of the iPhone app: layout, done-when, rules | New |
 | docs/decisions/0043-ios-app-swiftui-and-xcodegen.md | ADR: iPhone app is native SwiftUI, project generated with XcodeGen | New, proposed |
+| docs/decisions/0044-shield-screen-without-visible-ai-marker.md | ADR: the shield screen shows no "AI generated" text; the marker stays in the code and the pull request | New, proposed |
 | ios/project.yml | XcodeGen definition of the iPhone app and its three Screen Time extensions; `xcodegen generate` writes the Xcode project (not committed) | New |
 | ios/Shared/DesignTokens.swift | Colours and corner sizes from docs/design.md as Swift constants | New |
 | ios/Shared/AppGroup.swift | App Group name and storage keys shared by the app and the extensions | New |
@@ -63,10 +64,12 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | ios/Concentr8/SampleTasks.swift | Sample data for the next-tasks list until the server contract is known | New |
 | ios/Concentr8/Info.plist | App settings (name, version, launch screen) | New |
 | ios/Concentr8/Concentr8.entitlements | Family Controls and App Group for the app | New, signing by a human |
+| ios/Concentr8/Assets.xcassets/ | Images of the app: `AppIcon`, the desktop icon (`app/build/icon.png`) redrawn edge to edge, because iOS cuts the corners itself | New |
 | ios/Concentr8Monitor/DeviceActivityMonitorExtension.swift | Monitor extension: shields the chosen apps while a session runs, lifts the shield at the end | New, needs a real iPhone to try |
 | ios/Concentr8Monitor/Info.plist | Settings of the Monitor extension | New |
 | ios/Concentr8Monitor/Concentr8Monitor.entitlements | Family Controls and App Group for the Monitor extension | New, signing by a human |
-| ios/Concentr8ShieldConfig/ShieldConfigurationExtension.swift | Shield screen "Are you focused?" (AI generated); only two buttons fit | New, needs a real iPhone to try |
+| ios/Concentr8ShieldConfig/ShieldConfigurationExtension.swift | Shield screen "Are you focused?" (AI generated, marker only in the code, ADR 0044); only two buttons fit | Tried on an iPhone 12 Pro; readable colours and icon added |
+| ios/Concentr8ShieldConfig/Assets.xcassets/ | Images of the ShieldConfig extension: `ShieldIcon` (the round bear from the desktop icon) shown on the shield screen | New |
 | ios/Concentr8ShieldConfig/Info.plist | Settings of the ShieldConfig extension | New |
 | ios/Concentr8ShieldConfig/Concentr8ShieldConfig.entitlements | Family Controls and App Group for the ShieldConfig extension | New, signing by a human |
 | ios/Concentr8ShieldAction/ShieldActionExtension.swift | Stores the shield answer with a time in the App Group | New, needs a real iPhone to try |

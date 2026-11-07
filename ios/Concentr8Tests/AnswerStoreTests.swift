@@ -45,6 +45,6 @@ final class AnswerStoreTests: XCTestCase {
 
     func testEveryAnswerHasAPlainLabel() {
         XCTAssertEqual(FocusAnswer.allCases.map(\.label),
-                       ["Working on my task", "On a break", "Not focused"])
+                       ["On my task", "On a break", "Not focused"])
     }
 }

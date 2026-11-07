@@ -24,7 +24,7 @@ final class ShieldActionExtension: ShieldActionDelegate {
         completionHandler(answer(for: action))
     }
 
-    // The primary button means "working on my task", the secondary one "on a break".
+    // The primary button means "on my task", the secondary one "on a break".
     // Both close the blocked app and keep the shield up.
     private func answer(for action: ShieldAction) -> ShieldActionResponse {
         switch action {
