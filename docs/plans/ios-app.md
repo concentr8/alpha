@@ -1,6 +1,6 @@
 # Plan: Concentr8 iPhone app (phone companion with app blocking)
 
-Status: Draft, waiting for a human "go" (see AGENTS.md: plan before code).
+Status: Go given by Jack (2026-11-07). Phase 1 is specified in `docs/plans/ios-app-phase-1.md`.
 Goal: an iPhone app that is the phone side of Concentr8. A blocker on the
 laptop does not help if the student can still pick up the phone. The app blocks
 distracting apps during a focus session, asks the student whether they are
@@ -27,13 +27,17 @@ focused, shows the next tasks, and lets them talk to the Concentr8 AI.
 - Reported in the Apple forum, not verified by us: blocking did not work for
   external TestFlight testers in one case. Test this early.
 
-## Name and identifiers (proposal, a human confirms)
+## Name and identifiers (confirmed by Jonas, 2026-11-07)
 - Name: Concentr8
-- App: `com.concentr8.app`
-- Extensions: `com.concentr8.app.monitor` (DeviceActivityMonitor),
-  `com.concentr8.app.shieldconfig` (ShieldConfiguration),
-  `com.concentr8.app.shieldaction` (ShieldAction)
-- App Group (app and extensions share data): `group.com.concentr8.app`
+- App: `app.concentr8.ios` (the Mac app is `app.concentr8.mac`)
+- Extensions: `app.concentr8.ios.monitor` (DeviceActivityMonitor),
+  `app.concentr8.ios.shieldconfig` (ShieldConfiguration),
+  `app.concentr8.ios.shieldaction` (ShieldAction)
+- App Group (app and extensions share data): `group.app.concentr8.ios`
+- TODO: we do not own a domain yet. Apple does not need one for a bundle ID, but
+  the ID cannot change after the app is created in App Store Connect. Ask Jack
+  whether `concentr8.app` is ours before the first upload.
+- The Xcode project is generated from `ios/project.yml` with XcodeGen (ADR 0043).
 
 ## Look
 Reuse docs/design.md. No new colours, fonts or layouts.
