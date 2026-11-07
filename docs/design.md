@@ -141,6 +141,15 @@ slot in words, then opens the existing editor with “Add to calendar”.
   is a calendar-only exception approved in the calendar redesign plan and ADR
   0028; no other page is restyled.
 
+## iPhone app (AI generated, for Jack to redraw)
+The phone screens use the same tokens as Swift constants in `ios/Shared/DesignTokens.swift`. No new colours.
+- Shield screen ("Are you focused?"): `--paper` background, `--ink` title, `--muted` subtitle. The main button is
+  `--selected` with `--ink` text instead of `--action` with `--action-ink`, because iOS 27.2 drew the light text on
+  the terracotta button too dark to read. The second button is `--action` text on the system's light button.
+- No visible "AI generated" text on the shield (ADR 0044); the home screen keeps its marker.
+- App icon and shield icon reuse the desktop icon (`app/build/icon.png`): the same green and round bear, redrawn edge
+  to edge for iOS.
+
 ## How to check a change did not alter the look
 Render the same screens before and after and compare them pixel by pixel
 (Home, Calendar, Toolbox, Courses, Workflow, Profile, the tool pages, Focus,
