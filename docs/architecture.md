@@ -49,6 +49,9 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/ios-app.md | Plan: Concentr8 iPhone app with app blocking, focus check, tasks and chat | New, go given |
 | docs/plans/ios-app-phase-1.md | Spec for the first unattended run of the iPhone app: layout, done-when, rules | New |
 | docs/decisions/0043-ios-app-swiftui-and-xcodegen.md | ADR: iPhone app is native SwiftUI, project generated with XcodeGen | New, proposed |
+| ios/project.yml | XcodeGen definition of the iPhone app and its three Screen Time extensions; `xcodegen generate` writes the Xcode project (not committed) | New |
+| ios/Shared/DesignTokens.swift | Colours and corner sizes from docs/design.md as Swift constants | New |
+| ios/Shared/AppGroup.swift | App Group name and storage keys shared by the app and the extensions | New |
 | docs/decisions/0021-app-in-alpha-downloads-on-site-repo.md | ADR: builds in alpha, stable downloads on the site repo | New |
 | app/main.js | Desktop app: opens `frontend/index.html` in a window; web links (and the Google sign-in) go to the default browser | New |
 | app/desktop/links.js | Decides which addresses may go to the default browser: only http and https (ADR 0035) | New |
