@@ -107,6 +107,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/chat-followups.md | Plan: follow-ups of the chat actions (due date, Back from chat cards, French "tu", translations) | New, waiting for a human go |
 | docs/plans/chat-interview-and-google-login.md | Plan: chat asks first, time estimates, Google sign-in (CON-53 backend items) | New, waiting for a human go |
 | docs/plans/simplicity-redesign.md | Plan: redesign of first start and Home for simplicity (flows, tokens, components, pull requests with acceptance criteria) | New, waiting for a human go |
+| docs/decisions/0045-simplicity-redesign-decisions.md | ADR: five decisions for the redesign (warm colours, optional calendar step, rows instead of swipe cards, no visible AI note, Playwright) | New |
 | docs/design/baseline.md | Steps, clicks, screens, words and time of the five core tasks on main at 158af01; the yardstick for the redesign | New |
 | docs/design/audit.md | Heuristic evaluation and three persona walkthroughs of first start and Home, with severity | New |
 | docs/design/research.md | Sourced research (ADHD, onboarding, motion, WCAG 2.2 AA) and teardown of five reference apps | New |

@@ -1,6 +1,6 @@
 # Plan: make Concentr8 radically simple (first start and Home)
 
-Status: **WAITING FOR A GO from Jonas.** No app code is changed by this pull request.
+Status: **GO given by Jonas on 2026-11-10, with the decisions in section 1.** No app code is changed by this pull request.
 Purpose: the design and the build order for the redesign. Phase 2 (implementation) follows this file and nothing else.
 
 Read with it:
@@ -10,24 +10,16 @@ Read with it:
 - `docs/design/mockups/index.html`: before and after, all component states (open it in a browser).
 - `docs/design/mockups/tokens.css`: the tokens as code.
 
-## 1. Questions for Jonas (answers needed before Phase 2)
+## 1. Decisions (Jonas, 2026-11-10)
 
-1. **Colours.** The brief says black/white/grey, but `main` shows Jack's warm paper look (ADR 0037, accepted
-   2026-11-04). Research finds no evidence for either with ADHD. The layout works in both; it is one block of
-   tokens. **Which one ships: (a) black/white/grey, or (b) Jack's warm colours with two values darkened for contrast?**
-   The mockups show both (switch at the top). Recommendation: decide by taste, then test with students.
-2. **Calendar step.** The brief calls it mandatory; in the code it is optional since ADR 0039, because Google shows
-   "Google hasn't verified this app" for the calendar permission. This plan puts the calendar on its own screen right
-   after sign-in with a quiet "Not now". **Keep "Not now" (recommended until Google has verified the app), or remove
-   it and make the calendar required?** With the warning, a required step will lose skeptical testers (audit, persona 3).
-3. **Swipe cards.** I recommend rows with a visible checkbox instead of swipeable cards: on desktop a swipe cannot be
-   discovered, and WCAG 2.5.7 requires a click alternative anyway. Swipe stays as an extra on touch screens.
-   **OK to replace the swipeable cards with rows?**
-4. **Jack and the frozen frontend.** AGENTS.md says Jack's version wins and new screens carry an "AI generated" note.
-   This redesign changes `frontend/index.html` (Home, sign-in, tokens). **Does your go replace Jack's review for this
-   work, and may the new screens ship without a visible "AI generated" note** (the marker stays as a code comment)?
-5. **Browser tests.** Phase 3 needs end-to-end tests in a real browser. That means Playwright as a development-only
-   dependency in a new `e2e/` folder (AGENTS.md: no new dependency without asking). **OK?**
+1. **Colours: Jack's warm look with the two contrast fixes** (`--muted` `#655445`, `--control` `#8f7a69`). The warm block
+   of `tokens.css` becomes the default theme in PR 1; the neutral block is dropped from the app (it stays in the mockups).
+2. **Calendar step: keep a quiet "Not now"** while Google shows the "unverified app" warning. Revisit after Google verifies the app.
+3. **Swipeable cards are replaced by rows with a visible checkbox.** Swipe stays as an extra on touch screens.
+4. **This go replaces Jack's review** for this work, and **new screens ship without a visible "AI generated" note**
+   (the marker stays as an `AI-GENERATED:` code comment). This is a one-time exception to AGENTS.md; ADR 0045 records it.
+5. **Playwright is allowed as a development-only dependency** for browser tests, in a new `e2e/` folder (Phase 3). It is not
+   part of any shipped build and is not listed in `server/` or `app/` dependencies.
 
 ## 2. What changes for the student
 
@@ -50,7 +42,7 @@ Read with it:
    button "Open Google again".
 2. **Calendar** ("Step 2 of 3"). Title "Plan around your real day". Text: "Concentr8 reads your Google Calendar to
    find free time for your to-dos. It never changes your calendar." Main button "Connect Google Calendar", quiet
-   button "Not now" (see question 2). While waiting: "Finish in the Google window. Concentr8 continues by itself." and
+   button "Not now" (decision 2). While waiting: "Finish in the Google window. Concentr8 continues by itself." and
    a disabled button "Waiting for Google…". On success the app selects one calendar by itself (the one whose id is
    the student's email, otherwise the first in the list), saves it through the existing save call, and moves on. No
    "Save selection". On failure: "The calendar did not connect. Nothing was changed. You can try again or do it later
@@ -104,13 +96,13 @@ Behaviour:
 
 | Rule | Proposal | Reason |
 |---|---|---|
-| Black/white/grey | Open, see question 1 | No evidence either way (research, part A, 5a). Both pass contrast after the fixes |
+| Black/white/grey | Decided: Jack's warm colours (decision 1) | No evidence either way (research, part A, 5a). Both pass contrast after the fixes |
 | Top 3 to-dos as swipeable cards | Top 3 stays; one Next card plus two rows; swipe only as a touch extra | WCAG 2.5.7; swipe is not discoverable on desktop (5c) |
 | Small buttons | Small look, safe targets: 36 px buttons, 28 px icon buttons 8 px apart, and one 44 px main action per screen | WCAG 2.5.8 floor is 24 px; Apple and Google recommend 44 to 48 px for touch (5d) |
 | Near-empty Home | Kept, but "empty" means one next action, not zero | An empty page makes the student decide; working-memory and choice-overload findings (part A, 1) |
 | Tools suggested inside the chat | Kept for tools. The main action "Start focus" is a permanent button | Chat has an articulation barrier; buttons fix discoverability (5f) |
 | No mood row, no Claude logo or colours | Kept | No evidence against; nothing in the design needs them |
-| Mandatory calendar | Open, see question 2 | Permission priming works better than a wall (part A, 2); Google's warning |
+| Mandatory calendar | Decided: quiet "Not now" (decision 2) | Permission priming works better than a wall (part A, 2); Google's warning |
 
 ### 3.4 Tokens
 All values are in `docs/design/mockups/tokens.css` with their contrast ratios. Summary:
@@ -165,7 +157,7 @@ and stop. Hard limits: no change to secrets, env vars, OAuth settings or the wor
 
 ### PR 1: "Calmer look: one set of colours, sizes and spacing"
 - Scope: `frontend/index.html` theme block (`:root`, lines 881-918 and the theme rules after it). Add the tokens of
-  `tokens.css` (theme per question 1), keep the old names as aliases. No layout change.
+  `tokens.css` (warm theme, decision 1), keep the old names as aliases. No layout change.
 - Accept when: (1) every colour pair used for text measures at least 4.5:1 and every control edge and focus ring at
   least 3:1 (list the measured pairs in the pull request); (2) the focus ring is 2 px `--focus` with a 2 px gap
   everywhere; (3) under `prefers-reduced-motion: reduce` no CSS transition or animation runs longer than 1 ms,
@@ -191,14 +183,14 @@ and stop. Hard limits: no change to secrets, env vars, OAuth settings or the wor
 - Accept when: (1) a new account on the web goes: status line → Google → calendar screen → first to-do field, with
   1 click inside Concentr8 before typing; (2) the page is never blank for more than 1 s without the status line;
   (3) after connecting, one calendar is selected and saved without a further click, and Calendar shows its events;
-  (4) "Not now" (if kept) goes to step 3 and the step never shows again, Settings still offers the calendar;
+  (4) "Not now"  goes to step 3 and the step never shows again, Settings still offers the calendar;
   (5) a failed or cancelled connection shows the failure screen, never "Failed to fetch"; (6) Enter in step 3 shows
   the to-do on Home within 100 ms with the server blocked; (7) a new account has 0 to-dos, 0 courses, 0 events;
   `?demo` still has the samples and still skips sign-in; an existing account keeps every to-do it had; (8) the three
   dead "Continue with Google" buttons (`index.html:1926`, `1928`, `1931`) start sign-in; (9) every screen works with
   Tab, Enter and Escape only, and the field in step 3 has focus on arrival; (10) desktop app: the status text of
   section 3.1 shows and sign-in completes; (11) ADR "Calendar step right after sign-in" (changes ADR 0039 as
-  answered in question 2).
+  decided in decision 2).
 
 ### PR 4: "Home shows your next to-do and starts focus in one click"
 - Scope: `frontend/index.html` Home markup and script (577-593, 2804-2866, 782-788), new `frontend/home-next.js`
@@ -234,6 +226,6 @@ translation of the existing 542 texts and the language switch (CON-43).
 
 ## 5. How Phase 3 checks it
 Re-run the five tasks of `baseline.md` the same way and compare; repeat the audit and the three walkthroughs; add
-end-to-end tests for first start and Home (question 5); then a 15-minute moderated test with five Berkeley students.
+end-to-end tests for first start and Home (decision 5); then a 15-minute moderated test with five Berkeley students.
 Three points have no evidence yet and are the first things to watch there: the colour choice, the top-3 cap, and
 whether students notice the Next card before the chat box.
