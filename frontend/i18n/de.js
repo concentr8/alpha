@@ -67,7 +67,8 @@
   "Try again.": "Versuch es noch einmal.",
   "Sign-in did not work.": "Die Anmeldung hat nicht geklappt.",
   "Open in browser": "Im Browser öffnen",
-  "One moment…": "Einen Moment…"
+  "One moment…": "Einen Moment…",
+  "Focus session": "Fokus-Session"
   };
   if (root.I18n) root.I18n.add('de', entries);
   if (typeof module !== 'undefined') module.exports = entries;

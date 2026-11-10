@@ -48,9 +48,9 @@ measured before the warm look and may be a little off; the CSS is the truth.
   Room and Break. A hash router shows them (`#calendar`, `#todos`, `#data`,
   `#toolbox/music` etc.).
 - Home (Jack): a chat switcher top left (`.chat-switcher`, history panel
-  `.chat-history`), the greeting, `.home-question` "What's on your plate right now?",
-  `.quick-start-options` (Quick Start) and, in a focus chat, `.focus-chat-actions`
-  (Start focus session). The AI button is hidden on Home.
+  `.chat-history`), the small greeting, the Next card with two rows and the add row (`#home-next`, ADR 0049), the chip
+  "Plan a session" (`#quick-start.c8-chip`) and, in a focus chat, `.focus-chat-actions` ("Start focus"). The AI button
+  is hidden on Home.
 - Toolbox detail pages: Timer, Body Doubling, Music, Block App, Breathing
   Exercise, Meditation (and Saved sessions), Checklist.
 - Content pages use `.page-content` and start with `.product-heading` (title,
@@ -81,7 +81,7 @@ measured before the warm look and may be a little off; the CSS is the truth.
 | `.template-grid` | Cards in 3 columns (2 when narrow) | gap 22px |
 | `.avatar` | Round initials | 40px, `#eee` |
 | `.chat-switcher` / `.chat-history-row` | Chat title button and its history list on Home (Jack) | pill 40px high, `#f4f4f2`; rows 44px, current row `#f4f4f2` |
-| `.quick-start-options` / `.focus-chat-actions` | Small button with a grey hint next to it (Jack) | 40px button, `#dedede` border; hint 14px `#777` |
+| `.quick-start-options` / `.focus-chat-actions` | Row for the "Plan a session" chip / the "Start focus" button of a focus chat | chip 28px (`.c8-chip`); button 44px |
 | `.chat-pending` | "Concentr8 is thinking…" under the chat (Jack) | 16px, `#777` |
 | `.cal-toolbar` / `.cal-toolbar-actions` | Calendar's one toolbar row (Jack) | 40px controls, range 20px |
 | `.profile-picture`, `.avatar img` | Profile picture (AI generated, not drawn by Jack) | 72px on Personal information, 32px in the sidebar |
@@ -124,6 +124,15 @@ Three full-window screens built from the `c8-` blocks, centred, one job each: (1
 or the fallback with an error box and "Continue with Google"; (2) "Step 2 of 3", calendar reason, "Connect Google
 Calendar" and a quiet "Not now" (waiting and failed looks); (3) "Step 3 of 3", one question and one focused field.
 Screens: `docs/evidence/simplicity/pr3/`.
+
+## Home (ADR 0049)
+One column of at most `--content-width` (640px): small greeting; the Next card (label "Next", checkbox, title, due date
+in words plus estimate, the page's one filled button "Start focus 25 min", ⋯ menu); two more to-dos as `.c8-row`s; the
+add row (`N` focuses it); "All to-dos (n)"; then, at the bottom, the chip "Plan a session" and the chat composer.
+While a session runs the card says "Now", "Focus ends at …" and shows the dark `.c8-pill` with the time left. Inside a
+chat the card shrinks to one line (`.c8-next--compact`) with a secondary "Start focus". With no open to-do the card holds
+the field "What is the next thing you need to get done?" and a quiet "Just start 25 min". Under 560px the start button
+spans the card. Screens: `docs/evidence/simplicity/pr4/`.
 
 ## Texts and languages (ADR 0047)
 Every new text goes through `I18n.t('English text')` with a single-quoted literal and gets German ("du"), French ("tu")
