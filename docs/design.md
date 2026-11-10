@@ -15,14 +15,14 @@ one terracotta button colour, Bricolage Grotesque for titles and Lexend for text
 `bundled-licenses` block). Thin warm borders, almost no shadows.
 
 ## Tokens (CSS variables in `:root`, written once in the file)
-Names and values follow ADR 0046 (`docs/design/mockups/tokens.css`, warm theme). New code uses the semantic names
-in the first column; the old names (`--paper`, `--sidebar`, `--body-ink`, `--ink-hover`) remain as aliases.
+Names and values follow ADR 0046 (`docs/design/mockups/tokens.css`, warm theme). The old names (`--paper`, `--sidebar`,
+`--body-ink`, `--ink-hover`) were retired in the simplicity redesign, PR 5.
 | Use | Variable | Value |
 |---|---|---|
-| Page background | `--bg` (old `--paper`) | `#fffbf2` |
+| Page background | `--bg` | `#fffbf2` |
 | Cards, dialogs | `--surface` / `--surface-muted` | `#fffdf8` / `#f1e3d7` |
-| Sidebar, sunken areas | `--surface-sunken` (old `--sidebar`) | `#efddc8` |
-| Text / secondary text | `--ink` / `--ink-2` (old `--body-ink`) | `#2a1d14` / `#4a3020` |
+| Sidebar, sunken areas | `--surface-sunken` | `#efddc8` |
+| Text / secondary text | `--ink` / `--ink-2` | `#2a1d14` / `#4a3020` |
 | Muted text | `--muted` | `#655445` (at least 4.5:1 on every surface) |
 | Dividers / control borders | `--line` / `--control` | `#e2d6c9` (decoration only) / `#8f7a69` (at least 3:1) |
 | Selected / hover | `--selected` / `--hover` | `#f2cab6` / `#f7e4d6` |
@@ -32,7 +32,7 @@ in the first column; the old names (`--paper`, `--sidebar`, `--body-ink`, `--ink
 | Focus ring | `--focus` | `#2a1d14`, 2px, offset 2px (exceptions: calendar events 1px, scroll areas inset, meditation slider 7px) |
 | Shadows, backdrop | `--shadow-color`, `--shadow-faint`, `--backdrop` | brown at 10%, 4%, 20% |
 | Fonts | `--font-display` / `--font-body` | Bricolage Grotesque / Lexend |
-| Text sizes | `--text-xs` … `--text-xl` | 12 / 14 / 16 / 20 / 28px; weights `--weight-regular/medium/bold` 400/500/600 |
+| Text sizes | `--text-xs` … `--text-xl` | 12 / 14 / 16 / 20 / 28px; weights `--weight-regular/medium/bold` 400/500/600. Exceptions: the calendar grid and its dialogs, timer and stat numerals over 34px |
 | Space | `--space-1` … `--space-8` | 4 / 8 / 12 / 16 / 24 / 32 / 40 / 64px |
 | Corners | `--radius-control` / `--radius-panel` / `--radius-pill` | 8px / 12px / 999px |
 | Sizes | `--size-main` / `--size-control` / `--size-small` | 44px main action and inputs / 36px buttons / 28px icon buttons (8px apart) |
@@ -42,7 +42,7 @@ measured before the warm look and may be a little off; the CSS is the truth.
 
 ## Layout
 - `.app` is a 3-column grid: sidebar 224px, content (flexible), agent panel 336px.
-  Minimum width 760px, so there is no phone layout yet.
+  Phone widths down to 320px use one column (ADR 0014, 0049).
 - Pages (Jack, 2026-11-03, ADR 0036): Home, Courses, Toolbox, To Do List, Data,
   Calendar in the sidebar (buttons with `data-page`), plus Workflow, Profile, Focus,
   Room and Break. A hash router shows them (`#calendar`, `#todos`, `#data`,
@@ -61,42 +61,42 @@ measured before the warm look and may be a little off; the CSS is the truth.
 ## Components (class names to reuse)
 | Class | Use | Key facts |
 |---|---|---|
-| `.wire-button` | Every normal button | min-height 48px, border 1.5px `#bdbdbd`, radius 7px, 18px text |
-| `.wire-button.solid` | The one main action | background `#292929`, white text |
-| `.icon-button` | Icon only (close, menu) | 44x44px, transparent, hover `#eee`; needs `aria-label` |
-| `.text-back` | "Back" link at the top | no border, 17px, color `#555` |
+| `.wire-button` | Every normal button | min-height 44px, 1px `--control` border, `--radius-control`, `--text-sm`, hover `--hover` |
+| `.wire-button.solid` | The one main action | `--action` background, `--action-ink` text, `--action-border` |
+| `.icon-button` | Icon only (close, menu) | 44x44px, transparent, `--radius-control`, hover `--hover`; needs `aria-label` |
+| `.text-back` | "Back" link at the top | no border, `--text-sm`, `--ink-2` |
 | `.chat-action` (`.solid`, `.quiet`) | Small button under an answer of Concentr8 (ADR 0027) | 30px high, 14px text, 1px `--ink` border, radius 8px; Enter confirms the newest one (`kbd` hint) |
-| `.chat-note` / `.chat-undo` | Plain line "Added to to-do: … · Undo", no box | 14px, grey `#666` |
-| `.chat-tool` | Tool card inside the chat (name + Open) | 1px `#d6d6d6`, radius 12px, max 380px |
-| `.preview-note.quiet` | "AI generated" marker for Home, as quiet as possible | 11px, `#9a9a9a`, no box |
-| user message | Dark bubble: `--ink`, white text, radius 18px (answers have no bubble) | |
+| `.chat-note` / `.chat-undo` | Plain line "Added to to-do: … · Undo", no box | `--text-sm`, `--muted` |
+| `.chat-tool` | Tool card inside the chat (name + Open) | 1px `--line`, `--radius-panel`, max 380px |
+| `.preview-note.quiet` | "AI generated" marker where one is still shown (calendar dialogs) | `--text-xs`, `--muted`, no box |
+| user message | Dark bubble: `--ink` background, `--surface` text, rounded (answers have no bubble) | |
 | `.message-action` | Small text action in chat | underline on hover |
-| `.product-form` | Forms in dialogs | grid, gap 22px, inputs 48px high, 1px `#bbb` border, radius 6px |
+| `.product-form` | Forms in dialogs | grid, inputs 44px high, 1px `--control` border on `--surface`, `--radius-control` |
 | `.cal-field` | Labelled field in calendar forms | same input look as `.product-form` |
 | `.dialog-actions` | Button row at the bottom of a dialog | right-aligned, gap 12px |
 | `.section-toolbar` | Heading with actions on one line | space-between |
-| `.preview-note` | Grey hint box ("preview only") | background `#f4f4f4`, 16px |
-| `.empty-message` | Empty list text | 18px, `#666` |
+| `.preview-note` | Grey hint text ("preview only") | `--text-md`, `--muted` |
+| `.empty-message` | Empty list text | `--text-md`, `--muted` |
 | `.stat-row` | Three numbers in a row | big 38px numbers |
 | `.template-grid` | Cards in 3 columns (2 when narrow) | gap 22px |
-| `.avatar` | Round initials | 40px, `#eee` |
-| `.chat-switcher` / `.chat-history-row` | Chat title button and its history list on Home (Jack) | pill 40px high, `#f4f4f2`; rows 44px, current row `#f4f4f2` |
+| `.avatar` | Round initials | 40px, `--surface-muted` |
+| `.chat-switcher` / `.chat-history-row` | Chat title button and its history list on Home (Jack) | 44px high, 1px `--line`, `--surface`; rows 44px, current row `--selected` |
 | `.quick-start-options` / `.focus-chat-actions` | Row for the "Plan a session" chip / the "Start focus" button of a focus chat | chip 28px (`.c8-chip`); button 44px |
-| `.chat-pending` | "Concentr8 is thinking…" under the chat (Jack) | 16px, `#777` |
+| `.chat-pending` | "Concentr8 is thinking…" under the chat (Jack) | `--text-sm`, `--muted` |
 | `.cal-toolbar` / `.cal-toolbar-actions` | Calendar's one toolbar row (Jack) | 40px controls, range 20px |
 | `.profile-picture`, `.avatar img` | Profile picture (AI generated, not drawn by Jack) | 72px on Personal information, 32px in the sidebar |
-| `.detail-heading` | Header of a tool page: `.text-back`, `h1`, `.detail-actions` on the right | 28px title, actions push right |
-| `.detail-section`, `.detail-note`, `.detail-empty` | Block with 21px/500 title, grey note, empty text | notes `#737373`, 16px |
-| `.detail-search` | Search field with icon and button | 1px `#ccc`, radius 6px |
-| `.ambient-card` | Music card with picture and name | 1px `#eaeaea`, radius 8px, selected = 2px dark frame around the whole card |
-| `.player-bar` / `.meditation-player` | Bottom player (music, meditation) | 1px border, radius 8px / 12px, round play button |
-| `.block-preset`, `.blocked-app` | Block App preset card and chip | 1px `#eaeaea`, radius 8px / 6px |
+| `.detail-heading` | Header of a tool page: `.text-back`, `h1`, `.detail-actions` on the right | `--text-xl` title, actions push right |
+| `.detail-section`, `.detail-note`, `.detail-empty` | Block with a `--text-lg` title, grey note, empty text | notes `--muted`, `--text-md` |
+| `.detail-search` | Search field with icon and button | 1px `--control`, `--radius-control`, focus ring around the whole field |
+| `.ambient-card` | Music card with picture and name | `--surface`, 1px `--line`, `--radius-panel`, selected = 2px dark frame around the whole card |
+| `.player-bar` / `.meditation-player` | Bottom player (music, meditation) | 1px border, `--radius-control` / `--radius-panel`, round play button |
+| `.block-preset`, `.blocked-app` | Block App preset card and chip | `--surface`, 1px `--line`, `--radius-panel` / `--radius-control` |
 | `.check-row` | Checklist row | checkbox, text field, due date, delete |
-| `.time-wheels` | Timer picker (hours, minutes, seconds) | scroll-snap wheels, selected row `#f3f3f2` |
-| `.solo-timer-dial` | Clockwise timer ring | stroke 7, accent `#566b60` |
-| `.data-chart`, `.activity-bar` | Insights bar chart | bars `#a6b5af` |
+| `.time-wheels` | Timer picker (hours, minutes, seconds) | scroll-snap wheels, selected row `--selected`, tabular numbers |
+| `.solo-timer-dial` | Clockwise timer ring | stroke 7, `--progress` on a `--surface-muted` track |
+| `.data-chart`, `.activity-bar` | Insights bar chart | bars `--progress-soft` |
 | `.room-grid`, `.camera-frame`, `.room-toolbar` | Body Double room | 3x2 grid, toolbar with 5 buttons |
-| `.composer` | Text input with send button | 64px high, radius 8px |
+| `.composer` | Text input with send button | 1px `--control`, `--radius-panel`, `--surface`; focus ring around the whole box |
 | Calendar mini month, visibility rail, quick add, view switch | Calendar-only extension built from `.wire-button`, `.icon-button`, `.cal-field`, `.preview-note.quiet` | Day / Week / Month; task blocks use existing light greys, deadlines use `--ink`, read-only Google blocks use existing sage/grey with dashed borders |
 Dialogs, calendar details and the agent panel are built in the scripts and
 reuse the same classes.
@@ -172,11 +172,11 @@ slot in words, then opens the existing editor with “Add to calendar”.
 - Calendar remains inside `frontend/index.html`; `frontend/calendar-tools.js`
   contains dependency-free local date arithmetic and quick-add parsing.
 - The calendar uses a left mini month and visibility rail, a quick-add field,
-  Day / Week / Month controls, a tabular time gutter, thin grey grid lines, and
-  the existing Arial and grey/white/sage tokens. At 800px the rail is hidden
+  Day / Week / Month controls, a tabular time gutter, thin `--line` grid lines, and
+  the shared tokens (ADR 0046). Its own small text sizes stay (dense grid, ADR 0046 exception). At 800px the rail is hidden
   before the seven-column week becomes cramped; below 700px the initial view is
   one day.
-- Tasks retain a light-grey block, deadlines are dark with white text, and
+- Tasks keep a light `--surface-muted` block, deadlines are dark (`--ink`) with light text, and
   Google events are visibly read-only and dashed. External events remain in
   CalendarUI memory and are never passed to Concentr8 storage.
 - The current-time marker follows the browser's local timezone. The quick-add

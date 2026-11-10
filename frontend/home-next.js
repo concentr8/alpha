@@ -66,6 +66,7 @@
   const api = { order, deadlineOf, dueText, leftMs };
   if (typeof module !== 'undefined') module.exports = api;
   if (!root.document) return;
+  root.HomeNext = api; // the To Do List page uses the same order and words
 
   // ---------- In the browser ----------
   const t = (text, values) => (root.I18n ? root.I18n.t(text, values) : text);

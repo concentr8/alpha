@@ -34,3 +34,11 @@ a fill for the current nav item, chat row, today's date and text selection). Kee
 - Checkbox ticks and the text caret use `--focus` and turn from brown to near-black.
 - With reduced motion, every element briefly "transitions" for 1ms when a style changes; this is invisible but a
   script that reads computed styles in the same frame sees the start value.
+
+## Applied to the whole app (PR 5)
+- Font sizes in the CSS use the five `--text-*` tokens (280 declarations). Exceptions, kept on purpose: the calendar grid
+  and its dialogs (dense layout) and display numerals over 34px (timers, meditation clock, stats).
+- Radii of 7-10px use `--radius-control`, 12-14px `--radius-panel`.
+- Spacing values on the 4px scale (4, 8, 12, 16, 24, 32, 40, 64px) use `--space-*`. Off-scale values (10, 14, 18, 20px …)
+  are left as they are: changing them would move layouts of pages this redesign does not touch.
+- The old names `--paper`, `--sidebar`, `--body-ink`, `--ink-hover` are gone.
