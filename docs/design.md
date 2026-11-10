@@ -15,22 +15,28 @@ one terracotta button colour, Bricolage Grotesque for titles and Lexend for text
 `bundled-licenses` block). Thin warm borders, almost no shadows.
 
 ## Tokens (CSS variables in `:root`, written once in the file)
+Names and values follow ADR 0046 (`docs/design/mockups/tokens.css`, warm theme). New code uses the semantic names
+in the first column; the old names (`--paper`, `--sidebar`, `--body-ink`, `--ink-hover`) remain as aliases.
 | Use | Variable | Value |
 |---|---|---|
-| Page background | `--paper` | `#fffbf2` |
+| Page background | `--bg` (old `--paper`) | `#fffbf2` |
 | Cards, dialogs | `--surface` / `--surface-muted` | `#fffdf8` / `#f1e3d7` |
-| Sidebar | `--sidebar` | `#efddc8` |
-| Text / secondary text | `--ink` / `--body-ink` | `#2a1d14` / `#4a3020` |
-| Muted text | `--muted` | `#786657` |
-| Dividers / control borders | `--line` / `--control` | `#e2d6c9` / `#a08b7a` |
+| Sidebar, sunken areas | `--surface-sunken` (old `--sidebar`) | `#efddc8` |
+| Text / secondary text | `--ink` / `--ink-2` (old `--body-ink`) | `#2a1d14` / `#4a3020` |
+| Muted text | `--muted` | `#655445` (at least 4.5:1 on every surface) |
+| Dividers / control borders | `--line` / `--control` | `#e2d6c9` (decoration only) / `#8f7a69` (at least 3:1) |
 | Selected / hover | `--selected` / `--hover` | `#f2cab6` / `#f7e4d6` |
 | Main button (and progress) | `--action` (`--action-hover`, `--action-border`, `--action-ink`) | `#b4532f` (`#9f4728`, `#924124`, `#fffbf2`) |
 | Progress, soft | `--progress`, `--progress-soft` | `#b4532f`, `#c88d6d` |
 | Error | `--danger`, `--danger-surface` | `#9b2948`, `#f8e7ec` |
-| Focus ring | `--focus` | `#8a5b38`, 2px, offset 5px |
+| Focus ring | `--focus` | `#2a1d14`, 2px, offset 2px (exceptions: calendar events 1px, scroll areas inset, meditation slider 7px) |
 | Shadows, backdrop | `--shadow-color`, `--shadow-faint`, `--backdrop` | brown at 10%, 4%, 20% |
 | Fonts | `--font-display` / `--font-body` | Bricolage Grotesque / Lexend |
-| Corners | `--radius-control` / `--radius-panel` | 8px / 12px |
+| Text sizes | `--text-xs` … `--text-xl` | 12 / 14 / 16 / 20 / 28px; weights `--weight-regular/medium/bold` 400/500/600 |
+| Space | `--space-1` … `--space-8` | 4 / 8 / 12 / 16 / 24 / 32 / 40 / 64px |
+| Corners | `--radius-control` / `--radius-panel` / `--radius-pill` | 8px / 12px / 999px |
+| Sizes | `--size-main` / `--size-control` / `--size-small` | 44px main action and inputs / 36px buttons / 28px icon buttons (8px apart) |
+| Motion | `--dur-fast` / `--dur-base` / `--dur-slow`, `--ease` | 100 / 200 / 300ms; all 1ms under `prefers-reduced-motion` |
 Use the variables, not new hex values. Pixel sizes of titles and rows below were
 measured before the warm look and may be a little off; the CSS is the truth.
 

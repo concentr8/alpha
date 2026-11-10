@@ -29,7 +29,7 @@ enum Tokens {
     static let paper = Hex(value: 0xFFFBF2)        // --paper: page background
     static let surface = Hex(value: 0xFFFDF8)      // --surface: cards
     static let ink = Hex(value: 0x2A1D14)          // --ink: text
-    static let muted = Hex(value: 0x786657)        // --muted: secondary text
+    static let muted = Hex(value: 0x655445)        // --muted: secondary text (ADR 0046)
     static let line = Hex(value: 0xE2D6C9)         // --line: dividers
     static let action = Hex(value: 0xB4532F)       // --action: main button
     static let actionPressed = Hex(value: 0x9F4728) // --action-hover: pressed main button
