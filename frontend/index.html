@@ -1331,6 +1331,83 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
 
 </style>
   <button class="resume-focus" id="resume-focus" type="button" hidden aria-label="Return to active focus session"></button>
+<style data-source="simplicity-components.css">
+/* Building blocks of docs/plans/simplicity-redesign.md (section 3.5), copied from docs/design/mockups/index.html.
+   Prefixed c8- so they never clash with older classes; only ADR 0046 tokens. Used by the first start (PR 3) and Home (PR 4).
+   States are drawn in section 6 of the mockups. */
+.c8-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: var(--size-control); padding: 0 var(--space-4); border: 1px solid var(--control); border-radius: var(--radius-control); background: var(--bg); color: var(--ink); font: var(--weight-medium) var(--text-sm)/1.2 var(--font-body); white-space: nowrap; cursor: pointer; transition: background-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease); }
+.c8-btn:hover { background: var(--hover); }
+.c8-btn:active { transform: scale(.98); }
+.c8-btn:disabled { opacity: .45; cursor: default; transform: none; }
+.c8-btn--main { min-height: var(--size-main); border-color: var(--action-border); background: var(--action); color: var(--action-ink); }
+.c8-btn--main:hover { background: var(--action-hover); }
+.c8-btn--quiet { border-color: transparent; background: none; color: var(--ink-2); }
+.c8-btn--quiet:hover { background: var(--hover); }
+.c8-btn--icon { width: var(--size-small); min-height: var(--size-small); padding: 0; border-color: transparent; background: none; color: var(--muted); }
+.c8-btn--icon:hover { background: var(--hover); color: var(--ink); }
+.c8-btn__extra { font-weight: var(--weight-regular); opacity: .85; }
+.c8-chip { min-height: var(--size-small); padding: 0 var(--space-3); border: 1px solid var(--control); border-radius: var(--radius-pill); background: var(--bg); color: var(--ink-2); font: var(--weight-regular) var(--text-sm)/1.2 var(--font-body); cursor: pointer; }
+.c8-chip:hover { background: var(--hover); }
+/* Spinner: shown only after 1s of waiting; a still ring under reduced motion. */
+.c8-spinner { flex: none; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: c8-spin .8s linear infinite; }
+@keyframes c8-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .c8-spinner { animation: none; border-right-color: currentColor; opacity: .5; } }
+.c8-meta { color: var(--muted); font-size: var(--text-sm); }
+.c8-overdue { color: var(--danger); font-weight: var(--weight-medium); }
+.c8-label { color: var(--muted); font-size: var(--text-xs); letter-spacing: .04em; text-transform: uppercase; }
+.c8-kbd { padding: 0 5px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); font-size: var(--text-xs); }
+/* Checkbox: native input, 24px target (WCAG 2.5.8). The tick colour is --bg written out, because a data URI cannot read variables. */
+.c8-check { flex: none; display: inline-grid; place-items: center; width: 24px; height: 24px; margin: 0; border: 1.5px solid var(--control); border-radius: 6px; background: var(--bg); cursor: pointer; appearance: none; -webkit-appearance: none; transition: background-color var(--dur-fast) var(--ease); }
+.c8-check:hover { border-color: var(--ink-2); }
+.c8-check:checked { border-color: var(--ink); background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='%23fffbf2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
+/* Next card */
+.c8-next { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-2) var(--space-3); align-items: center; padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--surface); }
+.c8-next__label { grid-column: 1 / -1; }
+.c8-next__title { margin: 0; color: var(--ink); font-size: var(--text-lg); font-weight: var(--weight-medium); line-height: var(--leading-tight); overflow-wrap: anywhere; }
+.c8-next--compact { padding: var(--space-2) var(--space-3); }
+.c8-next--compact .c8-next__title { overflow: hidden; font-size: var(--text-md); text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 560px) {
+  .c8-next { grid-template-columns: auto minmax(0, 1fr); }
+  .c8-next > .c8-btn--main, .c8-next > .c8-pill, .c8-next > .c8-next__start { grid-column: 1 / -1; width: 100%; }
+}
+/* To-do rows */
+.c8-rows { margin: 0; padding: 0; list-style: none; }
+.c8-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: var(--space-3); align-items: center; min-height: var(--size-main); padding: 0 var(--space-4); border-radius: var(--radius-control); }
+.c8-row + .c8-row { border-top: 1px solid var(--line); }
+.c8-row:hover, .c8-row:focus-within { background: var(--hover); }
+.c8-row__title { min-width: 0; padding: 0; overflow: hidden; border: 0; background: none; color: var(--ink); font: inherit; text-align: left; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.c8-row--done .c8-row__title { color: var(--muted); text-decoration: line-through; }
+.c8-row--add { grid-template-columns: auto minmax(0, 1fr) auto; color: var(--muted); }
+.c8-row--add:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+.c8-row--add input { width: 100%; min-width: 0; min-height: calc(var(--size-main) - 2px); border: 0; outline: 0; background: none; color: var(--ink); font: inherit; }
+.c8-row--add input::placeholder { color: var(--muted); }
+.c8-plus { width: 24px; text-align: center; }
+/* Field */
+.c8-field { display: flex; align-items: center; gap: var(--space-2); min-height: var(--size-main); padding: 0 var(--space-3); border: 1px solid var(--control); border-radius: var(--radius-control); background: var(--bg); }
+.c8-field:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+.c8-field input { flex: 1; min-width: 0; min-height: calc(var(--size-main) - 2px); border: 0; outline: 0; background: none; color: var(--ink); font: inherit; font-size: var(--text-md); }
+.c8-field--error { border-color: var(--danger); }
+.c8-field-error { margin: var(--space-2) 0 0; color: var(--danger); font-size: var(--text-sm); }
+/* Messages */
+.c8-note { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); color: var(--ink-2); font-size: var(--text-sm); }
+.c8-note button { min-height: 24px; padding: 0 var(--space-1); border: 0; background: none; color: var(--ink); font: inherit; text-decoration: underline; cursor: pointer; }
+.c8-alert { padding: var(--space-3) var(--space-4); border-radius: var(--radius-control); background: var(--danger-surface); color: var(--ink); font-size: var(--text-sm); text-align: left; }
+.c8-alert strong { color: var(--danger); }
+.c8-status { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--muted); font-size: var(--text-sm); }
+.c8-pill { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: var(--size-main); padding: 0 var(--space-4); border: 0; border-radius: var(--radius-pill); background: var(--ink); color: var(--bg); font: var(--weight-medium) var(--text-sm)/1 var(--font-body); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; }
+.c8-ring { flex: none; width: 16px; height: 16px; border: 2px solid var(--bg); border-radius: 50%; background: conic-gradient(var(--bg) calc(var(--c8-done, 0) * 1%), transparent 0); }
+/* Onboarding screens: one job per screen, centred. */
+.c8-onboarding { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-4); min-height: 100%; padding: var(--space-6) var(--space-5); text-align: center; }
+.c8-brand { color: var(--ink); font: var(--weight-bold) var(--text-lg)/1.2 var(--font-display); }
+.c8-step { color: var(--muted); font-size: var(--text-xs); letter-spacing: .04em; text-transform: uppercase; }
+.c8-title { margin: 0; color: var(--ink); font: var(--weight-bold) var(--text-xl)/var(--leading-tight) var(--font-display); }
+.c8-body { max-width: 44ch; margin: 0; color: var(--ink-2); }
+.c8-stack { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+</style>
+  <script src="i18n.js"></script>
+  <script src="i18n/de.js"></script>
+  <script src="i18n/fr.js"></script>
+  <script src="i18n/es.js"></script>
   <script src="concentr8-demo.js"></script>
   <script src="concentr8-server.js"></script>
 <script src="concentr8-blocker.js"></script>

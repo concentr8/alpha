@@ -110,6 +110,11 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/decisions/0045-simplicity-redesign-decisions.md | ADR: five decisions for the redesign (warm colours, optional calendar step, rows instead of swipe cards, no visible AI note, Playwright) | New |
 | docs/decisions/0046-design-tokens-simplicity-redesign.md | ADR: design tokens of the redesign (warm colours with contrast fixes, sizes, motion, one focus ring) | New |
 | docs/evidence/simplicity/ | Before/after screenshots for each pull request of the simplicity redesign | New |
+| docs/decisions/0047-translation-layer.md | ADR: translation layer with English text as the key; ?lang= for testing until the language switch | New |
+| frontend/i18n.js | Translation layer: I18n.t(text, values), English fallback, fills {patterns} without translating the student's words | New |
+| frontend/i18n/de.js, fr.js, es.js | German ("du"), French ("tu") and Spanish (Spain) texts keyed by the English text | New |
+| frontend/test/i18n.test.js | Tests for the translation layer; fails when a text passed to t() lacks a translation | New |
+| frontend/index.html `simplicity-components.css` block | `c8-` building blocks of the redesign (buttons, checkbox, Next card, rows, field, messages, onboarding) | New |
 | docs/design/baseline.md | Steps, clicks, screens, words and time of the five core tasks on main at 158af01; the yardstick for the redesign | New |
 | docs/design/audit.md | Heuristic evaluation and three persona walkthroughs of first start and Home, with severity | New |
 | docs/design/research.md | Sourced research (ADHD, onboarding, motion, WCAG 2.2 AA) and teardown of five reference apps | New |

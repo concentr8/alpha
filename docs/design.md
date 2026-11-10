@@ -101,6 +101,30 @@ measured before the warm look and may be a little off; the CSS is the truth.
 Dialogs, calendar details and the agent panel are built in the scripts and
 reuse the same classes.
 
+## Building blocks of the simplicity redesign (`c8-` classes, ADR 0046)
+Written once in the `simplicity-components.css` style block of `frontend/index.html`; drawn with every state in
+`docs/design/mockups/index.html`, section 6. Use these for first start, Home and new work; older classes stay for older pages.
+| Class | What | States |
+|---|---|---|
+| `.c8-btn` + `--main` / `--quiet` / `--icon` | Buttons: 36px; main action 44px (one per screen); icon 28px, 8px apart | hover, pressed (scale .98), focus ring, disabled, busy (`.c8-spinner` after 1s) |
+| `.c8-chip` | Chat suggestion | hover, focus |
+| `.c8-check` | Native checkbox, 24px | unchecked, hover, checked, focus |
+| `.c8-next` (`__label`, `__title`, `--compact`) | Next card on Home | next, now, overdue, empty, compact; one column under 560px |
+| `.c8-rows`, `.c8-row` (`__title`, `--done`, `--add`) | One-line to-do rows and the add row | hover/focus, done, long title (ellipsis), add row focus |
+| `.c8-field`, `--error`, `.c8-field-error` | Text field with a key hint (`.c8-kbd`) | focus, error with a sentence under it |
+| `.c8-note` | Message with Undo; stays until the next action | — |
+| `.c8-alert` | Error: what happened (`strong`), what to do | — |
+| `.c8-status` | Spinner plus words | still under reduced motion |
+| `.c8-pill`, `.c8-ring` | Running session; ring fill from `--c8-done` (0-100) | — |
+| `.c8-onboarding`, `.c8-brand`, `.c8-step`, `.c8-title`, `.c8-body`, `.c8-stack` | First-start screens | — |
+| `.c8-meta`, `.c8-overdue`, `.c8-label` | Small grey text, overdue text (words plus colour), uppercase label | — |
+
+## Texts and languages (ADR 0047)
+Every new text goes through `I18n.t('English text')` with a single-quoted literal and gets German ("du"), French ("tu")
+and Spanish (Spain) entries in `frontend/i18n/de.js`, `fr.js`, `es.js`; `frontend/test/i18n.test.js` fails otherwise.
+Values such as a to-do title go in as `{name}` patterns and are never translated. Everyone sees English until the
+language switch (CON-43); `?lang=de|fr|es` forces a language for testing.
+
 ## Behavior and data
 - State lives in the browser (`localStorage`, key `articul8-wireframe-v2`).
   The backend is not connected yet.
