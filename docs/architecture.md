@@ -106,6 +106,11 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/plans/voice-on-azure.md | Plan: voice on the Azure server | New |
 | docs/plans/chat-followups.md | Plan: follow-ups of the chat actions (due date, Back from chat cards, French "tu", translations) | New, waiting for a human go |
 | docs/plans/chat-interview-and-google-login.md | Plan: chat asks first, time estimates, Google sign-in (CON-53 backend items) | New, waiting for a human go |
+| docs/plans/simplicity-redesign.md | Plan: redesign of first start and Home for simplicity (flows, tokens, components, pull requests with acceptance criteria) | New, waiting for a human go |
+| docs/design/baseline.md | Steps, clicks, screens, words and time of the five core tasks on main at 158af01; the yardstick for the redesign | New |
+| docs/design/audit.md | Heuristic evaluation and three persona walkthroughs of first start and Home, with severity | New |
+| docs/design/research.md | Sourced research (ADHD, onboarding, motion, WCAG 2.2 AA) and teardown of five reference apps | New |
+| docs/design/mockups/ | Static before/after mockups (`index.html`), proposed tokens (`tokens.css`), screenshots of main (`before/`) | New |
 | docs/plans/sign-in-on-first-open.md | Plan: the Google sign-in page opens when a signed-out student starts the app | New |
 | docs/plans/todos-on-calendar.md | Plan: new to-dos are placed on the calendar by themselves, with or without Google Calendar | New |
 | docs/decisions/0041-todos-placed-on-the-calendar.md | ADR: new to-dos get a block by themselves, and the rules that protect the week | New |
