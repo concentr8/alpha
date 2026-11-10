@@ -576,16 +576,17 @@ textarea:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
       </section>
       <section class="check-in" aria-labelledby="check-in-title">
         <h1 id="check-in-title">Hello</h1>
-        <p class="home-question">What's on your plate right now?</p>
+        <!-- AI-GENERATED: Next card, rows and add row (frontend/home-next.js, ADR 0049); Jonas's go replaces Jack's review (ADR 0045). -->
+        <div class="home-next" id="home-next"></div>
         <div class="home-chat-scroll" id="home-chat-scroll" tabindex="0" role="region" aria-label="Conversation history" hidden>
           <div class="conversation" id="home-conversation" role="log" aria-label="Conversation" aria-live="polite"></div>
         </div>
         <div class="quick-start-options">
-          <button class="wire-button" id="quick-start" type="button">Quick Start <span aria-hidden="true">↗</span></button>
+          <button class="c8-chip" id="quick-start" type="button">Plan a session</button>
           </div>
-        <div class="focus-chat-actions" id="focus-chat-actions" hidden><button class="wire-button" id="chat-start-focus" type="button">Start focus session</button></div>
+        <div class="focus-chat-actions" id="focus-chat-actions" hidden><button class="wire-button" id="chat-start-focus" type="button">Start focus</button></div>
         <form class="composer chat-composer" id="main-composer">
-          <textarea rows="1" aria-label="What's on your mind?" placeholder="What’s on your mind?" autocomplete="off" maxlength="2000"></textarea>
+          <textarea rows="1" aria-label="Ask Concentr8, or say what is on your plate" placeholder="Ask Concentr8, or say what is on your plate" autocomplete="off" maxlength="2000"></textarea>
           <div class="composer-actions">
             <div class="voice-control"><button class="icon-button voice-button" type="button" data-voice="main" aria-label="Start voice input" aria-pressed="false" title="Voice input"><svg class="mic-symbol" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v4M8 22h8"/></svg><svg class="stop-symbol" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor"/></svg></button><span class="voice-status" aria-live="polite" hidden></span></div>
             <button class="icon-button send-button" type="submit" aria-label="Send message" disabled><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V4m-7 7 7-7 7 7"/></svg></button>
@@ -760,7 +761,6 @@ textarea:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
 /* Jack's local MVP layout: shared tokens, a wider chat and independent pages. */
 .check-in{max-width:860px;top:clamp(150px,25vh,240px)}
 .check-in h1{margin-bottom:12px}
-.home-question{font-size:27px;line-height:1.4;margin-bottom:32px;letter-spacing:-.4px}
 .chat-toolbar{position:absolute;top:28px;left:32px;right:32px;display:flex;align-items:center;gap:8px;z-index:2}
 .chat-toolbar .chat-switcher{min-height:40px;max-width:min(420px,100%);min-width:0;font-size:16px;font-weight:500;padding:8px 12px;gap:10px;border:0;border-radius:24px;background:var(--surface-muted)}
 .chat-switcher span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -785,7 +785,7 @@ textarea:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
 .quick-start-options>span,.focus-chat-actions>span{color:var(--muted);font-size:14px}
 .check-in.has-messages{top:98px;height:calc(100dvh - 126px);min-height:300px;margin-bottom:28px}
 .has-messages h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
-.has-messages .home-question,.has-messages .quick-start-options{display:none}
+.has-messages .quick-start-options{display:none}
 .chat-pending{font-size:16px;color:var(--muted);padding:10px 0}
 .calendar-page .page-heading{min-height:48px;margin-bottom:52px}
 .cal-toolbar{justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
@@ -809,7 +809,6 @@ textarea:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
   .chat-history{position:fixed;top:74px;left:16px;width:400px;max-width:calc(100% - 32px)}
   .check-in{top:0;margin:80px auto 32px}
   .check-in.has-messages{top:0;margin:24px auto;height:calc(100dvh - 118px);min-height:300px}
-  .home-question{font-size:24px}
   .quick-start-options,.focus-chat-actions{gap:10px;flex-wrap:wrap}
   .sidebar{overflow-y:auto}
   .nav{margin-top:24px}
@@ -992,7 +991,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   outline-color: var(--focus);
 }
 input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color: var(--focus); }
-h1, h2, h3, .brand, .home-question, .workflow-name, .tool-card-name {
+h1, h2, h3, .brand, .workflow-name, .tool-card-name {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   color: var(--ink);
@@ -1094,7 +1093,6 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
   color: var(--muted);
   margin-bottom: 12px;
 }
-.home-question { font-size: 32px; line-height: 1.2; font-weight: 600; letter-spacing: -.8px; margin-bottom: 30px; text-wrap: balance; }
 .quick-start-options, .focus-chat-actions { gap: 14px; margin-bottom: 20px; }
 .quick-start-options .wire-button, .focus-chat-actions .wire-button { min-height: 44px; padding: 10px 17px; font-size: 14px; }
 .composer { background: var(--surface); border: 1px solid var(--control); border-radius: 14px; }
@@ -1280,7 +1278,6 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
 @media (max-width: 760px) {
   h1, .page-content h1, .product-heading h1, .page-heading h1, .detail-heading h1,
   .page-content[aria-label="Toolbox"] > :is(.product-heading, .detail-heading) > h1 { font-size: 28px; }
-  .home-question { font-size: 28px; line-height: 1.25; }
   .check-in h1, #check-in-title { font-size: 18px; }
   .chat-composer textarea, .agent .chat-composer textarea { font-size: 16px; }
   .chat-composer { padding: 17px 14px 12px; }
@@ -1369,6 +1366,7 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
 @media (max-width: 560px) {
   .c8-next { grid-template-columns: auto minmax(0, 1fr); }
   .c8-next > .c8-btn--main, .c8-next > .c8-pill, .c8-next > .c8-next__start { grid-column: 1 / -1; width: 100%; }
+  .c8-next__start > .c8-btn--main { flex: 1; }
 }
 /* To-do rows */
 .c8-rows { margin: 0; padding: 0; list-style: none; }
@@ -1407,6 +1405,28 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
    concentr8-signin.js hides the body to avoid a flash of the app. */
 dialog.c8-screen { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; overflow: auto; border: 0; background: var(--bg); color: var(--ink-2); visibility: visible; }
 dialog.c8-screen::backdrop { background: var(--bg); }
+/* Home leads with the next to-do (ADR 0049): one column of at most --content-width; the chat sits at the bottom. */
+.home-next { display: flex; flex-direction: column; gap: var(--space-2); }
+.check-in:not(.has-messages) { display: flex; flex-direction: column; top: 0; max-width: var(--content-width); min-height: calc(100dvh - 140px); margin: clamp(56px, 12vh, 112px) auto 24px; }
+.check-in:not(.has-messages) #check-in-title { margin-bottom: var(--space-3); font-size: var(--text-sm); }
+.check-in:not(.has-messages) .quick-start-options { margin: auto 0 var(--space-2); padding-top: var(--space-6); }
+.check-in:not(.has-messages) .chat-composer { min-height: 96px; }
+.check-in.has-messages > .home-next { flex-shrink: 0; width: calc(100% - 96px); max-width: 860px; margin: 0 auto var(--space-3); }
+#quick-start.c8-chip { min-height: var(--size-small); padding: 0 var(--space-3); border: 1px solid var(--control); background: var(--bg); color: var(--ink-2); font-size: var(--text-sm); font-weight: var(--weight-regular); }
+#quick-start.c8-chip:hover { background: var(--hover); }
+.c8-next__title--done { color: var(--muted); text-decoration: line-through; }
+.c8-next--empty { grid-template-columns: minmax(0, 1fr); }
+.home-empty { display: grid; gap: var(--space-3); }
+.home-just-start { justify-self: start; }
+.home-all { align-self: flex-start; }
+.c8-menu-wrap { position: relative; }
+.c8-menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 5; display: flex; flex-direction: column; min-width: 180px; padding: var(--space-1); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); box-shadow: 0 8px 24px var(--shadow-color); }
+.c8-menu button { min-height: var(--size-control); padding: 0 var(--space-3); border: 0; border-radius: 6px; background: none; color: var(--ink); font: inherit; font-size: var(--text-sm); text-align: left; white-space: nowrap; cursor: pointer; }
+.c8-menu button:hover, .c8-menu button:focus-visible { background: var(--hover); }
+@media (max-width: 760px) {
+  .check-in:not(.has-messages) { width: calc(100% - 32px); margin-top: 72px; }
+  .check-in.has-messages > .home-next { width: calc(100% - 32px); }
+}
 </style>
   <script src="i18n.js"></script>
   <script src="i18n/de.js"></script>
@@ -1503,6 +1523,8 @@ dialog.c8-screen::backdrop { background: var(--bg); }
   try { state = read(JSON.parse(localStorage.getItem(key))); } catch (_) { /* Still usable without storage. */ }
   // Tool selection is temporary; chat drafts belong to their saved conversation.
   state.tools.selected=[];state.tools.customSelection=false;
+  /* Every start opens a fresh Home with the Next card (ADR 0049); the last chat, with its draft, stays first under "Chats". */
+  ChatHistory.start(state);
   const id = () => typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   function update(change, reason) {
     change(state);
@@ -1653,8 +1675,10 @@ dialog.c8-screen::backdrop { background: var(--bg); }
     return selected;
   }
   function chosen(){return S.state.tools.customSelection?S.state.tools.selected.filter(id=>tools.some(t=>t.id===id)):[];}
-  function ensureTask(text=context()||'Focus session') {
+  /* Returns null when there is nothing to name a to-do after: a focus session without a to-do creates none (audit A8). */
+  function ensureTask(text=context()) {
     const current=currentTask();if(current)return current.id;
+    if(!String(text||'').trim())return null;
     const match=S.state.tasks.find(t=>t.title===text);if(match){S.selectTask(match.id);return match.id;}
     return S.upsertTask({title:text,steps:[]});
   }
@@ -1724,13 +1748,13 @@ dialog.c8-screen::backdrop { background: var(--bg); }
   }
   function start({taskId,workflowId,minutes=25,selected=['timer'],mode='countdown',eventId=null,origin='Toolbox',timerOnly=false,roomId=null}) {
     const existing=S.state.activeSession;if(existing&&existing.status!=='review'){P.closeModal();P.go('Focus');announce('Your current session is still active.');return;}
-    taskId ||= P.ensureTask();P.ensureSteps(taskId);
+    taskId ||= P.ensureTask();if(taskId)P.ensureSteps(taskId);
     const task=S.state.tasks.find(t=>t.id===taskId),workflow=S.state.workflows.find(w=>w.id===workflowId);
     if(workflow&&!workflow.nodes.length){announce('Add a tool to this workflow first.');return;}
     const list=phases(workflow,minutes,selected,mode),now=Date.now();
     if(list.some(p=>p.tools.includes('music')))P.Sound.prime();
     const originPath=location.hash.split('/')[0]==='#'+origin.toLowerCase()?decodeURIComponent(location.hash.split('/')[1]||''):'';
-    S.change(s=>{s.activeTaskId=taskId;s.activeSession={id:S.uid(),timerOnly,taskId,taskTitle:task.title,eventId,workflowId:workflow?.id||null,workflowSnapshot:workflow?JSON.parse(JSON.stringify(workflow)):null,phases:list,index:0,status:list[0].kind==='checklist'?'ready':'running',startedAt:now,phaseStartedAt:now,phaseElapsedMs:0,focusMs:0,initialDone:(task.steps||[]).filter(x=>x.done).map(x=>x.id),initialTaskDone:task.done===true,soundOff:false,origin,originPath};},'focus');
+    S.change(s=>{s.activeTaskId=taskId;s.activeSession={id:S.uid(),timerOnly,taskId,taskTitle:task?.title||'',eventId,workflowId:workflow?.id||null,workflowSnapshot:workflow?JSON.parse(JSON.stringify(workflow)):null,phases:list,index:0,status:list[0].kind==='checklist'?'ready':'running',startedAt:now,phaseStartedAt:now,phaseElapsedMs:0,focusMs:0,initialDone:(task?.steps||[]).filter(x=>x.done).map(x=>x.id),initialTaskDone:task?.done===true,soundOff:false,origin,originPath};},'focus');
     P.closeModal();P.go(roomId?'Room':'Focus',roomId||'');syncSound();
   }
   function setup({taskId,eventId,workflowId,selected,minutes,mode,origin='Toolbox'}={}) {
@@ -1790,7 +1814,7 @@ dialog.c8-screen::backdrop { background: var(--bg); }
   const views=new Map(),pendingFit=new Set(),MIN_ZOOM=.1,MAX_ZOOM=2;
   const templates=[
     {name:'Evening Study Session',nodes:[{type:'breathing',minutes:1},{type:'checklist'},{type:'timer',minutes:25,tools:['timer','music']}]},
-    {name:'Quick Start',nodes:[{type:'checklist'},{type:'timer',minutes:10,tools:['timer']}]},
+    {name:'Ten-minute start',nodes:[{type:'checklist'},{type:'timer',minutes:10,tools:['timer']}]},
     {name:'Study Together',nodes:[{type:'breathing',minutes:1},{type:'body',minutes:25,tools:['timer','body']}]}
   ];
   const current=()=>S.state.workflows.find(w=>w.id===decodeURIComponent(location.hash.split('/')[1]||''));
@@ -2799,6 +2823,11 @@ function setAgent(open, focusInput=true) {
 
 (() => {
   const store=window.Articul8;
+  const t=(text,values)=>window.I18n?window.I18n.t(text,values):text;
+  /* Labels of the redesigned Home in the student's language (ADR 0047, 0049). */
+  document.getElementById('quick-start').textContent=t('Plan a session');
+  document.getElementById('chat-start-focus').textContent=t('Start focus');
+  {const box=document.querySelector('#main-composer textarea');box.placeholder=t('Ask Concentr8, or say what is on your plate');box.setAttribute('aria-label',t('Ask Concentr8, or say what is on your plate'));}
   const app=document.querySelector('.app');
   const sidebar=document.getElementById('sidebar');
   const checkIn=document.querySelector('.check-in');
@@ -2938,7 +2967,7 @@ function setAgent(open, focusInput=true) {
   const greetingTitle=document.getElementById('check-in-title');
   function renderGreeting() {
     const hour=new Date().getHours();
-    const word=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+    const word=hour<12?t('Good morning'):hour<18?t('Good afternoon'):t('Good evening');
     const name=store.state.profile.name.trim();
     const chat=store.state.chats.find(c=>c.id===store.state.activeChatId);
     greetingTitle.textContent=store.state.messages.length?ChatHistory.title(chat):(name?word+', '+name:word);
@@ -3285,6 +3314,7 @@ function setAgent(open, focusInput=true) {
 })();
 
 </script>
+<script src="home-next.js"></script>
   <script data-source="pages.js">
 (() => {
   const content=document.getElementById('page-content'),app=document.querySelector('.app'),home=document.querySelector('.workspace');

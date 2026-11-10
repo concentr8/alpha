@@ -43,7 +43,8 @@ test('all inline scripts parse', () => {
   for (const [index, match] of scripts.entries()) new vm.Script(match[1], { filename: `inline-${index}.js` });
 });
 
-test('separate chats retain messages, drafts and selected chat after reload', () => {
+// ADR 0049: every start opens a fresh Home in a blank chat; earlier chats keep their messages and drafts and are one click away.
+test('separate chats retain messages and drafts after reload; the app opens a fresh chat', () => {
   const first = boot();
   first.app.send('Write the essay outline');
   const firstId = first.app.state.activeChatId;
@@ -56,8 +57,10 @@ test('separate chats retain messages, drafts and selected chat after reload', ()
   assert.equal(first.app.state.messages[0].text, 'Write the essay outline');
   assert.equal(first.app.state.draft, 'Three points to include');
   const restored = boot(first.saved());
-  assert.equal(restored.app.state.activeChatId, firstId);
-  assert.equal(restored.app.state.chats.length, 2);
+  assert.notEqual(restored.app.state.activeChatId, firstId);
+  assert.equal(restored.app.state.messages.length, 0);
+  assert.equal(restored.app.state.chats.length, 3);
+  restored.app.selectChat(firstId);
   assert.equal(restored.app.state.draft, 'Three points to include');
   assert.equal(restored.app.state.messages, restored.app.state.chats.find(c => c.id === firstId).messages);
 });
@@ -67,7 +70,7 @@ test('migration preserves old tasks and a legacy conversation, empty chats are r
     messages: [{ id: 'msg', text: 'Earlier conversation' }], draft: 'An unfinished thought' };
   const { app } = boot(old);
   assert.equal(app.state.tasks[0].title, 'My edited task');
-  assert.equal(app.state.messages[0].text, 'Earlier conversation');
+  assert.equal(app.state.chats.find(c => c.messages.length).messages[0].text, 'Earlier conversation');
   app.newChat(); app.newChat(); app.newChat();
   assert.equal(app.state.chats.length, 2);
   assert.equal(app.state.tasks[0].done, true);
@@ -95,6 +98,7 @@ test('a late reply stays in its originating chat, with one task and working undo
   assert.equal(message.actions[0].state, 'done');
   const reloaded = boot(env.saved());
   assert.equal(reloaded.app.state.tasks.filter(t => t.title === 'Outline first paragraph').length, 1);
+  reloaded.app.selectChat(firstId);
   reloaded.app.runAction(message.id, 0, 'undo');
   assert.equal(reloaded.app.state.tasks.some(t => t.title === 'Outline first paragraph'), false);
 });
@@ -173,13 +177,14 @@ test('greetings and Quick Start wait for a real topic, then keep that title stab
   assert.equal(ChatHistory.title(chat), 'Outline essay');
 });
 
-test('existing chats get short topics without changing content, recency or selected chat', () => {
+test('existing chats get short topics without changing content or recency', () => {
   const original = boot();
   original.app.send('I want to go hiking with my friends, but I also have a paper due tonight');
   original.app.setDraft('Keep this unfinished thought');
   const saved = original.saved();
   saved.chats[0].updatedAt = 1000;
   const restored = boot(saved);
+  restored.app.selectChat(saved.chats[0].id); // a reload opens a fresh chat (ADR 0049)
   const before = JSON.stringify(restored.app.state);
   assert.equal(ChatHistory.title(restored.app.state.chats[0]), 'Hiking · Paper');
   assert.equal(JSON.stringify(restored.app.state), before);
@@ -188,8 +193,8 @@ test('existing chats get short topics without changing content, recency or selec
   const reloaded = boot(restored.saved());
   assert.equal(ChatHistory.title(reloaded.app.state.chats[0]), 'Hiking · Paper');
   assert.equal(reloaded.app.state.chats[0].updatedAt, 1000);
-  assert.equal(reloaded.app.state.draft, 'Keep this unfinished thought');
-  assert.equal(reloaded.app.state.activeChatId, saved.chats[0].id);
+  assert.equal(reloaded.app.state.chats[0].draft, 'Keep this unfinished thought');
+  assert.notEqual(reloaded.app.state.activeChatId, saved.chats[0].id);
 });
 
 test('topic titles work offline without consulting assistant answers or sending requests', () => {

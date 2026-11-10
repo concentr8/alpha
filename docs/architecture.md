@@ -117,6 +117,9 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | frontend/onboarding.js | Steps 2 and 3 of the first start: calendar with a quiet "Not now", then the first to-do (ADR 0048) | New |
 | frontend/test/onboarding.test.js | Tests for which first-start step shows when and which calendar is picked | New |
 | docs/decisions/0048-first-start-in-three-steps.md | ADR: first start in three steps, calendar step right after sign-in, samples only in demo mode | New |
+| frontend/home-next.js | Home's Next card, rows, add row and Undo notes; sorting and due-date words (ADR 0049) | New |
+| frontend/test/home-next.test.js | Tests for the order of to-dos on Home, due-date words and time left | New |
+| docs/decisions/0049-home-leads-with-the-next-to-do.md | ADR: Home leads with the next to-do, one-click focus, fresh Home on every start | New |
 | frontend/index.html `simplicity-components.css` block | `c8-` building blocks of the redesign (buttons, checkbox, Next card, rows, field, messages, onboarding) | New |
 | docs/design/baseline.md | Steps, clicks, screens, words and time of the five core tasks on main at 158af01; the yardstick for the redesign | New |
 | docs/design/audit.md | Heuristic evaluation and three persona walkthroughs of first start and Home, with severity | New |

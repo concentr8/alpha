@@ -67,7 +67,8 @@
   "Try again.": "Réessaie.",
   "Sign-in did not work.": "La connexion n'a pas fonctionné.",
   "Open in browser": "Ouvrir dans le navigateur",
-  "One moment…": "Un instant…"
+  "One moment…": "Un instant…",
+  "Focus session": "Session de focus"
   };
   if (root.I18n) root.I18n.add('fr', entries);
   if (typeof module !== 'undefined') module.exports = entries;
