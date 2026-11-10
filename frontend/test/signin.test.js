@@ -1,4 +1,4 @@
-/* Purpose: regression coverage for going to Google on start (ADR 0038, 0040), with no calendar step after it (ADR 0039).
+/* Purpose: regression coverage for going to Google on start (ADR 0038, 0040) and step 1 of the first start (ADR 0048).
    Run with node --test frontend/test/signin.test.js. Uses VM, a tiny fake page and a fake window.Concentr8;
    never opens Google and never calls the hosted backend. */
 const { test } = require('node:test');
@@ -27,7 +27,7 @@ function fakeDialog() {
 }
 
 // trip: what finishGoogleTrip answers. google: what goToGoogle answers. Both count their calls in `calls`.
-function boot({ signedIn = false, desktop = false, demo = false, trip = { returned: false }, google = { ok: true } } = {}) {
+function boot({ signedIn = false, desktop = false, demo = false, trip = { returned: false }, google = { ok: true }, browser = null } = {}) {
   const dialog = fakeDialog();
   const body = { style: {}, append() {} };
   const calls = { goToGoogle: 0, signIn: 0 };
@@ -43,7 +43,7 @@ function boot({ signedIn = false, desktop = false, demo = false, trip = { return
     isDesktop: () => desktop,
     goToGoogle: async () => { calls.goToGoogle += 1; return google; },
     finishGoogleTrip: async () => { if (trip.ok) setToken('test-token'); return trip; },
-    signIn: async () => { calls.signIn += 1; return new Promise(() => {}); }, // stays in the browser for the whole test
+    signIn: async ({ onBrowser } = {}) => { calls.signIn += 1; if (browser) onBrowser(browser); return new Promise(() => {}); }, // stays in the browser
     signOut: () => setToken('')
   };
   if (demo) window.Concentr8Demo = { isDemo: () => true }; // ADR 0042
@@ -53,15 +53,18 @@ function boot({ signedIn = false, desktop = false, demo = false, trip = { return
 }
 const settle = () => new Promise((resolve) => setImmediate(resolve));
 
-test('signed out on start: the tab goes to Google, with no Concentr8 page and no flash of the app', async () => {
+test('signed out on start: the tab goes to Google; meanwhile a status line, never a blank page or a flash of the app', async () => {
   const { dialog, body, calls } = boot();
   await settle();
   assert.equal(calls.goToGoogle, 1);
-  assert.equal(dialog.open, false);
   assert.equal(body.style.visibility, 'hidden');
+  assert.equal(dialog.open, true);
+  assert.equal(dialog.querySelector('[data-signin-wait]').hidden, false);
+  assert.equal(dialog.querySelector('[data-signin-buttons]').hidden, true);
+  assert.match(dialog.innerHTML, /Opening Google sign-in/);
 });
 
-test('signed in: nothing happens, and no calendar step follows (ADR 0039)', async () => {
+test('signed in: nothing happens here (the calendar step lives in onboarding.js, ADR 0048)', async () => {
   const { dialog, body, calls } = boot({ signedIn: true });
   await settle();
   assert.equal(calls.goToGoogle, 0);
@@ -83,7 +86,8 @@ test('back from Google without signing in: the Concentr8 page, never a loop back
   assert.equal(calls.goToGoogle, 0);
   assert.equal(dialog.open, true);
   assert.equal(body.style.visibility, '');
-  assert.match(dialog.querySelector('[data-signin-status]').textContent, /not finished/);
+  assert.equal(dialog.querySelector('[data-signin-buttons]').hidden, false);
+  assert.match(dialog.querySelector('[data-signin-headline]').textContent, /not finished/);
 });
 
 test('server not reachable: the Concentr8 page shows the reason', async () => {
@@ -91,7 +95,8 @@ test('server not reachable: the Concentr8 page shows the reason', async () => {
   await settle();
   assert.equal(dialog.open, true);
   assert.equal(body.style.visibility, '');
-  assert.match(dialog.querySelector('[data-signin-status]').textContent, /not reachable/);
+  assert.match(dialog.querySelector('[data-signin-headline]').textContent, /could not reach Concentr8/);
+  assert.match(dialog.querySelector('[data-signin-status]').textContent, /Check your internet/);
 });
 
 test('desktop app: Google opens in the browser by itself, the page says to finish there', async () => {
@@ -100,6 +105,13 @@ test('desktop app: Google opens in the browser by itself, the page says to finis
   assert.equal(calls.signIn, 1);
   assert.equal(calls.goToGoogle, 0);
   assert.equal(dialog.open, true);
+});
+
+test('desktop app: while Google is open in the browser, the text says so and the button offers to open Google again', async () => {
+  const { dialog } = boot({ desktop: true, browser: { blocked: false } });
+  await settle();
+  assert.match(dialog.querySelector('[data-signin-text]').textContent, /Finish signing in in your browser/);
+  assert.equal(dialog.querySelector('[data-signin-action]').textContent, 'Open Google again');
 });
 
 test('signing out goes to Google again', async () => {
@@ -119,6 +131,12 @@ test('the Concentr8 page has no close button, and Escape cannot skip it', async 
   assert.equal(prevented, true);
   dialog.close(); // Chrome: Escape before any click closes it anyway
   assert.equal(dialog.open, true);
+});
+
+test('the page shows no internal "AI generated" note to students (ADR 0045)', async () => {
+  const { dialog } = boot({ trip: { returned: true, ok: false } });
+  await settle();
+  assert.doesNotMatch(dialog.innerHTML, /AI generated|preview-note/);
 });
 
 test('sign-in never starts the calendar connection', () => {

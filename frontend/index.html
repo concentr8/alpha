@@ -1391,7 +1391,7 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
 /* Messages */
 .c8-note { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); color: var(--ink-2); font-size: var(--text-sm); }
 .c8-note button { min-height: 24px; padding: 0 var(--space-1); border: 0; background: none; color: var(--ink); font: inherit; text-decoration: underline; cursor: pointer; }
-.c8-alert { padding: var(--space-3) var(--space-4); border-radius: var(--radius-control); background: var(--danger-surface); color: var(--ink); font-size: var(--text-sm); text-align: left; }
+.c8-alert { max-width: 52ch; padding: var(--space-3) var(--space-4); border-radius: var(--radius-control); background: var(--danger-surface); color: var(--ink); font-size: var(--text-sm); text-align: left; }
 .c8-alert strong { color: var(--danger); }
 .c8-status { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--muted); font-size: var(--text-sm); }
 .c8-pill { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: var(--size-main); padding: 0 var(--space-4); border: 0; border-radius: var(--radius-pill); background: var(--ink); color: var(--bg); font: var(--weight-medium) var(--text-sm)/1 var(--font-body); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; }
@@ -1403,6 +1403,10 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
 .c8-title { margin: 0; color: var(--ink); font: var(--weight-bold) var(--text-xl)/var(--leading-tight) var(--font-display); }
 .c8-body { max-width: 44ch; margin: 0; color: var(--ink-2); }
 .c8-stack { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+/* A first-start screen fills the window: nothing of the app shows behind it. visibility: visible keeps it on screen while
+   concentr8-signin.js hides the body to avoid a flash of the app. */
+dialog.c8-screen { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; overflow: auto; border: 0; background: var(--bg); color: var(--ink-2); visibility: visible; }
+dialog.c8-screen::backdrop { background: var(--bg); }
 </style>
   <script src="i18n.js"></script>
   <script src="i18n/de.js"></script>
@@ -1424,24 +1428,28 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
   const validTime = value => typeof value==='string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value) && Number.isFinite(Date.parse(value+'Z')) && new Date(value+'Z').toISOString().slice(0,16)===value;
   const validEvent = event => event && typeof event.title==='string' && event.title.trim() && validTime(event.start) && validTime(event.end) && (event.kind==='deadline' || event.end>event.start);
   const cleanEvent = event => ({id:event.id,title:event.title.trim().slice(0,200),kind:event.kind==='deadline'?'deadline':'plan',start:event.start,end:event.kind==='deadline'?event.start:event.end,allDay:event.kind==='deadline'&&event.allDay===true,taskId:typeof event.taskId==='string'?event.taskId:null,notes:typeof event.notes==='string'?event.notes.slice(0,2000):''});
+  /* Sample courses, to-dos and calendar blocks only in demo mode (ADR 0048): a new student starts empty and can tell what is theirs (audit A6). */
+  const demo = Boolean(window.Concentr8Demo && window.Concentr8Demo.isDemo());
+  const samples = list => demo ? list : [];
   const initial = () => ({
     version: 2, draft: '', collapsed: matchMedia('(max-width:760px)').matches, messages: [], agentEventId:null,
-    activeTaskId:null, taskContext:'', courses:[{id:'cs188',name:'COMPSCI 188',why:''},{id:'econ1',name:'ECON 1',why:''},{id:'rhetor10',name:'RHETOR 10',why:''}],
+    onboarding:{calendar:'',firstTodo:''},
+    activeTaskId:null, taskContext:'', courses:samples([{id:'cs188',name:'COMPSCI 188',why:''},{id:'econ1',name:'ECON 1',why:''},{id:'rhetor10',name:'RHETOR 10',why:''}]),
     workflows:[], sessions:[], activeSession:null,
     tools:{favorites:[],selected:[],customSelection:false,blockedApps:[],sound:'brown'},
     wellness:{saved:[]}, social:{messages:{}}, usage:{days:{}},
     profile:{name:'',email:'',avatar:''}, settings:{focusMinutes:25,autoAdvance:true}, canvas:{schoolUrl:'',imported:[]},
-    calendarEvents: [
+    calendarEvents: samples([
       {id:'plan-problem',title:'Computer Vision Assignment 1',kind:'plan',start:day(0)+'T10:00',end:day(0)+'T11:30',taskId:'problem-set',notes:'',allDay:false},
       {id:'plan-essay',title:'Rhetoric Essay 1: Argument Analysis',kind:'plan',start:day(2)+'T12:00',end:day(2)+'T13:00',taskId:'essay-outline',notes:'',allDay:false},
       {id:'plan-reading',title:'Computer Vision Reading 1: Image Formation',kind:'plan',start:day(3)+'T14:00',end:day(3)+'T15:00',taskId:'reading',notes:'',allDay:false},
       {id:'deadline-essay',title:'Rhetoric Essay 1: Argument Analysis',kind:'deadline',start:day(4)+'T17:00',end:day(4)+'T17:00',taskId:'essay-outline',notes:'',allDay:false}
-    ],
-    tasks: [
+    ]),
+    tasks: samples([
       {id: 'problem-set', title: 'Computer Vision Assignment 1', done: false, course: 'COMPSCI 188',steps:[{id:'ps1',text:'Read the instructions',done:false},{id:'ps2',text:'Solve the first problem',done:false},{id:'ps3',text:'Check the answer',done:false}]},
       {id: 'essay-outline', title: 'Rhetoric Essay 1: Argument Analysis', done: false, course: 'RHETOR 10',steps:[{id:'es1',text:'Read the prompt',done:false},{id:'es2',text:'List three ideas',done:false},{id:'es3',text:'Draft the outline',done:false}]},
       {id: 'reading', title: 'Computer Vision Reading 1: Image Formation', done: false, course: 'COMPSCI 188',steps:[{id:'r1',text:'Open the reading',done:false},{id:'r2',text:'Read one section',done:false},{id:'r3',text:'Write one note',done:false}]}
-    ]
+    ])
   });
   function read(value) {
     const clean = initial();
@@ -1465,6 +1473,7 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
     if(value.usage?.days&&typeof value.usage.days==='object')clean.usage.days=value.usage.days;
     if(value.profile){clean.profile={...clean.profile,...value.profile};if(!/^data:image\/(jpeg|png|webp);base64,/.test(clean.profile.avatar||'')||clean.profile.avatar.length>120000)clean.profile.avatar='';}
     if(value.settings)clean.settings={...clean.settings,...value.settings};
+    if(value.onboarding&&typeof value.onboarding==='object')for(const step of ['calendar','firstTodo'])if(typeof value.onboarding[step]==='string')clean.onboarding[step]=value.onboarding[step];
     const session=clean.activeSession;
     if(session&&!session.workflowId&&session.status!=='review'&&session.phases.some(p=>p.kind==='meditation')){
       const currentIndex=session.index||0,current=session.phases[currentIndex];
@@ -2562,6 +2571,7 @@ dialog::backdrop, .wire-dialog::backdrop { background: var(--backdrop); }
 </script>
   <script src="concentr8-google-calendar.js"></script>
 <script src="concentr8-signin.js"></script>
+<script src="onboarding.js"></script>
 <script src="task-placement.js"></script>
   <script data-source="elevenlabs.js">
 /* Optional ElevenLabs voice through the Concentr8 server. ON by default.

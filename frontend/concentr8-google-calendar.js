@@ -1,9 +1,11 @@
 // Purpose: adds the approved read-only Google Calendar connection to Profile Settings and Calendar.
 // Called by: frontend/index.html after calendar.js; runtime hooks on articul8:navigate and the initial hash.
 // Calls: Concentr8's existing connection/API, its Google windows (ADR 0035) and CalendarUI.setExternal; Google events never
-//        enter Concentr8.
+//        enter Concentr8. Also gives frontend/onboarding.js the calendar step of the first start (ADR 0048) and window.I18n.
 (() => {
   'use strict';
+
+  const t = (text, values) => (window.I18n ? window.I18n.t(text, values) : text);
 
   const STATUS_PATH = '/google/status';
   const CALENDARS_PATH = '/google/calendars';
@@ -84,15 +86,22 @@
 
   async function request(path, method = 'GET', body, signal) {
     const token = authToken();
-    const response = await fetch(apiUrl(path), {
-      method,
-      headers: {
-        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal: AbortSignal.any([...(signal ? [signal] : []), AbortSignal.timeout(20000)]),
-    });
+    let response;
+    try {
+      response = await fetch(apiUrl(path), {
+        method,
+        headers: {
+          ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal: AbortSignal.any([...(signal ? [signal] : []), AbortSignal.timeout(20000)]),
+      });
+    } catch (error) {
+      if (signal?.aborted) throw error; // an abort this file asked for stays an abort
+      // Why: the browser's own text ("Failed to fetch") meant nothing to students (audit A9).
+      throw new Error(`${t('We could not reach Concentr8.')} ${t('Check your internet, then try again.')}`);
+    }
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw Object.assign(new Error(data.error || `The server answered ${response.status}.`),
       { connected: data.connected === true });
@@ -263,7 +272,74 @@
       return Array.isArray(result.events) ? result.events.map(calendarEvent) : null;
     } catch (_) { return null; }
   }
-  window.Concentr8GoogleCalendar = { busyEvents };
+  // --- The calendar step of the first start (frontend/onboarding.js, ADR 0048): the same connection without this file's dialog. ---
+
+  // state: connected | disconnected | unconfigured (no Google set up on the server) | signin | unknown (server not reachable).
+  async function onboardingStatus() {
+    try {
+      const setup = await request(STATUS_PATH);
+      if (!setup.configured) return { state: 'unconfigured' };
+      if (!authToken()) return { state: 'signin' };
+      const data = await request(CALENDARS_PATH);
+      return {
+        state: data.connected ? 'connected' : 'disconnected',
+        calendars: Array.isArray(data.calendars) ? data.calendars : [],
+        selectedIds: Array.isArray(data.selectedIds) ? data.selectedIds : [],
+      };
+    } catch (_) {
+      return { state: 'unknown' };
+    }
+  }
+
+  // Opens Google for the read-only calendar permission. `done` resolves with { ok, calendars } once connected, or ok:false
+  // when the Google window closed without it, after 5 minutes, or after cancel(). onBrowserNeeded(open) is called when the
+  // browser blocked the window: open() must then run from a click.
+  function onboardingConnect({ onBrowserNeeded } = {}) {
+    let cancelled = false;
+    let popup = null;
+    const done = (async () => {
+      try {
+        popup = window.Concentr8.openGoogleWindow('concentr8-google-calendar');
+        const result = await request('/google/login', 'POST', {});
+        const destination = new URL(result.authorizationUrl);
+        const trusted = new URL(baseUrl());
+        if (destination.origin !== trusted.origin || destination.pathname !== '/google/login' || !destination.searchParams.has('ticket')) {
+          return { ok: false };
+        }
+        if (popup) popup.location.href = destination.href;
+        else if (window.Concentr8.isDesktop()) window.Concentr8.openInBrowser(destination.href);
+        else onBrowserNeeded?.(() => window.Concentr8.openInBrowser(destination.href));
+        const until = Date.now() + 5 * 60 * 1000;
+        while (!cancelled && Date.now() < until) {
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          // Why wait for the window to close: the server saves the permission before Google's page closes it.
+          if (cancelled || (popup && !popup.closed)) continue;
+          const status = await onboardingStatus();
+          if (status.state === 'connected') return { ok: true, ...status };
+          if (popup) return { ok: false };
+        }
+        return { ok: false, cancelled };
+      } catch (_) {
+        return { ok: false };
+      } finally {
+        if (popup && !popup.closed) popup.close();
+      }
+    })();
+    return { done, cancel: () => { cancelled = true; } };
+  }
+
+  // Saves the calendars to show (the step picks one by itself) and refreshes this file's own state for Settings and Calendar.
+  async function onboardingSave(calendarIds) {
+    try {
+      await request(CALENDARS_PATH, 'POST', { calendarIds: calendarIds.slice(0, 3) });
+      loadAccount();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  window.Concentr8GoogleCalendar = { busyEvents, onboarding: { status: onboardingStatus, connect: onboardingConnect, save: onboardingSave } };
 
   function wallTime(value, allDay) {
     const text = String(value || '');

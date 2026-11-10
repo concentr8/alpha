@@ -62,6 +62,11 @@ function textsUsedInCode() {
   return [...found];
 }
 
+test('the scan finds texts the app really uses (guards against a silently broken scan)', () => {
+  const texts = textsUsedInCode();
+  for (const text of ['Plan around your real day', 'Step {n} of {total}', 'Opening Google sign-in…']) assert.ok(texts.includes(text), text);
+});
+
 test('every text passed to t() has a German, French and Spanish entry', () => {
   const missing = [];
   for (const text of textsUsedInCode()) {

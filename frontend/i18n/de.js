@@ -62,7 +62,12 @@
   "Chats": "Chats",
   "Good morning": "Guten Morgen",
   "Good afternoon": "Guten Tag",
-  "Good evening": "Guten Abend"
+  "Good evening": "Guten Abend",
+  "Sign-in was not finished.": "Die Anmeldung wurde nicht abgeschlossen.",
+  "Try again.": "Versuch es noch einmal.",
+  "Sign-in did not work.": "Die Anmeldung hat nicht geklappt.",
+  "Open in browser": "Im Browser öffnen",
+  "One moment…": "Einen Moment…"
   };
   if (root.I18n) root.I18n.add('de', entries);
   if (typeof module !== 'undefined') module.exports = entries;
