@@ -114,6 +114,9 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | frontend/i18n.js | Translation layer: I18n.t(text, values), English fallback, fills {patterns} without translating the student's words | New |
 | frontend/i18n/de.js, fr.js, es.js | German ("du"), French ("tu") and Spanish (Spain) texts keyed by the English text | New |
 | frontend/test/i18n.test.js | Tests for the translation layer; fails when a text passed to t() lacks a translation | New |
+| frontend/onboarding.js | Steps 2 and 3 of the first start: calendar with a quiet "Not now", then the first to-do (ADR 0048) | New |
+| frontend/test/onboarding.test.js | Tests for which first-start step shows when and which calendar is picked | New |
+| docs/decisions/0048-first-start-in-three-steps.md | ADR: first start in three steps, calendar step right after sign-in, samples only in demo mode | New |
 | frontend/index.html `simplicity-components.css` block | `c8-` building blocks of the redesign (buttons, checkbox, Next card, rows, field, messages, onboarding) | New |
 | docs/design/baseline.md | Steps, clicks, screens, words and time of the five core tasks on main at 158af01; the yardstick for the redesign | New |
 | docs/design/audit.md | Heuristic evaluation and three persona walkthroughs of first start and Home, with severity | New |
@@ -154,7 +157,7 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/decisions/0034-google-name-with-profile-scope.md | ADR: sign-in also asks for the Google name (`profile` scope); the app fills the name only while it is empty | New |
 | docs/decisions/0036-jack-redesign-takes-over-the-frontend.md | ADR: Jack's redesign becomes the frontend; what came from him and what was kept | New |
 | docs/decisions/0035-google-sign-in-in-default-browser.md | ADR: desktop sign-in opens in the default browser; a blocked window shows "Open in browser" | New |
-| frontend/concentr8-signin.js | Sends a signed-out student to Google on start (ADR 0038, 0040); its "Continue with Google" page is the fallback and cannot be closed; continues in the browser when no window can open (ADR 0035). AI generated | New |
+| frontend/concentr8-signin.js | Step 1 of the first start: sends a signed-out student to Google (ADR 0038, 0040) and shows "Opening Google sign-in…" meanwhile (ADR 0048); its "Continue with Google" screen is the fallback and cannot be closed; continues in the browser when no window can open (ADR 0035) | Updated |
 | server/test/calendar-availability.test.js | Pure availability boundaries and conflict tests | New |
 | docs/decisions/0029-calendar-availability.md | Working hours, task estimates and availability semantics | New |
 | frontend/calendar-tools.js | Dependency-free local date and deterministic quick-add helpers used by CalendarUI and its Node tests | New (ADR 0028) |

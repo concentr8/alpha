@@ -119,6 +119,12 @@ Written once in the `simplicity-components.css` style block of `frontend/index.h
 | `.c8-onboarding`, `.c8-brand`, `.c8-step`, `.c8-title`, `.c8-body`, `.c8-stack` | First-start screens | — |
 | `.c8-meta`, `.c8-overdue`, `.c8-label` | Small grey text, overdue text (words plus colour), uppercase label | — |
 
+## First start (ADR 0048)
+Three full-window screens built from the `c8-` blocks, centred, one job each: (1) brand and "Opening Google sign-in…",
+or the fallback with an error box and "Continue with Google"; (2) "Step 2 of 3", calendar reason, "Connect Google
+Calendar" and a quiet "Not now" (waiting and failed looks); (3) "Step 3 of 3", one question and one focused field.
+Screens: `docs/evidence/simplicity/pr3/`.
+
 ## Texts and languages (ADR 0047)
 Every new text goes through `I18n.t('English text')` with a single-quoted literal and gets German ("du"), French ("tu")
 and Spanish (Spain) entries in `frontend/i18n/de.js`, `fr.js`, `es.js`; `frontend/test/i18n.test.js` fails otherwise.

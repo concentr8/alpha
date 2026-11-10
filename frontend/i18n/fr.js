@@ -62,7 +62,12 @@
   "Chats": "Discussions",
   "Good morning": "Bonjour",
   "Good afternoon": "Bon après-midi",
-  "Good evening": "Bonsoir"
+  "Good evening": "Bonsoir",
+  "Sign-in was not finished.": "La connexion n'a pas été terminée.",
+  "Try again.": "Réessaie.",
+  "Sign-in did not work.": "La connexion n'a pas fonctionné.",
+  "Open in browser": "Ouvrir dans le navigateur",
+  "One moment…": "Un instant…"
   };
   if (root.I18n) root.I18n.add('fr', entries);
   if (typeof module !== 'undefined') module.exports = entries;

@@ -62,7 +62,12 @@
   "Chats": "Chats",
   "Good morning": "Buenos días",
   "Good afternoon": "Buenas tardes",
-  "Good evening": "Buenas noches"
+  "Good evening": "Buenas noches",
+  "Sign-in was not finished.": "No se ha terminado de iniciar sesión.",
+  "Try again.": "Vuelve a intentarlo.",
+  "Sign-in did not work.": "No se ha podido iniciar sesión.",
+  "Open in browser": "Abrir en el navegador",
+  "One moment…": "Un momento…"
   };
   if (root.I18n) root.I18n.add('es', entries);
   if (typeof module !== 'undefined') module.exports = entries;
