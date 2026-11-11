@@ -59,7 +59,7 @@
     $('browser').hidden = !blocked;
     // Why the new label: clicking the main button again starts a fresh trip to Google.
     if (!blocked) $('action').textContent = t('Open Google again');
-    status(blocked ? window.Concentr8.blockedWindowText : SIGNIN_WAIT);
+    status(blocked ? t('The sign-in window was blocked. Open it in your browser.') : SIGNIN_WAIT);
   }
 
   function openBrowser() {

@@ -119,12 +119,18 @@ existing inline blocks plus the pure helper documented in ADR 0028.
 | docs/decisions/0048-first-start-in-three-steps.md | ADR: first start in three steps, calendar step right after sign-in, samples only in demo mode | New |
 | frontend/home-next.js | Home's Next card, rows, add row and Undo notes; sorting and due-date words (ADR 0049) | New |
 | frontend/test/home-next.test.js | Tests for the order of to-dos on Home, due-date words and time left | New |
+| e2e/package.json, e2e/README.md | End-to-end browser tests: Playwright as the only dev dependency, `node --test`; how to run them (not in CI, which has no browser) | New |
+| e2e/helpers.js | Shared test setup: serves frontend/ locally, launches Chrome (CHROME_PATH), mocks the Concentr8 server and Google with switchable scenarios | New |
+| e2e/first-start.test.js | Browser tests for the first start: status line, calendar step in one click, first to-do, failure texts, new and existing accounts, demo | New |
+| e2e/home.test.js | Browser tests for Home in demo mode: one-click focus, order, N key, Undo, empty card, reload, chat card, targets, 320 px, German | New |
 | docs/decisions/0049-home-leads-with-the-next-to-do.md | ADR: Home leads with the next to-do, one-click focus, fresh Home on every start | New |
 | frontend/index.html `simplicity-components.css` block | `c8-` building blocks of the redesign (buttons, checkbox, Next card, rows, field, messages, onboarding) | New |
 | docs/design/baseline.md | Steps, clicks, screens, words and time of the five core tasks on main at 158af01; the yardstick for the redesign | New |
 | docs/design/audit.md | Heuristic evaluation and three persona walkthroughs of first start and Home, with severity | New |
 | docs/design/research.md | Sourced research (ADHD, onboarding, motion, WCAG 2.2 AA) and teardown of five reference apps | New |
 | docs/design/mockups/ | Static before/after mockups (`index.html`), proposed tokens (`tokens.css`), screenshots of main (`before/`) | New |
+| docs/design/test-report.md | Phase 3 of the simplicity redesign: the five core tasks before and after, the audit repeated, what was tested, fixed and left open | New |
+| docs/design/user-test-script.md | 15-minute moderated test with 5 Berkeley students: tasks, what to observe, questions | New |
 | docs/plans/sign-in-on-first-open.md | Plan: the Google sign-in page opens when a signed-out student starts the app | New |
 | docs/plans/todos-on-calendar.md | Plan: new to-dos are placed on the calendar by themselves, with or without Google Calendar | New |
 | docs/decisions/0041-todos-placed-on-the-calendar.md | ADR: new to-dos get a block by themselves, and the rules that protect the week | New |

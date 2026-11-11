@@ -30,3 +30,12 @@ returning student landed in yesterday's chat (audit A1, A4, A5, A7, A8, A12, A13
   names the next to-do. Task e: Home with the Next card instead of yesterday's chat.
 - Home has more controls than before (about 18 instead of 13) but one filled button.
 - `frontend/test/chat-history.test.js` now expects a fresh chat after a reload.
+
+## Corrections after testing (Phase 3, `docs/design/test-report.md`)
+- Pressing "Home" in the sidebar while Home shows a chat starts a fresh chat, so the full Home with the add row is
+  always one visible click away; the open chat stays in the chat switcher.
+- A redraw of Home keeps the keyboard focus on the same control (or on Undo when that control is gone).
+- The floating "Focus · time" button is hidden on Home while the card shows the running session.
+- A deadline that passed earlier today reads "Was due today, 6:28 PM" / "Overdue today" (words, not only colour).
+- Inside a chat the one-line card also shows "Done. Undo", and a ticked to-do has no "Start focus".
+- The ⋯ menu follows the menu keyboard pattern (arrow keys, Home, End; Tab closes it).

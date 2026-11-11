@@ -43,8 +43,9 @@
     if (diff < 0) return { text: diff === -1 ? t('Overdue since yesterday') : t('Overdue {n} days', { n: -diff }), overdue: true };
     if (diff === 0) {
       const passed = Boolean(time) && localTime(now) >= time;
-      if (short) return { text: t('Today'), overdue: passed };
-      return { text: time ? t('Due today, {time}', { time: timeText }) : t('Due today'), overdue: passed };
+      if (passed) return { text: short ? t('Overdue today') : t('Was due today, {time}', { time: timeText }), overdue: true };
+      if (short) return { text: t('Today'), overdue: false };
+      return { text: time ? t('Due today, {time}', { time: timeText }) : t('Due today'), overdue: false };
     }
     if (diff === 1) {
       if (short) return { text: t('Tomorrow'), overdue: false };
@@ -125,6 +126,8 @@
       const left = leftMs(running, Date.now());
       const done = left == null ? 0 : Math.round(100 - (left / ((running.phases[running.index].seconds || 1) * 1000)) * 100);
       action = `<button class="c8-pill c8-next__start" type="button" data-home-open style="--c8-done:${done}"><span class="c8-ring" aria-hidden="true"></span><span data-home-left>${left == null ? '' : t('{time} left', { time: clock(left) })}</span> · ${t('Open')}</button>`;
+    } else if (task.done) {
+      action = '<span></span>'; // nothing to start on a to-do that was just ticked
     } else if (compact) {
       action = `<button class="c8-btn c8-next__start" type="button" data-home-start="${esc(task.id)}">${t('Start focus')}</button>`;
     } else {
@@ -134,7 +137,7 @@
     const label = compact ? '' : `<span class="c8-label c8-next__label">${now ? t('Now') : t('Next')}</span>`;
     const titleClass = `c8-next__title${task && task.done ? ' c8-next__title--done' : ''}`;
     return `<section class="c8-next${compact ? ' c8-next--compact' : ''}" aria-label="${now ? t('Now') : t('Next to-do')}">${label}${check}`
-      + `<div><p class="${titleClass}">${esc(title)}</p>${compact ? '' : `<p class="c8-meta" style="margin:0">${meta}</p>`}</div>${action}</section>`;
+      + `<div><p class="${titleClass}" title="${esc(title)}">${esc(title)}</p>${compact ? '' : `<p class="c8-meta" style="margin:0">${meta}</p>`}</div>${action}</section>`;
   }
 
   // No open to-do: the card asks for the next one, with a quiet way to just start.
@@ -162,6 +165,8 @@
     // Keep what the student is typing in the add field across a redraw.
     const active = document.activeElement;
     const typing = active && mount.contains(active) && active.matches('[data-home-input]') ? { value: active.value, start: active.selectionStart } : null;
+    // A redraw replaces every element, so remember which control had the keyboard focus (WCAG 2.4.3).
+    const focused = active && mount.contains(active) && !typing ? focusKey(active) : null;
     const list = shown();
     const openCount = s.tasks.filter((task) => !task.done).length;
     let html = card(list[0], compact);
@@ -169,15 +174,26 @@
       html += `<ul class="c8-rows home-rows">${list.slice(1).map(row).join('')}`
         + `<li class="c8-row c8-row--add"><span class="c8-plus" aria-hidden="true">+</span><form data-home-add novalidate style="display:contents"><input data-home-input autocomplete="off" maxlength="2000" aria-label="${t('Add a to-do')}" placeholder="${t('Add a to-do')}"></form><span class="c8-kbd" aria-hidden="true">N</span></li></ul>`;
     }
-    if (!compact && note) html += `<p class="c8-note" role="status">${esc(note.text)}${note.undo ? ` <button type="button" data-home-undo>${t('Undo')}</button>` : ''}</p>`;
+    if (note) html += `<p class="c8-note" role="status">${esc(note.text)}${note.undo ? ` <button type="button" data-home-undo>${t('Undo')}</button>` : ''}</p>`;
     if (!compact && openCount > 0) html += `<button class="c8-btn c8-btn--quiet home-all" type="button" data-home-all>${t('All to-dos ({n})', { n: openCount })}</button>`;
     mount.innerHTML = html;
     if (typing) {
       const input = mount.querySelector('[data-home-input]');
       if (input) { input.value = typing.value; input.focus(); input.setSelectionRange(typing.start, typing.start); }
     }
+    if (focused) {
+      // The same control again; if it is gone (a deleted row, a used Undo), the nearest useful one.
+      const again = mount.querySelector(focused) || mount.querySelector('[data-home-undo]') || mount.querySelector('[data-home-check]');
+      if (again) again.focus();
+    }
     const opened = menuFor && mount.querySelector('.c8-menu [role="menuitem"]');
     if (opened) opened.focus();
+  }
+
+  // A selector that finds the same control after a redraw, from its data-home-… attribute.
+  function focusKey(element) {
+    const attribute = [...element.attributes].find((a) => a.name.startsWith('data-home-'));
+    return attribute ? `[${attribute.name}="${CSS.escape(attribute.value)}"]` : null;
   }
 
   // ----- Actions -----
@@ -192,9 +208,10 @@
     const text = input.value.trim();
     if (!text) return;
     const before = new Set(S.state.tasks.map((task) => task.id));
+    // Why first: addTask redraws Home, and the redraw carries over whatever is still typed in the field.
+    input.value = '';
     S.addTask(text);
     const created = S.state.tasks.find((task) => !before.has(task.id));
-    input.value = '';
     held = null;
     note = { text: t('Added "{title}".', { title: text }), undo: created ? () => remove(created.id, true) : null };
     render();
@@ -252,10 +269,24 @@
     if (input) add(input);
   });
   mount.addEventListener('keydown', (event) => {
+    if (menuFor && menuKey(event)) return;
     if (event.key !== 'Escape') return;
     if (menuFor) { const id = menuFor; menuFor = null; render(); mount.querySelector(`[data-home-menu="${CSS.escape(id)}"]`)?.focus(); event.stopPropagation(); return; }
     if (event.target.matches('[data-home-input]')) { event.target.value = ''; event.target.blur(); }
   });
+
+  // Arrow keys, Home and End move inside the open ⋯ menu; Tab closes it and returns to its button (menu pattern, WCAG 2.1.1).
+  function menuKey(event) {
+    const items = [...mount.querySelectorAll('.c8-menu [role="menuitem"]')];
+    const at = items.indexOf(document.activeElement);
+    const to = { ArrowDown: (at + 1) % items.length, ArrowUp: (at - 1 + items.length) % items.length, Home: 0, End: items.length - 1 }[event.key];
+    if (to !== undefined && items.length) { event.preventDefault(); items[to].focus(); return true; }
+    if (event.key !== 'Tab') return false;
+    event.preventDefault();
+    const id = menuFor; menuFor = null; render();
+    mount.querySelector(`[data-home-menu="${CSS.escape(id)}"]`)?.focus();
+    return true;
+  }
 
   // The student's next action ends the held view and the note (but not the Undo click itself).
   document.addEventListener('click', (event) => {
@@ -264,7 +295,7 @@
   });
   // Why setTimeout: redrawing inside keydown would replace the field before the typed letter lands in it.
   document.addEventListener('keydown', (event) => {
-    if (event.target.closest && event.target.closest('[data-home-undo]')) return;
+    if (event.target.closest && mount.contains(event.target)) return; // Home's own controls end the note themselves
     if ((held || note) && !['Shift', 'Tab', 'Control', 'Alt', 'Meta'].includes(event.key)) { held = null; note = null; setTimeout(render); }
   }, true);
 

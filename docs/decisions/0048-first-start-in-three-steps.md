@@ -29,3 +29,9 @@ because Google shows "Google hasn't verified this app" for the calendar permissi
 - Existing students who never connected Google see step 2 once after this update.
 - The step screens are full-window dialogs: nothing of the app shows behind them, and the sidebar is not visible in step 3
   (a deviation from the mockup, which showed it: one job per screen).
+
+## Corrections after testing (Phase 3, `docs/design/test-report.md`)
+- While step 2 waits for Google, the keyboard focus rests on the screen, not on "Not now": a second Enter no longer
+  skips the calendar by accident.
+- When the browser blocks the Google window, step 2 says so and its main button is "Open in browser".
+- After the last step the keyboard focus goes to the chat box.
