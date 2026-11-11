@@ -68,7 +68,12 @@
   "Sign-in did not work.": "Die Anmeldung hat nicht geklappt.",
   "Open in browser": "Im Browser öffnen",
   "One moment…": "Einen Moment…",
-  "Focus session": "Fokus-Session"
+  "Focus session": "Fokus-Session",
+  "Was due today, {time}": "War heute fällig, {time}",
+  "Overdue today": "Heute überfällig",
+  "Your browser blocked the Google window.": "Dein Browser hat das Google-Fenster blockiert.",
+  "The sign-in window was blocked. Open it in your browser.": "Das Anmeldefenster wurde blockiert. Öffne es in deinem Browser.",
+  "Enter": "Enter"
   };
   if (root.I18n) root.I18n.add('de', entries);
   if (typeof module !== 'undefined') module.exports = entries;

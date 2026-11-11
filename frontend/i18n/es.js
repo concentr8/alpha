@@ -68,7 +68,12 @@
   "Sign-in did not work.": "No se ha podido iniciar sesión.",
   "Open in browser": "Abrir en el navegador",
   "One moment…": "Un momento…",
-  "Focus session": "Sesión de foco"
+  "Focus session": "Sesión de foco",
+  "Was due today, {time}": "Era para hoy, {time}",
+  "Overdue today": "Vencida hoy",
+  "Your browser blocked the Google window.": "Tu navegador ha bloqueado la ventana de Google.",
+  "The sign-in window was blocked. Open it in your browser.": "Se ha bloqueado la ventana de inicio de sesión. Ábrela en tu navegador.",
+  "Enter": "Intro"
   };
   if (root.I18n) root.I18n.add('es', entries);
   if (typeof module !== 'undefined') module.exports = entries;

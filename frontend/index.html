@@ -1410,6 +1410,11 @@ dialog.c8-screen::backdrop { background: var(--bg); }
 #quick-start.c8-chip { min-height: var(--size-small); padding: 0 var(--space-3); border: 1px solid var(--control); background: var(--bg); color: var(--ink-2); font-size: var(--text-sm); font-weight: var(--weight-regular); }
 #quick-start.c8-chip:hover { background: var(--hover); }
 .c8-next__title--done { color: var(--muted); text-decoration: line-through; }
+/* A very long title keeps "Start focus" on screen: three lines, the rest in the tooltip and the editor. */
+.c8-next:not(.c8-next--compact) p.c8-next__title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+/* Narrow screens have no room for the key hint next to a placeholder (and usually no Enter key to point at). */
+@media (max-width: 420px) { .c8-field .c8-kbd { display: none; } }
+.c8-screen:focus { outline: none; }
 .c8-next--empty { grid-template-columns: minmax(0, 1fr); }
 .home-empty { display: grid; gap: var(--space-3); }
 .home-just-start { justify-self: start; }
@@ -1778,7 +1783,7 @@ dialog.c8-screen::backdrop { background: var(--bg); }
     const a=S.state.activeSession,phase=phaseOf(a);
     const value=document.querySelector('[data-timer-value]');
     if(a&&phase&&value){const e=bounded(a),remaining=phase.seconds?phase.seconds*1000-e:e;value.textContent=time(remaining);const ring=document.querySelector('.timer-progress');if(ring){const length=2*Math.PI*138;ring.style.strokeDasharray=length;const progress=phase.seconds?Math.min(1,e/(phase.seconds*1000)):0;ring.style.strokeDashoffset=ring.hasAttribute('data-clockwise-ring')?length*(1-progress):length*progress;}const breath=document.querySelector('[data-breath-instruction]');if(breath)breath.textContent=phase.kind==='breathing'?Math.floor(e/1000)%10<4?'Breathe in':'Breathe out':'';document.querySelector('.breathing-dial')?.classList.toggle('inhale',Math.floor(e/1000)%10<4);}
-    const resume=document.getElementById('resume-focus');if(resume){resume.hidden=!a||location.hash.startsWith('#focus')||location.hash.startsWith('#room')||location.hash.startsWith('#break');if(!resume.hidden){resume.textContent=a.status==='review'?'Session complete':`Focus · ${phase?.seconds?time(phase.seconds*1000-bounded(a)):time(bounded(a))}`;resume.setAttribute('aria-label',a.status==='review'?'View completed focus session':'Return to active focus session');}}
+    const resume=document.getElementById('resume-focus');if(resume){/* On Home the card already shows the running session; the floating button sat on the send button. */resume.hidden=!a||(a.status!=='review'&&!document.querySelector('.workspace').hidden)||location.hash.startsWith('#focus')||location.hash.startsWith('#room')||location.hash.startsWith('#break');if(!resume.hidden){resume.textContent=a.status==='review'?'Session complete':`Focus · ${phase?.seconds?time(phase.seconds*1000-bounded(a)):time(bounded(a))}`;resume.setAttribute('aria-label',a.status==='review'?'View completed focus session':'Return to active focus session');}}
   }
   document.addEventListener('click',event=>{
     const b=event.target.closest('button');if(!b)return;
@@ -3347,7 +3352,13 @@ function setAgent(open, focusInput=true) {
     window.dispatchEvent(new CustomEvent('articul8:navigate',{detail:{page:name}}));FocusUI.paint();
   }
   function fromHash(){const parts=location.hash.slice(1).split('/');navigate(names.find(n=>slug(n)===parts[0])||'Home',decodeURIComponent(parts[1]||''),false);}
-  document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
+  /* "Home" always means the Home with the Next card and the add row (ADR 0049): pressing it while Home shows a chat starts a
+     fresh chat, and the open one stays in the chat switcher. Without this a new student sat in the first chat with no
+     visible way to the add row. */
+  document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{
+    if(b.dataset.page==='Home'&&currentPage==='Home'&&window.Articul8.state.messages.length)window.Articul8.newChat();
+    navigate(b.dataset.page);
+  }));
   window.addEventListener('articul8:go',e=>navigate(e.detail.page,e.detail.path||''));
   window.addEventListener('popstate',fromHash);
   window.addEventListener('articul8:rerender',render);

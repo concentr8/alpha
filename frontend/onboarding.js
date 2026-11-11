@@ -48,7 +48,13 @@
     store().change((s) => { s.onboarding = { ...s.onboarding, [step]: value }; }, 'onboarding');
   }
   function open() { if (!dialog.open) dialog.showModal(); }
-  function close() { if (dialog.open) dialog.close(); dialog.innerHTML = ''; }
+  // After the last step the keyboard focus goes to the chat box, not to nowhere (the chat has just asked its question).
+  function close() {
+    const wasOpen = dialog.open;
+    if (wasOpen) dialog.close();
+    dialog.innerHTML = '';
+    if (wasOpen) document.querySelector('#main-composer textarea')?.focus();
+  }
 
   // A neutral screen while the calendar is checked, so the student never sees Home flash up and disappear.
   function showChecking() {
@@ -57,20 +63,23 @@
     open();
   }
 
-  // ----- Step 2: calendar. look: ready | waiting | failed -----
+  // ----- Step 2: calendar. look: ready | waiting | failed; openInBrowser is set when the browser blocked the Google window -----
   function showCalendar(look, openInBrowser) {
     const step = `<div class="c8-step">${t('Step {n} of {total}', { n: 2, total: STEPS })}</div>`;
     const title = `<h1 class="c8-title" id="onboarding-title">${t('Plan around your real day')}</h1>`;
-    const text = look === 'waiting'
+    const text = openInBrowser
+      ? `<p class="c8-body" role="status">${t('Your browser blocked the Google window.')}</p>`
+      : look === 'waiting'
       ? `<p class="c8-body" role="status">${t('Finish in the Google window. Concentr8 continues by itself.')}</p>`
       : look === 'failed'
         ? `<p class="c8-alert" role="alert"><strong>${t('The calendar did not connect.')}</strong> ${t('Nothing was changed. You can try again or do it later in Settings.')}</p>`
         : `<p class="c8-body">${t('Concentr8 reads your Google Calendar to find free time for your to-dos. It never changes your calendar.')}</p>`;
-    const main = look === 'waiting'
+    const main = openInBrowser
+      ? `<button class="c8-btn c8-btn--main" type="button" data-onboarding-browser>${t('Open in browser')}</button>`
+      : look === 'waiting'
       ? `<button class="c8-btn c8-btn--main" type="button" disabled><span class="c8-spinner" aria-hidden="true"></span>${t('Waiting for Google…')}</button>`
       : `<button class="c8-btn c8-btn--main" type="button" data-onboarding-connect>${look === 'failed' ? t('Try again') : t('Connect Google Calendar')}</button>`;
-    const browser = openInBrowser ? `<button class="c8-btn" type="button" data-onboarding-browser>${t('Open in browser')}</button>` : '';
-    dialog.innerHTML = `<div class="c8-onboarding">${step}${title}${text}<div class="c8-stack">${main}${browser}`
+    dialog.innerHTML = `<div class="c8-onboarding">${step}${title}${text}<div class="c8-stack">${main}`
       + `<button class="c8-btn c8-btn--quiet" type="button" data-onboarding-later>${t('Not now')}</button></div></div>`;
     dialog.onclick = (event) => {
       if (event.target.closest('[data-onboarding-connect]')) connect();
@@ -78,8 +87,9 @@
       else if (event.target.closest('[data-onboarding-browser]') && openInBrowser) { openInBrowser(); showCalendar('waiting'); }
     };
     open();
-    const first = dialog.querySelector('[data-onboarding-connect], [data-onboarding-later]');
-    if (first) first.focus();
+    // While waiting, focus rests on the screen itself: on "Not now", a second Enter would skip the calendar by accident.
+    const first = dialog.querySelector('[data-onboarding-connect], [data-onboarding-browser]');
+    if (first) first.focus(); else { dialog.tabIndex = -1; dialog.focus(); }
   }
 
   async function connect() {
@@ -109,7 +119,7 @@
     dialog.innerHTML = '<form class="c8-onboarding" data-onboarding-todo novalidate>'
       + `<div class="c8-step">${t('Step {n} of {total}', { n: 3, total: STEPS })}</div>`
       + `<h1 class="c8-title" id="onboarding-title">${t('What is the one thing you need to get done?')}</h1>`
-      + `<div class="c8-field" style="width:min(100%,var(--content-width))"><input name="todo" autocomplete="off" maxlength="2000" aria-label="${t('Your first to-do')}" aria-describedby="onboarding-todo-error" placeholder="${t('For example: read chapter 4')}"><span class="c8-kbd" aria-hidden="true">Enter</span></div>`
+      + `<div class="c8-field" style="width:min(100%,var(--content-width))"><input name="todo" autocomplete="off" maxlength="2000" aria-label="${t('Your first to-do')}" aria-describedby="onboarding-todo-error" placeholder="${t('For example: read chapter 4')}"><span class="c8-kbd" aria-hidden="true">${t('Enter')}</span></div>`
       + `<p class="c8-field-error" id="onboarding-todo-error" role="alert" hidden>${t('Type a to-do first.')}</p>`
       + `<p class="c8-meta">${t('You can add more later.')}</p></form>`;
     const form = dialog.querySelector('form');

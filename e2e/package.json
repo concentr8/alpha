@@ -1,0 +1,12 @@
+{
+  "name": "concentr8-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "End-to-end browser tests for first start and Home (docs/plans/simplicity-redesign.md).",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

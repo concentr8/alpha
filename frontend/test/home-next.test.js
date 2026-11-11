@@ -38,7 +38,8 @@ test('due words: today, tomorrow, a weekday, a later date, no date', () => {
 test('due words: overdue since yesterday, overdue n days, and a time today that has passed', () => {
   assert.deepEqual(dueText({ start: '2026-11-09T17:00' }, now), { text: 'Overdue since yesterday', overdue: true });
   assert.deepEqual(dueText({ start: '2026-11-07T17:00' }, now), { text: 'Overdue 3 days', overdue: true });
-  assert.equal(dueText({ start: '2026-11-10T09:00' }, now).overdue, true);
+  assert.deepEqual(dueText({ start: '2026-11-10T09:00' }, now), { text: 'Was due today, 9:00 AM', overdue: true }); // words, not only colour
+  assert.deepEqual(dueText({ start: '2026-11-10T09:00' }, now, { short: true }), { text: 'Overdue today', overdue: true });
   assert.equal(dueText({ start: '2026-11-10T17:00' }, now).overdue, false);
 });
 
